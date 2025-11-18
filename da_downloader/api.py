@@ -63,10 +63,26 @@ class DeviantArtAPI:
         
         page = response.text
         
+        # 调试：保存响应到文件
+        try:
+            debug_file = f"/tmp/deviantart_{username}_response.html"
+            with open(debug_file, 'w', encoding='utf-8') as f:
+                f.write(page)
+            logger.debug(f"Response saved to: {debug_file}")
+        except:
+            pass
+        
         # 检查用户是否存在
         if '404' in page or 'Page Not Found' in page:
             logger.error(f"User '{username}' not found!")
             return None
+        
+        # 调试：检查页面标题
+        if '<title>' in page:
+            title_start = page.index('<title>') + 7
+            title_end = page.index('</title>', title_start)
+            page_title = page[title_start:title_end]
+            logger.debug(f"Page title: {page_title}")
         
         # 提取 CSRF token
         try:
