@@ -1,0 +1,30 @@
+# DeviantArt Downloader 配置文件示例
+# 复制此文件为 config.yaml 并修改配置
+
+# 基本设置
+ask_before_download: true      # 每个文件下载前询问
+debug_mode: false               # 调试模式
+delay_seconds: 1.0              # 下载间隔（秒）
+
+# 路径设置
+cookies_path: "cookies.txt"     # Cookie 文件路径
+destination_folder: null        # 下载目录（null = 默认 Downloads）
+
+# API 设置
+lazy_load_limit: 24             # 每次加载数量 (1-60)
+offset: 0                       # 起始偏移量
+
+# 网络设置
+proxy: ""                       # 代理服务器（留空 = 不使用）
+max_retries: 3                  # 最大重试次数
+retry_delay: 3                  # 重试延迟（秒）
+timeout: 180                    # 请求超时（秒）
+
+# 下载设置
+quality: "o"                    # 质量: o=原图, f=全图, p=预览
+replace_existing: true          # 覆盖已存在文件
+separate_folders: true          # 为每个作者创建单独文件夹
+
+# 日志设置
+log_file: null                  # 日志文件（null = 不保存）
+log_level: "INFO"               # 日志级别: DEBUG, INFO, WARNING, ERROR

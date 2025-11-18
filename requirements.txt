@@ -1,0 +1,17 @@
+# DeviantArt Downloader - 核心依赖
+# Python 3.6+ 兼容
+
+# HTTP 客户端
+requests>=2.25.0
+
+# 可选：异步支持（需要 Python 3.10+）
+# httpx>=0.25.0
+# aiofiles>=23.2.1
+
+# 可选：数据验证（需要 Python 3.10+）
+# pydantic>=2.5.0
+# pydantic-settings>=2.1.0
+
+# 可选：CLI 美化
+# typer[all]>=0.9.0
+# rich>=13.7.0

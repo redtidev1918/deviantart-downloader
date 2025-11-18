@@ -1,0 +1,209 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deviantart-downloader"
+version = "3.0.0"
+description = "专业的 DeviantArt 作品批量下载工具 - Professional DeviantArt batch downloader with anti-ban features"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "DeviantArt Downloader Team"}
+]
+keywords = [
+    "deviantart", 
+    "downloader", 
+    "scraper",
+    "art",
+    "gallery",
+    "batch-download",
+    "async", 
+    "cli",
+    "anti-ban"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Multimedia :: Graphics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+
+dependencies = [
+    "httpx>=0.25.0",
+    "aiofiles>=23.2.1",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.7.0",
+    "pyyaml>=6.0.1",
+    "python-dotenv>=1.0.0",
+    "sqlalchemy>=2.0.23",
+    "aiosqlite>=0.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "httpx-mock>=0.7.0",
+    "black>=23.12.0",
+    "mypy>=1.7.1",
+    "ruff>=0.1.7",
+    "pre-commit>=3.6.0",
+    "ipython>=8.18.0",
+]
+
+[project.scripts]
+devart-dl = "deviantart_downloader_cli:main"
+deviantart-dl = "deviantart_downloader_cli:main"
+da-dl = "deviantart_downloader_cli:main"
+
+[tool.setuptools]
+packages = ["deviantart_dl", "da_downloader"]
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["deviantart_dl/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+asyncio_mode = "auto"
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["deviantart_dl"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+# Ruff configuration
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "YTT", # flake8-2020
+    "ANN", # flake8-annotations
+    "S",   # flake8-bandit
+    "BLE", # flake8-blind-except
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "T10", # flake8-debugger
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "G",   # flake8-logging-format
+    "PIE", # flake8-pie
+    "T20", # flake8-print
+    "PT",  # flake8-pytest-style
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "PD",  # pandas-vet
+    "PL",  # Pylint
+    "TRY", # tryceratops
+    "RUF", # Ruff-specific rules
+]
+ignore = [
+    "ANN101",  # Missing type annotation for self
+    "ANN102",  # Missing type annotation for cls
+    "D100",    # Missing docstring in public module
+    "D104",    # Missing docstring in public package
+    "S101",    # Use of assert
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # Unused import
+"tests/*" = ["S101", "PLR2004", "ANN"]  # Allow assert and magic values in tests
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.isort]
+known-first-party = ["deviantart_dl", "da_downloader"]

@@ -1,0 +1,14 @@
+# DeviantArt Cookies Example
+# 
+# 将你的 DeviantArt cookies 粘贴到下面（删除此注释）
+# 格式：cookie1=value1; cookie2=value2; cookie3=value3
+#
+# 重要的 cookies 包括：
+# - auth
+# - auth_secure  
+# - userinfo
+#
+# 如何获取 cookies？运行脚本后会显示详细指引
+#
+# 示例格式（请替换为你自己的实际 cookie 值）：
+# auth=1234567890abcdef; auth_secure=abcdef1234567890; userinfo=username%3Ayourname
