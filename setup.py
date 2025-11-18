@@ -11,7 +11,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
-    name="devart-downloader",  # 使用更短的包名避免冲突
+    name="devart-dl",  # 更简短独特的包名
     version="3.0.0",
     author="zoidberg-xgd",
     author_email="",
