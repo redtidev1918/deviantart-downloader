@@ -30,7 +30,7 @@ class Config:
     
     # 下载设置
     quality: str = "o"  # o=original, f=full, p=preview
-    replace_existing: bool = True
+    replace_existing: bool = False  # 默认跳过已存在文件
     separate_folders: bool = True
     
     # 日志设置
