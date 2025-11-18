@@ -4,9 +4,9 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 [中文文档](README.md) | **English Documentation**
 
-[![PyPI](https://img.shields.io/pypi/v/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
-[![Python](https://img.shields.io/pypi/pyversions/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
-[![Downloads](https://img.shields.io/pypi/dm/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
+[![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)
+[![Python](https://img.shields.io/pypi/pyversions/devart-dl.svg)](https://pypi.org/project/devart-dl/)
+[![Downloads](https://img.shields.io/pypi/dm/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#internationalization)
 
@@ -35,10 +35,10 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 ```bash
 # Basic installation
-pip install deviantart-downloader
+pip install devart-dl
 
 # Or with browser login support
-pip install deviantart-downloader[browser]
+pip install devart-dl[browser]
 ```
 
 **Method 2: Install from source**

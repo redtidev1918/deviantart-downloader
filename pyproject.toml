@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "deviantart-downloader"
-version = "3.0.0"
+name = "devart-dl"
+version = "3.0.1"
 description = "专业的 DeviantArt 作品批量下载工具 - Professional DeviantArt batch downloader with anti-ban features"
 readme = "README.md"
 requires-python = ">=3.6"
