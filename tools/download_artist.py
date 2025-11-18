@@ -131,9 +131,9 @@ def build_command(username: str, gallery_id: str | None, options: dict, version:
         命令列表
     """
     if version == 'v2':
-        cmd = ['python3', 'main.py']
+        cmd = ['python3', 'da_downloader/main.py']
     else:
-        cmd = ['python3', 'deviantart_downloader.py']
+        cmd = ['python3', 'legacy/deviantart_downloader.py']
     
     # 添加操作类型
     cmd.append('gallery')
