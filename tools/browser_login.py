@@ -190,15 +190,30 @@ class BrowserLogin:
         if self.headless:
             options.add_argument('--headless')
         
+        # 添加一些有用的选项
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        
         # 尝试使用 webdriver-manager
         try:
+            print(f"{C.YELLOW}正在下载/安装 ChromeDriver（首次可能需要一点时间）...{C.RESET}")
             from webdriver_manager.chrome import ChromeDriverManager
             from selenium.webdriver.chrome.service import Service
+            import os
+            # 设置超时
+            os.environ['WDM_LOG'] = '0'  # 减少日志输出
             service = Service(ChromeDriverManager().install())
+            print(f"{C.GREEN}✓ ChromeDriver 准备完成{C.RESET}")
             return webdriver.Chrome(service=service, options=options)
-        except:
-            # 尝试直接创建
-            return webdriver.Chrome(options=options)
+        except Exception as e:
+            print(f"{C.YELLOW}webdriver-manager 失败，尝试系统驱动...{C.RESET}")
+            print(f"  错误: {str(e)[:100]}")
+            try:
+                # 尝试直接创建（使用系统PATH中的chromedriver）
+                return webdriver.Chrome(options=options)
+            except Exception as e2:
+                print(f"{C.RED}✗ 无法启动 Chrome: {str(e2)[:100]}{C.RESET}")
+                raise
     
     def _create_firefox_driver(self):
         """创建 Firefox 驱动"""
@@ -333,6 +348,23 @@ def print_help():
 {C.GREEN}与统一命令集成:{C.RESET}
   devart-dl login browser           # 使用浏览器登录
   devart-dl login browser --firefox # 指定浏览器
+
+{C.BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{C.RESET}
+
+{C.YELLOW}故障排除 Troubleshooting:{C.RESET}
+
+  {C.RED}问题: 浏览器启动卡住{C.RESET}
+  解决: 可能在下载驱动，请等待1-2分钟
+       或使用 Ctrl+C 取消，然后尝试：
+       brew install chromedriver  # macOS
+       
+  {C.RED}问题: Chrome 未找到{C.RESET}
+  解决: 1. 确保已安装 Google Chrome
+       2. 或使用 Firefox: --browser=firefox
+       
+  {C.RED}问题: 权限错误{C.RESET}
+  解决: xattr -d com.apple.quarantine /path/to/chromedriver
+       或从"系统偏好设置"允许运行
 """)
 
 
