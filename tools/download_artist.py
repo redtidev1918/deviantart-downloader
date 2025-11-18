@@ -9,6 +9,7 @@ DeviantArt Artist Downloader - 通过作者 URL 批量下载所有作品
 - https://deviantart.com/username
 """
 
+import os
 import re
 import sys
 import subprocess
@@ -219,7 +220,10 @@ def main():
         print(f"{Colors.GREEN}{'='*70}{Colors.RESET}\n")
         
         # 执行命令（设置工作目录为项目根目录，以便 Python 能找到模块）
-        result = subprocess.run(cmd, cwd=str(PROJECT_ROOT))
+        # 使用 PYTHONUNBUFFERED 确保实时显示输出
+        env = os.environ.copy()
+        env['PYTHONUNBUFFERED'] = '1'
+        result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env)
         
         if result.returncode == 0:
             print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.RESET}")
