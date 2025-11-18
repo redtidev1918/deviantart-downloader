@@ -14,14 +14,14 @@
 ## ✨ 核心特性 | Core Features
 
 -  **统一CLI** - 单一命令 `devart-dl` 访问所有功能
-- 🔐 **5种登录方式** - Cookie文件、交互输入、会话保存、环境变量、浏览器
-- 🛡️ **智能防封** - 4种预设模式、自动延迟、速率限制
-- 🎯 **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
-- 📝 **增强日志** - 彩色输出、文件记录、调试模式 ⭐新增
-- 🌍 **国际化** - 中文/英文双语支持，自动检测
-- ⚡ **高性能** - 异步下载架构（Python 3.10+）
-- 📦 **零配置** - 开箱即用，渐进增强
-- 🏗️ **模块化** - 清晰的项目结构，易于维护
+-  **5种登录方式** - Cookie文件、交互输入、会话保存、环境变量、浏览器
+-  **智能防封** - 4种预设模式、自动延迟、速率限制
+-  **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
+-  **增强日志** - 彩色输出、文件记录、调试模式 ⭐新增
+-  **国际化** - 中文/英文双语支持，自动检测
+-  **高性能** - 异步下载架构（Python 3.10+）
+-  **零配置** - 开箱即用，渐进增强
+-  **模块化** - 清晰的项目结构，易于维护
 
 ---
 
@@ -190,16 +190,36 @@ devart-dl login interactive
 devart-dl login clear
 ```
 
-### 获取 Cookie
+### 快速获取 Cookie ⭐推荐
 
-**Chrome/Edge:**
-1. 登录 DeviantArt
-2. `F12` → `Network` → 刷新页面
-3. 点击请求 → `Headers` → 复制 `Cookie`
+**方法1: 一键导出脚本（最快）**
 
-**详细指南:**
+```javascript
+// 1. 在 DeviantArt 登录后的页面按 F12
+// 2. 切换到 Console 标签
+// 3. 粘贴以下代码并回车：
+(function(){let c=document.cookie;navigator.clipboard.writeText(c).then(()=>alert('✓ Cookie已复制！')).catch(()=>{let t=document.createElement('textarea');t.value=c;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('✓ Cookie已复制！')})})();
+// 4. Cookie 自动复制到剪贴板！
+```
+
+**方法2: 可视化导出（带UI）**
+- 使用 `tools/export_cookies.js` 完整脚本
+- 弹出漂亮的导出面板
+- 区分关键Cookie和完整Cookie
+
+**方法3: 书签工具（最方便）**
+- 创建书签，网址填入上面的脚本
+- 在 DeviantArt 页面点击书签
+- 一键导出
+
+**方法4: 手动复制（传统）**
+- Chrome/Edge: `F12` → `Application` → `Cookies`
+- Firefox: `F12` → `存储` → `Cookie`
+
+**📖 完整导出指南:**
 ```bash
-devart-dl login help
+# 查看所有导出方法（推荐阅读）
+cat tools/COOKIE_EXPORT_GUIDE.md
 ```
 
 ---
