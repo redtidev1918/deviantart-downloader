@@ -12,22 +12,25 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 ---
 
-## ✨ Core Features
+## Core Features
 
-- 🚀 **Unified CLI** - Single `devart-dl` command for all features
-- 🔐 **5 Login Methods** - Cookie file, interactive input, session save, environment variable, browser
-- 🛡️ **Smart Anti-Ban** - 4 preset modes, auto-delay, rate limiting
-- 🎯 **Flexible Downloads** - Single URL, full artist collection, batch gallery, search filters
-- 📝 **Enhanced Logging** - Colored output, file logging, debug mode
-- 📁 **Smart Organization** - 6 file organization modes with metadata
-- 🌍 **Internationalization** - Chinese/English bilingual support, auto-detection
-- ⚡ **High Performance** - Async download architecture (Python 3.10+)
-- 📦 **Zero Config** - Works out of the box, progressive enhancement
-- 🏗️ **Modular** - Clean project structure, easy to maintain
+-  **Unified CLI** - Single `devart-dl` command for all features
+-  **5 Login Methods** - Cookie file, interactive, session save, env var, browser
+-  **Smart Anti-Ban** - 4 preset modes, auto delay, rate limiting
+-  **Flexible Download** - Single URL, author gallery, batch, search filter
+-  **Resume Support** - Auto-resume after interruption, skip downloaded
+-  **Auto Retry** - Network errors auto-retry 3 times
+-  **1080p Videos** - Auto-select highest quality videos
+-  **Auto Proxy** - Auto-load proxy from environment variables
+-  **Enhanced Logging** - Colored output, file logging, login status display
+-  **Internationalization** - Chinese/English bilingual support
+-  **High Performance** - Async download, fast skip existing files
+-  **Zero Config** - Works out of box, progressive enhancement
+-  **Modular** - Clean project structure, easy to maintain
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -71,6 +74,35 @@ devart-dl gallery username
 
 # Search and download
 devart-dl search username "keyword"
+```
+
+### ⭐ v3.2.4 New Features Quick Start
+
+```bash
+# 1. Auto Proxy + Auto Login (Recommended Setup)
+export ALL_PROXY=http://127.0.0.1:7890  # Set proxy
+devart-dl login interactive              # One-time login
+devart-dl artist username                # Auto-loads proxy & cookies
+
+# 2. Resume Support (Continue after interruption)
+devart-dl artist username --ask=0        # Start download
+# Press Ctrl+C to interrupt
+devart-dl artist username --ask=0        # Re-run, auto-skips downloaded
+
+# 3. 1080p HD Video Downloads
+devart-dl artist username --ask=0        # Auto-downloads 1080p videos
+
+# 4. Login Status Display
+# Automatically shows at start:
+# 🔓 Login Status: ✅ LOGGED IN
+#    You can download original quality and mature content
+
+# 5. High-Performance Batch Downloads
+devart-dl artist username --ask=0 --proxy=http://127.0.0.1:7890
+# ✓ Auto-skip existing files
+# ✓ Auto-retry failures 3 times
+# ✓ Real-time progress display
+# ✓ 1080p video quality
 ```
 
 ---
