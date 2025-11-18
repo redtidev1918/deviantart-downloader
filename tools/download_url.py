@@ -18,6 +18,18 @@ from typing import Optional
 
 import requests
 
+# 添加项目根目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+try:
+    from tools.cookie_loader import load_cookies as load_cookies_from_sources, get_cookie_source
+except:
+    # 备用方案
+    def load_cookies_from_sources(cookie_file=None):
+        return None
+    def get_cookie_source(cookie_file=None):
+        return "未找到"
+
 # 颜色输出
 class Colors:
     GREEN = '\033[92m'
@@ -67,11 +79,18 @@ def print_help():
 ''')
 
 def load_cookies(path: str = "cookies.txt") -> str:
-    """加载 Cookie 文件"""
-    if os.path.isfile(path):
-        with open(path, 'r') as f:
-            return f.read().strip()
-    return ""
+    """
+    加载 Cookie
+    
+    支持多个来源:
+    1. 指定的文件
+    2. 环境变量
+    3. .env 文件
+    4. cookies.txt
+    5. 会话文件 ~/.deviantart_dl/session.json
+    """
+    cookies = load_cookies_from_sources(path if path != "cookies.txt" else None)
+    return cookies or ""
 
 def extract_deviation_id(url: str) -> Optional[str]:
     """从 URL 提取作品 ID"""
@@ -314,9 +333,11 @@ def main():
     # 加载 cookies
     cookies = load_cookies(cookies_path)
     if cookies:
-        print(f"{Colors.GREEN}✓ 已加载 Cookie{Colors.RESET}")
+        source = get_cookie_source(cookies_path if cookies_path != "cookies.txt" else None)
+        print(f"{Colors.GREEN}✓ 已加载 Cookie{Colors.RESET} ({source}, {len(cookies)} 字符)")
     else:
         print(f"{Colors.YELLOW}⚠ 未找到 Cookie (某些功能可能受限){Colors.RESET}")
+        print(f"{Colors.YELLOW}提示: 运行 'devart-dl login interactive' 设置登录{Colors.RESET}")
     
     # 解析短链接
     if 'fav.me' in url:
