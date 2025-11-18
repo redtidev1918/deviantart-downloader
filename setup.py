@@ -12,7 +12,7 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="devart-dl",  # 更简短独特的包名
-    version="3.2.6",
+    version="3.3.0",
     author="zoidberg-xgd",
     author_email="",
     description="Professional DeviantArt batch downloader with multiple login methods and anti-ban protection",
