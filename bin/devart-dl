@@ -128,9 +128,8 @@ def print_main_help():
 
 def run_command(script: str, args: list) -> int:
     """运行指定的脚本"""
-    # 获取项目根目录
-    script_dir = Path(__file__).parent.parent
-    script_path = script_dir / script
+    # 使用全局的 project_root（已解析符号链接）
+    script_path = project_root / script
     cmd = ['python3', str(script_path)] + args
     return subprocess.run(cmd).returncode
 
