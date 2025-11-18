@@ -12,7 +12,11 @@ DeviantArt Artist Downloader - 通过作者 URL 批量下载所有作品
 import re
 import sys
 import subprocess
+from pathlib import Path
 from urllib.parse import urlparse
+
+# 获取项目根目录
+PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 # 颜色输出
 class Colors:
@@ -131,9 +135,11 @@ def build_command(username: str, gallery_id: str | None, options: dict, version:
         命令列表
     """
     if version == 'v2':
-        cmd = ['python3', 'da_downloader/main.py']
+        script_path = PROJECT_ROOT / 'legacy' / 'main.py'
+        cmd = ['python3', str(script_path)]
     else:
-        cmd = ['python3', 'legacy/deviantart_downloader.py']
+        script_path = PROJECT_ROOT / 'legacy' / 'deviantart_downloader.py'
+        cmd = ['python3', str(script_path)]
     
     # 添加操作类型
     cmd.append('gallery')
