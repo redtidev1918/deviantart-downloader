@@ -145,9 +145,23 @@ class DeviantArtDownloader:
                     self.progress.mark_skipped(deviation.deviation_id)
                 continue
             
-            # 检查是否已下载（断点续传）
+            # 准备文件路径（用于检查）
+            destination = self._get_destination_folder(username, deviation.author)
+            filename = sanitize_filename(deviation.get_filename())
+            file_path = os.path.join(destination, filename)
+            
+            # 快速检查：文件是否已存在（最高优先级）
+            if os.path.isfile(file_path) and not self.config.replace_existing:
+                logger.info(f"[{i}] ✓ Already exists: {deviation.title}")
+                self.total_skipped += 1
+                # 标记为已下载
+                if self.progress:
+                    self.progress.mark_downloaded(deviation.deviation_id)
+                continue
+            
+            # 检查是否已下载（断点续传 - 进度记录）
             if self.progress and self.progress.is_downloaded(deviation.deviation_id):
-                logger.info(f"[{i}] ✓ Already downloaded: {deviation.title}")
+                logger.info(f"[{i}] ✓ Already downloaded (progress): {deviation.title}")
                 self.total_skipped += 1
                 continue
             
@@ -163,7 +177,7 @@ class DeviantArtDownloader:
             task = DownloadTask(
                 deviation=deviation,
                 quality=Quality(self.config.quality),
-                destination=self._get_destination_folder(username, deviation.author),
+                destination=destination,
                 index=i
             )
             
@@ -221,10 +235,7 @@ class DeviantArtDownloader:
         filename = sanitize_filename(deviation.get_filename())
         file_path = os.path.join(task.destination, filename)
         
-        # 检查文件是否已存在
-        if os.path.isfile(file_path) and not self.config.replace_existing:
-            logger.info(f"[{task.index}] Skipped (already exists): {filename}")
-            return DownloadResult(task=task, success=False, skipped=True)
+        # 注意：文件存在检查已在外层完成，这里不需要重复检查
         
         # 询问用户（如果需要）
         quality = task.quality.value
