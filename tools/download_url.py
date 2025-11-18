@@ -13,6 +13,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -23,12 +24,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from tools.cookie_loader import load_cookies as load_cookies_from_sources, get_cookie_source
+    from tools.file_organizer import FileOrganizer
 except:
     # 备用方案
     def load_cookies_from_sources(cookie_file=None):
         return None
     def get_cookie_source(cookie_file=None):
         return "未找到"
+    FileOrganizer = None
 
 # 颜色输出
 class Colors:
@@ -59,6 +62,12 @@ def print_help():
   --dest=<PATH>       下载目录 (默认: ./downloads)
   --cookies=<PATH>    Cookie 文件路径 (默认: ./cookies.txt)
   --filename=<NAME>   自定义文件名 (不含扩展名)
+  --organize=<MODE>   文件组织模式:
+                      by_author  - 按作者分类 (默认)
+                      by_date    - 按日期分类
+                      by_type    - 按文件类型分类
+                      flat       - 扁平结构
+                      mixed      - 混合模式 (作者/日期)
 
 {Colors.BOLD}示例:{Colors.RESET}
   {Colors.BLUE}# 下载全图质量{Colors.RESET}
@@ -326,6 +335,7 @@ def main():
     dest = Path('./downloads')
     cookies_path = 'cookies.txt'
     custom_filename = None
+    organize_mode = 'by_author'  # 默认按作者组织
     
     for arg in sys.argv[2:]:
         if arg.startswith('--quality='):
@@ -336,6 +346,8 @@ def main():
             cookies_path = arg.split('=')[1]
         elif arg.startswith('--filename='):
             custom_filename = arg.split('=')[1]
+        elif arg.startswith('--organize='):
+            organize_mode = arg.split('=')[1]
     
     # 验证质量参数
     if quality not in ['o', 'f', 'p']:
@@ -382,22 +394,55 @@ def main():
             ext = Path(filename).suffix
             filename = f"{custom_filename}{ext}"
         
+        # 准备元数据
+        metadata = {
+            'title': deviation.get('title', 'Unknown'),
+            'author': deviation.get('author', {}).get('username') if isinstance(deviation.get('author'), dict) else None,
+            'url': url,
+            'download_url': download_url,
+            'quality': quality,
+            'date': deviation.get('publishedTime', datetime.now().isoformat())[:10],
+            'deviation_id': deviation.get('deviationId'),
+        }
+        
+        # 使用文件组织器
+        if FileOrganizer and organize_mode != 'flat':
+            organizer = FileOrganizer(base_dir=str(dest), mode=organize_mode)
+            final_path = organizer.get_file_path(
+                filename=filename,
+                author=metadata['author'],
+                date=metadata['date'],
+                file_type='image'
+            )
+            print(f"{Colors.BLUE}📂 组织模式: {organize_mode}{Colors.RESET}")
+        else:
+            # 扁平结构或无组织器
+            dest.mkdir(parents=True, exist_ok=True)
+            final_path = dest / filename
+        
         # 确保目录存在
-        dest.mkdir(parents=True, exist_ok=True)
-        filepath = dest / filename
+        final_path.parent.mkdir(parents=True, exist_ok=True)
         
         # 检查文件是否存在
-        if filepath.exists():
+        if final_path.exists():
             response = input(f"{Colors.YELLOW}⚠ 文件已存在，是否覆盖? (y/n): {Colors.RESET}")
             if response.lower() not in ['y', 'yes']:
                 print(f"{Colors.YELLOW}✗ 已取消下载{Colors.RESET}")
                 sys.exit(0)
         
         # 下载文件
-        download_file(download_url, filepath, cookies)
+        download_file(download_url, final_path, cookies)
+        
+        # 保存元数据
+        if FileOrganizer and organize_mode != 'flat':
+            organizer._save_metadata(final_path, metadata)
+            print(f"{Colors.GREEN}✓ 已保存元数据{Colors.RESET}")
         
         print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 下载成功！{Colors.RESET}")
-        print(f"{Colors.GREEN}   文件位置: {filepath.absolute()}{Colors.RESET}\n")
+        print(f"{Colors.GREEN}   文件位置: {final_path.absolute()}{Colors.RESET}")
+        if metadata['author']:
+            print(f"{Colors.GREEN}   作者: {metadata['author']}{Colors.RESET}")
+        print()
         
     except Exception as e:
         print(f"\n{Colors.RED}✗ 错误: {e}{Colors.RESET}")

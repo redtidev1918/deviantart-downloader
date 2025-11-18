@@ -371,6 +371,57 @@ devart-dl --quiet artist username > /dev/null 2>&1 &
 | `--dest=<path>` | 下载目录 | `./downloads` |
 | `--delay=<seconds>` | 延迟时间（防封） | `1` |
 | `--limit=<number>` | 每批数量 | `24` |
+| `--organize=<mode>` | 文件组织模式 ⭐新增 | `by_author` |
+
+### 文件组织模式 ⭐新增
+
+智能管理下载的文件，自动分类整理：
+
+**可用模式：**
+
+| 模式 | 说明 | 目录结构示例 |
+|------|------|-------------|
+| `by_author` | 按作者分类（推荐） | `downloads/artist_name/artwork.jpg` |
+| `by_date` | 按日期分类 | `downloads/2025/01/15/artwork.jpg` |
+| `by_type` | 按文件类型分类 | `downloads/images/artwork.jpg` |
+| `by_gallery` | 按画廊分类 | `downloads/artist/gallery_name/artwork.jpg` |
+| `mixed` | 混合模式（作者+日期） | `downloads/artist/2025-01/artwork.jpg` |
+| `flat` | 扁平结构（无分类） | `downloads/artwork.jpg` |
+
+**使用示例：**
+
+```bash
+# 按作者分类（默认）
+devart-dl url <URL>
+devart-dl url <URL> --organize=by_author
+
+# 按日期分类
+devart-dl gallery username --organize=by_date
+
+# 按类型分类
+devart-dl artist username --organize=by_type
+
+# 混合模式（作者+日期）
+devart-dl gallery username --organize=mixed
+
+# 扁平结构
+devart-dl url <URL> --organize=flat
+```
+
+**元数据保存：**
+
+每个下载的文件都会保存元数据到 `.metadata/` 目录：
+- 作品标题、作者、URL
+- 下载时间、文件大小
+- 质量设置、deviation ID
+- JSON 格式，易于查询和管理
+
+**查看目录结构：**
+
+```bash
+python tools/file_organizer.py --mode=by_author --show-structure
+python tools/file_organizer.py --mode=by_date --show-structure
+```
 | `--cookies=<path>` | Cookie文件路径 | `cookies.txt` |
 | `--proxy=<url>` | 代理服务器 | - |
 | `--ask=<0\|1>` | 是否询问 | `1` |
