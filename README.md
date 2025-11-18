@@ -13,15 +13,15 @@
 
 ## ✨ 核心特性 | Core Features
 
-- **统一CLI** - 单一命令 `devart-dl` 访问所有功能
-- **浏览器登录** - 自动化浏览器登录，支持2FA
-- **5种登录方式** - 浏览器、Cookie、环境变量、交互、会话
-- **智能防封** - 4种预设模式、自动延迟、速率限制
-- **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
-- **国际化** - 中文/英文双语支持，自动检测
-- **高性能** - 异步下载架构（Python 3.10+）
-- **零配置** - 开箱即用，渐进增强
-- **模块化** - 清晰的项目结构，易于维护
+-  **统一CLI** - 单一命令 `devart-dl` 访问所有功能
+- 🔐 **5种登录方式** - Cookie文件、交互输入、会话保存、环境变量、浏览器
+- 🛡️ **智能防封** - 4种预设模式、自动延迟、速率限制
+- 🎯 **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
+- 📝 **增强日志** - 彩色输出、文件记录、调试模式 ⭐新增
+- 🌍 **国际化** - 中文/英文双语支持，自动检测
+- ⚡ **高性能** - 异步下载架构（Python 3.10+）
+- 📦 **零配置** - 开箱即用，渐进增强
+- 🏗️ **模块化** - 清晰的项目结构，易于维护
 
 ---
 
@@ -122,41 +122,35 @@ devart-dl search all "digital art"
 
 支持5种灵活的登录方式：
 
-| 方式 | 优点 | 适用场景 |
-|------|------|---------|
-| **浏览器自动** | 自动化、可视化、支持2FA | 首次使用、需要2FA |
-| **Cookie 文件** | 可重复使用 | 日常使用 |
-| **环境变量** | 安全、无文件 | CI/CD、脚本 |
-| **交互输入** | 灵活、一次性 | 测试、临时 |
-| **会话保存** | 自动加载 | 长期使用 |
+| 方式 | 难度 | 可靠性 | 推荐 | 适用场景 |
+|------|------|--------|------|---------|
+| **Cookie 文件** | ⭐⭐ 简单 | ⭐⭐⭐⭐⭐ | ✅ 推荐 | 日常使用 |
+| **交互输入** | ⭐⭐ 简单 | ⭐⭐⭐⭐⭐ | ✅ 推荐 | 首次设置 |
+| **会话保存** | ⭐ 最简单 | ⭐⭐⭐⭐ | ✅ | 长期使用 |
+| **环境变量** | ⭐⭐⭐ 中等 | ⭐⭐⭐⭐⭐ | - | CI/CD、脚本 |
+| **浏览器自动** | ⭐ 最简单 | ⭐⭐ 不稳定 | ⚠️ 可能失败 | 仅供尝试 |
 
-### 方式1: 浏览器自动登录
+### 方式1: 浏览器自动登录 
 
-**最方便！自动打开浏览器，无需手动复制**
+**注意：** DeviantArt 有反自动化检测，此方式可能被阻止。推荐使用方式2或方式4。
 
 ```bash
 # 安装依赖（仅首次）
 pip install selenium webdriver-manager
 
-# 使用浏览器登录
+# 尝试使用浏览器登录
 devart-dl login browser
 
 # 指定浏览器
 devart-dl login browser --browser=firefox
-devart-dl login browser --browser=edge
 ```
 
-**工作流程：**
-1. 自动打开浏览器到登录页
-2. 在浏览器中正常登录
-3. 登录后按 Enter 键
-4. 自动提取并保存 Cookie
+**已知问题：**
+- 可能遇到"Access Denied"错误（反自动化）
+- 首次运行需下载驱动（1-2分钟）
+- 需要已安装对应浏览器
 
-**优点：**
-- ✓ 无需手动复制 Cookie
-- ✓ 支持多因素认证
-- ✓ 可视化登录过程
-- ✓ 自动验证和保存
+**如果遇到问题，请使用方式2（Cookie文件）或方式4（交互输入）。**
 
 ### 方式2: Cookie 文件
 
@@ -265,6 +259,64 @@ export DEVART_LANG=en_US  # English
 # 测试
 python i18n.py --lang=zh_CN --test
 python i18n.py --lang=en_US --test
+```
+
+---
+
+## 📝 日志系统 | Logging
+
+增强的彩色日志系统，支持调试和文件记录
+
+### 日志选项
+
+```bash
+# 调试模式（启用文件日志）
+devart-dl --debug gallery username
+devart-dl -d url <URL>
+
+# 详细模式（显示所有信息）
+devart-dl --verbose artist username
+devart-dl -v gallery username
+
+# 安静模式（仅显示错误）
+devart-dl --quiet gallery username
+devart-dl -q url <URL>
+```
+
+### 日志文件位置
+
+```bash
+# 调试模式下，日志自动保存到：
+~/.deviantart_dl/logs/devart-dl_YYYYMMDD.log
+
+# 查看日志
+tail -f ~/.deviantart_dl/logs/devart-dl_*.log
+
+# 清理旧日志
+rm ~/.deviantart_dl/logs/*.log
+```
+
+### 日志级别
+
+| 级别 | 颜色 | 用途 |
+|------|------|------|
+| DEBUG | 青色 | 调试信息（仅在 --debug 模式） |
+| INFO | 绿色 | 一般信息 |
+| WARNING | 黄色 | 警告信息 |
+| ERROR | 红色 | 错误信息 |
+| CRITICAL | 紫色 | 严重错误 |
+
+### 示例
+
+```bash
+# 调试下载问题
+devart-dl --debug url <URL>
+
+# 查看详细下载进度
+devart-dl --verbose gallery username --delay=2
+
+# 后台静默运行
+devart-dl --quiet artist username > /dev/null 2>&1 &
 ```
 
 ---
