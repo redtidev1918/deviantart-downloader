@@ -48,12 +48,79 @@ env/
 Thumbs.db
 desktop.ini
 
-# Project specific
+# Project specific - 敏感数据
 cookies.txt
 config.yaml
 downloads.db
 Downloads/
 *.log
+
+# 环境变量和密钥 - Environment & Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+secrets/
+private/
+
+# 会话和认证 - Session & Auth
+session.json
+**/session.json
+.deviantart_dl/
+auth_tokens/
+*.cookie
+*.session
+
+# 下载内容 - Downloaded Content
+downloads/
+output/
+media/
+images/
+artworks/
+
+# 备份文件 - Backups
+*.backup
+*.bak
+*.old
+*.orig
+*.save
+*.swp
+*~
+
+# 临时文件 - Temporary
+tmp/
+temp/
+*.tmp
+*.cache
+
+# 数据库 - Databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# 日志文件 - Logs
+logs/
+*.log
+*.log.*
+
+# 配置文件 - Config (keep examples)
+config.yml
+settings.yaml
+local_settings.py
+instance/
+
+# 用户特定 - User Specific
+user_config/
+my_*/
+
+# Selenium驱动 - Selenium Drivers
+chromedriver
+geckodriver
+edgedriver
+*.exe
 
 # Mypy
 .mypy_cache/
@@ -63,6 +130,10 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
-# Keep examples
+# Pytest
+.pytest_cache/
+
+# 保留示例文件 - Keep examples
 !cookies.txt.example
 !config.example.yaml
+!.env.example
