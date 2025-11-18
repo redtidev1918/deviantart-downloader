@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devart-dl"
-version = "3.1.0"
+version = "3.1.1"
 description = "专业的 DeviantArt 作品批量下载工具 - Professional DeviantArt batch downloader with anti-ban features"
 readme = "README.md"
 requires-python = ">=3.6"
