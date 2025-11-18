@@ -259,14 +259,26 @@ class DeviantArtAPI:
         """获取全尺寸视图 URL（支持图片和视频）"""
         types = media.get('types', [])
         
-        # 优先查找视频类型
-        video = next((t for t in types if t.get('t') == 'video'), None)
-        if video:
-            logger.info("Found video content")
-            if 'c' in video:
-                url = base_uri + video['c'].replace('<prettyName>', pretty_name)
-                if token:
-                    url += f"?token={token}"
+        # 查找所有视频类型并选择最高质量
+        videos = [t for t in types if t.get('t') == 'video']
+        
+        if videos:
+            # 按质量排序（1080p > 720p > 480p > 360p）
+            quality_order = {'1080p': 4, '720p': 3, '480p': 2, '360p': 1}
+            videos_sorted = sorted(
+                videos, 
+                key=lambda v: quality_order.get(v.get('q', ''), 0),
+                reverse=True
+            )
+            
+            best_video = videos_sorted[0]
+            quality = best_video.get('q', 'unknown')
+            logger.info(f"Found video content - selecting {quality} quality")
+            
+            # 视频URL在 'b' 字段中（完整URL）
+            if 'b' in best_video:
+                url = best_video['b']
+                logger.info(f"Video URL ({quality}): {url[:80]}...")
                 return url
         
         # 查找全图

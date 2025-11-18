@@ -54,7 +54,7 @@ class Deviation:
         media = self.media
         if not media or 'prettyName' not in media:
             # 根据类型确定默认扩展名
-            default_ext = '.mp4' if self.deviation_type == 'video' else '.jpg'
+            default_ext = '.mp4' if self.deviation_type in ['video', 'film'] else '.jpg'
             return f"{self.title}{default_ext}"
         
         pretty_name = media['prettyName']
@@ -68,16 +68,11 @@ class Deviation:
         # 检查 types 字段（视频通常在这里）
         if 'types' in media:
             types = media['types']
-            # 视频类型
-            if isinstance(types, list) and len(types) > 0:
+            # 检查是否有视频类型
+            if isinstance(types, list):
                 for t in types:
-                    if isinstance(t, dict) and 't' in t:
-                        type_str = t['t']
-                        if 'video' in type_str or 'mp4' in type_str:
-                            return '.mp4'
-            # 检查 video 字段
-            if 'video' in types:
-                return '.mp4'
+                    if isinstance(t, dict) and t.get('t') == 'video':
+                        return '.mp4'
         
         # 从 baseUri 提取
         base_uri = media.get('baseUri', '')
@@ -85,7 +80,7 @@ class Deviation:
             return self._extract_extension(base_uri)
         
         # 根据作品类型返回默认值
-        return '.mp4' if self.deviation_type == 'video' else '.jpg'
+        return '.mp4' if self.deviation_type in ['video', 'film'] else '.jpg'
     
     def _extract_extension(self, uri: str) -> str:
         """从 URI 提取文件扩展名"""
