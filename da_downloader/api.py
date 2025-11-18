@@ -27,6 +27,12 @@ class DeviantArtAPI:
         self.max_retries = max_retries
         self.csrf_token: Optional[str] = None
         
+        # 记录代理使用情况
+        if self.proxies:
+            logger.info(f"Using proxy: {self.proxies.get('http') or self.proxies.get('https')}")
+        else:
+            logger.info("No proxy configured")
+        
     def _make_request(self, url: str, timeout: int = 30) -> Optional[requests.Response]:
         """发起 HTTP 请求并处理重试"""
         for attempt in range(self.max_retries):
