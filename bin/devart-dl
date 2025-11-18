@@ -256,6 +256,9 @@ def main():
         elif args[0] == 'browser':
             # 浏览器登录
             return run_command('tools/browser_login.py', args[1:])
+        elif args[0] in ['validate', 'verify', 'check', 'test']:
+            # 验证 Cookie
+            return run_command('tools/validate_cookies.py', args[1:])
         else:
             # 默认：自动登录并显示状态
             return run_command('tools/auth_manager.py', args)

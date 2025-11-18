@@ -190,6 +190,26 @@ devart-dl login interactive
 devart-dl login clear
 ```
 
+### 验证 Cookie 是否有效 ⭐新增
+
+```bash
+# 验证当前 Cookie
+devart-dl login validate
+
+# 验证指定 Cookie
+devart-dl login validate --cookies="auth=xxx; ..."
+
+# JSON 格式输出（用于脚本）
+devart-dl login check --json
+```
+
+**验证内容：**
+- ✓ Cookie 存在性检查
+- ✓ 登录状态验证
+- ✓ 用户信息获取
+- ✓ 下载权限测试
+- ✓ Cookie 过期检测
+
 ### 快速获取 Cookie ⭐推荐
 
 **方法1: 一键导出脚本（最快）**
