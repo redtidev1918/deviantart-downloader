@@ -132,8 +132,7 @@ class DeviantArtAPI:
             
             if folder_id:
                 url += f"&folderid={folder_id}"
-            else:
-                url += "&all_folder=true"
+            # 移除 all_folder=true，可能导致 400 错误
                 
         elif action == ActionType.SEARCH:
             if username.lower() == 'all':
