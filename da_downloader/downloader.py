@@ -10,6 +10,7 @@ from .auth import AuthManager
 from .api import DeviantArtAPI
 from .models import Deviation, DownloadTask, DownloadResult, ActionType, Quality
 from .utils import ensure_directory, sanitize_filename, ProgressTracker
+from .progress import ProgressManager
 
 
 logger = logging.getLogger(__name__)
@@ -50,10 +51,23 @@ class DeviantArtDownloader:
         self.total_downloaded = 0
         self.total_failed = 0
         self.total_skipped = 0
+        
+        # 进度管理器（稍后初始化，需要session_name）
+        self.progress: Optional[ProgressManager] = None
     
     def download_gallery(self, username: str, folder_id: Optional[str] = None):
-        """下载画廊"""
+        """下载画廊（支持断点续传）"""
         logger.info(f"Starting gallery download for user: {username}")
+        
+        # 初始化进度管理器
+        session_name = f"gallery_{username}_{folder_id or 'all'}"
+        self.progress = ProgressManager(session_name)
+        
+        # 显示上次进度
+        stats = self.progress.get_stats()
+        if stats['total'] > 0:
+            logger.info(f"📊 Resume from previous session:")
+            logger.info(f"  Downloaded: {stats['downloaded']}, Failed: {stats['failed']}, Skipped: {stats['skipped']}")
         
         if not self.api.get_csrf_token(username):
             logger.error("Failed to get CSRF token")
@@ -125,7 +139,23 @@ class DeviantArtDownloader:
             if not deviation.is_downloadable_type():
                 logger.info(f"[{i}] Skipped (not downloadable type): {deviation.title}")
                 self.total_skipped += 1
+                if self.progress:
+                    self.progress.mark_skipped(deviation.deviation_id)
                 continue
+            
+            # 检查是否已下载（断点续传）
+            if self.progress and self.progress.is_downloaded(deviation.deviation_id):
+                logger.info(f"[{i}] ✓ Already downloaded: {deviation.title}")
+                self.total_skipped += 1
+                continue
+            
+            # 检查是否需要重试
+            if self.progress and self.progress.is_failed(deviation.deviation_id):
+                if not self.progress.should_retry(deviation.deviation_id):
+                    logger.info(f"[{i}] ✗ Max retries exceeded: {deviation.title}")
+                    self.total_failed += 1
+                    continue
+                logger.info(f"[{i}] 🔄 Retrying (attempt {self.progress.get_retry_count(deviation.deviation_id) + 1}): {deviation.title}")
             
             # 创建下载任务
             task = DownloadTask(
@@ -137,6 +167,13 @@ class DeviantArtDownloader:
             
             # 执行下载
             result = self._download_single(task)
+            
+            # 更新进度管理器
+            if self.progress:
+                if result.success:
+                    self.progress.mark_downloaded(deviation.deviation_id)
+                elif not result.skipped:
+                    self.progress.mark_failed(deviation.deviation_id, result.error or "Unknown error")
             
             # 更新统计
             if result.success:
@@ -150,6 +187,10 @@ class DeviantArtDownloader:
             if not self.config.ask_before_download and not self.download_all:
                 sleep(self.config.delay_seconds)
         
+        # 更新进度位置
+        if self.progress:
+            self.progress.update_position(next_offset, next_cursor)
+        
         # 处理分页
         if has_more:
             logger.info(f"Fetching next page (offset: {next_offset})...")
@@ -160,6 +201,11 @@ class DeviantArtDownloader:
             logger.info(f"  Downloaded: {self.total_downloaded}")
             logger.info(f"  Failed:     {self.total_failed}")
             logger.info(f"  Skipped:    {self.total_skipped}")
+            
+            # 清除进度文件（下载完成）
+            if self.progress:
+                logger.info("  Clearing progress...")
+                self.progress.clear()
             logger.info("=" * 70)
     
     def _download_single(self, task: DownloadTask) -> DownloadResult:
