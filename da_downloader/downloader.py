@@ -73,9 +73,8 @@ class DeviantArtDownloader:
             logger.error("Failed to get CSRF token")
             return
         
-        # 检查登录状态
-        if self.auth.cookies:
-            self.auth.check_login_status(self.api.headers, self.api.proxies)
+        # 检查并显示登录状态
+        self._show_login_status()
         
         # 构建 API URL
         url = self.api.build_api_url(ActionType.GALLERY, username, folder_id=folder_id)
@@ -96,6 +95,9 @@ class DeviantArtDownloader:
             if not self.api.get_csrf_token(''):
                 logger.error("Failed to get CSRF token")
                 return
+        
+        # 显示登录状态
+        self._show_login_status()
         
         # 构建 API URL
         url = self.api.build_api_url(ActionType.SEARCH, username, query=query)
@@ -325,6 +327,23 @@ class DeviantArtDownloader:
             return 'o'
         else:
             return None
+    
+    def _show_login_status(self):
+        """显示登录状态"""
+        logger.info("=" * 70)
+        if self.auth.cookies:
+            is_logged_in = self.auth.check_login_status(self.api.headers, self.api.proxies)
+            if is_logged_in:
+                logger.info("🔓 Login Status: ✅ LOGGED IN")
+                logger.info("   You can download original quality and mature content")
+            else:
+                logger.info("🔒 Login Status: ⚠️  NOT LOGGED IN")
+                logger.info("   Limited to public content and full quality")
+        else:
+            logger.info("🔒 Login Status: ⚠️  NO COOKIES")
+            logger.info("   Limited to public content only")
+            logger.info("   Run 'devart-dl login interactive' to login")
+        logger.info("=" * 70)
     
     def _get_destination_folder(self, base_username: str, author: str) -> str:
         """获取目标文件夹路径"""
