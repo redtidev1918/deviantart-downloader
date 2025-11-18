@@ -4,10 +4,11 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 [中文文档](README.md) | **English Documentation**
 
-[![Python](https://img.shields.io/badge/Python-3.6%2B-blue.svg)](https://www.python.org/)
+[![PyPI](https://img.shields.io/pypi/v/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
+[![Python](https://img.shields.io/pypi/pyversions/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
+[![Downloads](https://img.shields.io/pypi/dm/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#internationalization)
-[![Version](https://img.shields.io/badge/Version-3.0.0-brightgreen.svg)](#)
 
 ---
 
@@ -29,6 +30,18 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 ## 🚀 Quick Start
 
 ### Installation
+
+**Method 1: Install from PyPI (Recommended) ⭐**
+
+```bash
+# Basic installation
+pip install deviantart-downloader
+
+# Or with browser login support
+pip install deviantart-downloader[browser]
+```
+
+**Method 2: Install from source**
 
 ```bash
 # Clone repository

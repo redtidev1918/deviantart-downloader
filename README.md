@@ -6,10 +6,11 @@
 
 **中文文档** | [English Documentation](README_EN.md)
 
-[![Python](https://img.shields.io/badge/Python-3.6%2B-blue.svg)](https://www.python.org/)
+[![PyPI](https://img.shields.io/pypi/v/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
+[![Python](https://img.shields.io/pypi/pyversions/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
+[![Downloads](https://img.shields.io/pypi/dm/deviantart-downloader.svg)](https://pypi.org/project/deviantart-downloader/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#国际化)
-[![Version](https://img.shields.io/badge/Version-3.0.0-brightgreen.svg)](#)
 
 ---
 
@@ -31,16 +32,28 @@
 
 ### 安装 | Installation
 
+**方式1: 从 PyPI 安装（推荐）⭐**
+
+```bash
+# 基础安装
+pip install deviantart-downloader
+
+# 或带浏览器登录支持
+pip install deviantart-downloader[browser]
+```
+
+**方式2: 从源码安装**
+
 ```bash
 # 克隆仓库
 git clone https://github.com/zoidberg-xgd/deviantart-downloader.git
 cd deviantart-downloader
 
 # 安装依赖
-pip install requests
+pip install -r requirements.txt
 
 # 安装统一命令（可选）
-./install.sh
+./bin/install.sh
 ```
 
 ### 基本使用 | Basic Usage
