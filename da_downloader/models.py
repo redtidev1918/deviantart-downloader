@@ -50,23 +50,49 @@ class Deviation:
         )
     
     def get_filename(self) -> str:
-        """获取文件名"""
+        """获取文件名（支持图片和视频）"""
         media = self.media
         if not media or 'prettyName' not in media:
-            return f"{self.title}.jpg"
+            # 根据类型确定默认扩展名
+            default_ext = '.mp4' if self.deviation_type == 'video' else '.jpg'
+            return f"{self.title}{default_ext}"
         
         pretty_name = media['prettyName']
-        base_uri = media.get('baseUri', '')
         
-        # 从 baseUri 提取文件扩展名
-        ext = self._extract_extension(base_uri)
+        # 优先从 types 或 baseUri 获取扩展名
+        ext = self._extract_extension_from_media(media)
         return f"{pretty_name}{ext}"
+    
+    def _extract_extension_from_media(self, media: Dict[str, Any]) -> str:
+        """从 media 字段提取文件扩展名"""
+        # 检查 types 字段（视频通常在这里）
+        if 'types' in media:
+            types = media['types']
+            # 视频类型
+            if isinstance(types, list) and len(types) > 0:
+                for t in types:
+                    if isinstance(t, dict) and 't' in t:
+                        type_str = t['t']
+                        if 'video' in type_str or 'mp4' in type_str:
+                            return '.mp4'
+            # 检查 video 字段
+            if 'video' in types:
+                return '.mp4'
+        
+        # 从 baseUri 提取
+        base_uri = media.get('baseUri', '')
+        if base_uri:
+            return self._extract_extension(base_uri)
+        
+        # 根据作品类型返回默认值
+        return '.mp4' if self.deviation_type == 'video' else '.jpg'
     
     def _extract_extension(self, uri: str) -> str:
         """从 URI 提取文件扩展名"""
         parts = uri.split('.')
         if len(parts) > 1:
-            return f".{parts[-1]}"
+            ext = parts[-1].split('?')[0]  # 移除查询参数
+            return f".{ext}"
         return ".jpg"
     
     def is_downloadable_type(self) -> bool:

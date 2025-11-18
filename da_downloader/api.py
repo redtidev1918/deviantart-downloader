@@ -257,8 +257,20 @@ class DeviantArtAPI:
     
     def _get_full_view_url(self, media: Dict, base_uri: str, 
                           token: str, pretty_name: str) -> Optional[str]:
-        """获取全尺寸视图 URL"""
+        """获取全尺寸视图 URL（支持图片和视频）"""
         types = media.get('types', [])
+        
+        # 优先查找视频类型
+        video = next((t for t in types if t.get('t') == 'video'), None)
+        if video:
+            logger.info("Found video content")
+            if 'c' in video:
+                url = base_uri + video['c'].replace('<prettyName>', pretty_name)
+                if token:
+                    url += f"?token={token}"
+                return url
+        
+        # 查找全图
         full_view = next((t for t in types if t.get('t') == 'fullview'), None)
         
         if not full_view:
