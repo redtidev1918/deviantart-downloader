@@ -19,7 +19,7 @@
 -  **5种登录方式** - Cookie文件、交互输入、会话保存、环境变量、浏览器
 -  **智能防封** - 4种预设模式、自动延迟、速率限制
 -  **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
--  **增强日志** - 彩色输出、文件记录、调试模式 ⭐新增
+-  **增强日志** - 彩色输出、文件记录、调试模式 
 -  **国际化** - 中文/英文双语支持，自动检测
 -  **高性能** - 异步下载架构（Python 3.10+）
 -  **零配置** - 开箱即用，渐进增强
@@ -33,7 +33,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/deviantart-downloader.git
+git clone https://github.com/zoidberg-xgd/deviantart-downloader.git
 cd deviantart-downloader
 
 # 安装依赖
@@ -124,13 +124,13 @@ devart-dl search all "digital art"
 
 支持5种灵活的登录方式：
 
-| 方式 | 难度 | 可靠性 | 推荐 | 适用场景 |
-|------|------|--------|------|---------|
-| **Cookie 文件** | ⭐⭐ 简单 | ⭐⭐⭐⭐⭐ | ✅ 推荐 | 日常使用 |
-| **交互输入** | ⭐⭐ 简单 | ⭐⭐⭐⭐⭐ | ✅ 推荐 | 首次设置 |
-| **会话保存** | ⭐ 最简单 | ⭐⭐⭐⭐ | ✅ | 长期使用 |
-| **环境变量** | ⭐⭐⭐ 中等 | ⭐⭐⭐⭐⭐ | - | CI/CD、脚本 |
-| **浏览器自动** | ⭐ 最简单 | ⭐⭐ 不稳定 | ⚠️ 可能失败 | 仅供尝试 |
+| 方式 | 难度 | 推荐 | 适用场景 |
+|------|------|------|---------|
+| **Cookie 文件** | 简单 | ✅ 推荐 | 日常使用 |
+| **交互输入** | 简单 | ✅ 推荐 | 首次设置 |
+| **会话保存** | 最简单 | ✅ | 长期使用 |
+| **环境变量** | 中等 | - | CI/CD、脚本 |
+| **浏览器自动** | 最简单 | ⚠️ 不稳定 | 仅供尝试 |
 
 ### 方式1: 浏览器自动登录 
 
@@ -212,7 +212,7 @@ devart-dl login check --json
 - ✓ 下载权限测试
 - ✓ Cookie 过期检测
 
-### 快速获取 Cookie ⭐推荐
+### 快速获取 Cookie 
 
 **方法1: 一键导出脚本（最快）**
 
@@ -620,8 +620,9 @@ MIT License - 仅供学习和个人使用
 
 ## 🔗 相关链接 | Links
 
-- **GitHub**: https://github.com/yourusername/deviantart-downloader
-- **Issues**: https://github.com/yourusername/deviantart-downloader/issues
+- **GitHub**: https://github.com/zoidberg-xgd/deviantart-downloader
+- **Issues**: https://github.com/zoidberg-xgd/deviantart-downloader/issues
+- **Discussions**: https://github.com/zoidberg-xgd/deviantart-downloader/discussions
 - **DeviantArt**: https://www.deviantart.com
 
 ---

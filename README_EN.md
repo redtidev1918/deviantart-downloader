@@ -17,8 +17,8 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 - 🔐 **5 Login Methods** - Cookie file, interactive input, session save, environment variable, browser
 - 🛡️ **Smart Anti-Ban** - 4 preset modes, auto-delay, rate limiting
 - 🎯 **Flexible Downloads** - Single URL, full artist collection, batch gallery, search filters
-- 📝 **Enhanced Logging** - Colored output, file logging, debug mode ⭐NEW
-- 📁 **Smart Organization** - 6 file organization modes with metadata ⭐NEW
+- 📝 **Enhanced Logging** - Colored output, file logging, debug mode
+- 📁 **Smart Organization** - 6 file organization modes with metadata
 - 🌍 **Internationalization** - Chinese/English bilingual support, auto-detection
 - ⚡ **High Performance** - Async download architecture (Python 3.10+)
 - 📦 **Zero Config** - Works out of the box, progressive enhancement
@@ -112,15 +112,15 @@ devart-dl search all "digital art"
 
 5 flexible authentication methods supported:
 
-| Method | Difficulty | Reliability | Recommended | Use Case |
-|--------|-----------|-------------|-------------|----------|
-| **Cookie File** | ⭐⭐ Easy | | ✅ Recommended | Daily use |
-| **Interactive Input** | ⭐⭐ Easy |  | ✅ Recommended | First setup |
-| **Session Save** | ⭐ Easiest | ⭐⭐⭐⭐ | ✅ | Long-term use |
-| **Environment Variable** | ⭐⭐⭐ Medium | ⭐⭐⭐⭐⭐ | - | CI/CD, scripts |
-| **Browser Auto** | ⭐ Easiest | ⭐⭐ Unstable | ⚠️ May fail | Try only |
+| Method | Difficulty | Recommended | Use Case |
+|--------|-----------|-------------|----------|
+| **Cookie File** | Easy | ✅ Recommended | Daily use |
+| **Interactive Input** | Easy | ✅ Recommended | First setup |
+| **Session Save** | Easiest | ✅ | Long-term use |
+| **Environment Variable** | Medium | - | CI/CD, scripts |
+| **Browser Auto** | Easiest | ⚠️ Unstable | Try only |
 
-### Method 1: Browser Auto-Login ⭐NEW (May be blocked)
+### Method 1: Browser Auto-Login (May be blocked)
 
 **Note:** DeviantArt has anti-automation detection, this method may be blocked. Recommend Method 2 or Method 4.
 
@@ -180,7 +180,7 @@ devart-dl login interactive
 devart-dl login clear
 ```
 
-### Validate Cookie ⭐NEW
+### Validate Cookie
 
 ```bash
 # Validate current cookie
@@ -200,9 +200,9 @@ devart-dl login check --json
 - ✓ Download permission test
 - ✓ Cookie expiry detection
 
-### Quick Cookie Export ⭐Recommended
+### Quick Cookie Export 
 
-**Method 1: One-click export script (Fastest)**
+### One-click export script (Fastest)
 
 ```javascript
 // 1. Press F12 on DeviantArt logged-in page
@@ -352,7 +352,7 @@ devart-dl --quiet artist username > /dev/null 2>&1 &
 
 ---
 
-## 📁 File Organization ⭐NEW
+## 📁 File Organization 
 
 Smart file management with automatic categorization:
 
