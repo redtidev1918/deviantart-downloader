@@ -145,13 +145,16 @@ def get_deviation_info(url: str, cookies: str) -> dict:
             
             # 提取 deviation 信息
             deviation = None
-            if '@@entities' in data and 'deviation' in data['@@entities']:
-                deviations = data['@@entities']['deviation']
-                # 获取第一个 deviation
-                deviation = list(deviations.values())[0] if deviations else None
-            
-            if deviation:
-                return deviation
+            if isinstance(data, dict):
+                if '@@entities' in data and isinstance(data['@@entities'], dict):
+                    if 'deviation' in data['@@entities']:
+                        deviations = data['@@entities']['deviation']
+                        # 获取第一个 deviation
+                        if isinstance(deviations, dict):
+                            deviation = list(deviations.values())[0] if deviations else None
+                
+                if deviation:
+                    return deviation
     except Exception as e:
         print(f"{Colors.YELLOW}⚠ 解析 JSON 失败: {e}{Colors.RESET}")
     
@@ -167,12 +170,26 @@ def get_download_url(deviation: dict, quality: str, cookies: str) -> tuple[str, 
         (download_url, filename)
     """
     # 如果有 media 信息
-    if 'media' in deviation:
+    if isinstance(deviation, dict) and 'media' in deviation:
         media = deviation['media']
+        if not isinstance(media, dict):
+            raise ValueError("Media 数据格式错误")
+        
         base_uri = media.get('baseUri', '')
         pretty_name = media.get('prettyName', 'download')
-        token = media.get('token', [''])[0] if 'token' in media else ''
+        
+        # 安全获取 token
+        token = ''
+        if 'token' in media:
+            token_data = media['token']
+            if isinstance(token_data, list) and token_data:
+                token = token_data[0]
+            elif isinstance(token_data, str):
+                token = token_data
+        
         types = media.get('types', [])
+        if not isinstance(types, list):
+            types = []
         
         # 根据质量选择
         if quality == 'o' and deviation.get('isDownloadable'):
@@ -350,10 +367,12 @@ def main():
         deviation = get_deviation_info(url, cookies)
         
         # 显示作品信息
-        if 'title' in deviation:
-            print(f"{Colors.GREEN}📝 标题: {deviation['title']}{Colors.RESET}")
-        if 'author' in deviation and 'username' in deviation['author']:
-            print(f"{Colors.GREEN}👤 作者: {deviation['author']['username']}{Colors.RESET}")
+        if isinstance(deviation, dict):
+            if 'title' in deviation:
+                print(f"{Colors.GREEN}📝 标题: {deviation['title']}{Colors.RESET}")
+            if 'author' in deviation and isinstance(deviation['author'], dict):
+                if 'username' in deviation['author']:
+                    print(f"{Colors.GREEN}👤 作者: {deviation['author']['username']}{Colors.RESET}")
         
         # 获取下载链接
         download_url, filename = get_download_url(deviation, quality, cookies)
