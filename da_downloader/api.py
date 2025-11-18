@@ -342,15 +342,20 @@ class DeviantArtAPI:
                     downloaded = 0
                     chunks = []
                     chunk_size = 8192
+                    last_reported = 0  # 上次报告的百分比
                     
                     for chunk in response.iter_content(chunk_size=chunk_size):
                         if chunk:
                             chunks.append(chunk)
                             downloaded += len(chunk)
-                            # 每下载1MB显示一次进度
-                            if downloaded % (1024 * 1024) < chunk_size:
-                                progress = (downloaded / total_size) * 100
-                                logger.info(f"  下载中: {progress:.1f}% ({downloaded / 1024 / 1024:.1f} MB / {total_size / 1024 / 1024:.1f} MB)")
+                            
+                            # 每10%显示一次进度，避免刷屏
+                            progress = (downloaded / total_size) * 100
+                            progress_10 = int(progress / 10) * 10  # 取整到10的倍数
+                            
+                            if progress_10 > last_reported and progress_10 % 10 == 0:
+                                logger.info(f"  下载中: {progress_10}% ({downloaded / 1024 / 1024:.1f} MB / {total_size / 1024 / 1024:.1f} MB)")
+                                last_reported = progress_10
                     
                     return b''.join(chunks)
                 else:
