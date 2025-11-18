@@ -4,6 +4,8 @@
 > 
 > Professional DeviantArt Batch Downloader with Browser Auto-Login & Anti-Ban
 
+**中文文档** | [English Documentation](README_EN.md)
+
 [![Python](https://img.shields.io/badge/Python-3.6%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#国际化)
