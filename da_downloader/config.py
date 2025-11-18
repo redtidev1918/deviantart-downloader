@@ -88,10 +88,30 @@ class Config:
         }
     
     def get_proxies(self) -> Dict[str, str]:
-        """获取代理配置"""
+        """获取代理配置（优先级：参数 > 环境变量）"""
+        import os
+        
+        # 优先使用命令行参数指定的代理
         if self.proxy:
             return {'http': self.proxy, 'https': self.proxy}
-        return {}
+        
+        # 尝试从环境变量读取代理
+        # 支持 HTTP_PROXY, HTTPS_PROXY, ALL_PROXY (大小写都支持)
+        http_proxy = os.environ.get('HTTP_PROXY') or os.environ.get('http_proxy')
+        https_proxy = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
+        all_proxy = os.environ.get('ALL_PROXY') or os.environ.get('all_proxy')
+        
+        proxies = {}
+        if http_proxy:
+            proxies['http'] = http_proxy
+        if https_proxy:
+            proxies['https'] = https_proxy
+        
+        # 如果设置了 ALL_PROXY，用它覆盖所有
+        if all_proxy:
+            proxies = {'http': all_proxy, 'https': all_proxy}
+        
+        return proxies
     
     def validate(self) -> bool:
         """验证配置有效性"""
