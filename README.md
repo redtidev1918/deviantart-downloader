@@ -186,23 +186,33 @@ export DEVIANTART_COOKIES="auth=xxx; auth_secure=xxx; ..."
 echo 'DEVIANTART_COOKIES=...' > .env
 ```
 
-### 方式4: 交互式输入
+### 方式4: 交互式输入（推荐 ⭐）
 
 ```bash
 # 运行交互式登录
 devart-dl login interactive
 
 # 按提示粘贴 Cookie
+# 选择保存为会话文件 (y)
 ```
 
-### 方式5: 会话保存
+**自动加载机制：**
+- ✅ 保存后，所有命令**自动**从会话文件加载 Cookie
+- ✅ 无需手动创建 `cookies.txt`
+- ✅ 无需每次指定 Cookie 路径
+- ✅ 有效期 30 天
+
+### 方式5: 会话管理
 
 ```bash
-# 首次登录后自动保存到 ~/.deviantart_dl/session.json
-# 30天有效期，自动加载
+# 查看会话状态
+devart-dl login validate
 
 # 清除会话
 devart-dl login clear
+
+# 会话文件位置
+~/.deviantart_dl/session.json
 ```
 
 ### 验证 Cookie 是否有效 ⭐新增
@@ -225,7 +235,28 @@ devart-dl login check --json
 - ✓ 下载权限测试
 - ✓ Cookie 过期检测
 
-### 快速获取 Cookie 
+### Cookie 加载优先级
+
+系统会按以下顺序查找 Cookie：
+
+**下载命令（gallery, artist, url 等）：**
+1. 📁 会话文件 `~/.deviantart_dl/session.json` ⭐ **优先**
+2. 📄 Cookie 文件 `cookies.txt`
+3. 🌍 环境变量 `DEVIANTART_COOKIES`
+4. 📋 .env 文件
+
+**推荐工作流：**
+```bash
+# 一次性设置
+devart-dl login interactive  # 保存到会话文件
+
+# 以后所有命令自动使用
+devart-dl artist username    # ✅ 自动加载会话
+devart-dl gallery username   # ✅ 自动加载会话
+devart-dl url <URL>          # ✅ 自动加载会话
+```
+
+### 快速获取 Cookie
 
 **方法1: 一键导出脚本（最快）**
 

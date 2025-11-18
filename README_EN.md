@@ -174,23 +174,33 @@ export DEVIANTART_COOKIES="auth=xxx; auth_secure=xxx; ..."
 echo 'DEVIANTART_COOKIES=...' > .env
 ```
 
-### Method 4: Interactive Input
+### Method 4: Interactive Input (Recommended ⭐)
 
 ```bash
 # Run interactive login
 devart-dl login interactive
 
-# Follow prompts to paste cookie
+# Paste cookie when prompted
+# Choose to save as session file (y)
 ```
 
-### Method 5: Session Save
+**Auto-load mechanism:**
+- ✅ After saving, all commands **automatically** load cookies from session file
+- ✅ No need to manually create `cookies.txt`
+- ✅ No need to specify cookie path each time
+- ✅ 30-day validity
+
+### Method 5: Session Management
 
 ```bash
-# Automatically saved to ~/.deviantart_dl/session.json after first login
-# 30-day validity, auto-loads
+# Check session status
+devart-dl login validate
 
 # Clear session
 devart-dl login clear
+
+# Session file location
+~/.deviantart_dl/session.json
 ```
 
 ### Validate Cookie
@@ -213,9 +223,30 @@ devart-dl login check --json
 - ✓ Download permission test
 - ✓ Cookie expiry detection
 
-### Quick Cookie Export 
+### Cookie Loading Priority
 
-### One-click export script (Fastest)
+The system searches for cookies in the following order:
+
+**For download commands (gallery, artist, url, etc.):**
+1. 📁 Session file `~/.deviantart_dl/session.json` ⭐ **Priority**
+2. 📄 Cookie file `cookies.txt`
+3. 🌍 Environment variable `DEVIANTART_COOKIES`
+4. 📋 .env file
+
+**Recommended workflow:**
+```bash
+# One-time setup
+devart-dl login interactive  # Save to session file
+
+# All future commands auto-load
+devart-dl artist username    # ✅ Auto-loads session
+devart-dl gallery username   # ✅ Auto-loads session
+devart-dl url <URL>          # ✅ Auto-loads session
+```
+
+### Quick Cookie Export
+
+**Method 1: One-click export script (Fastest)**
 
 ```javascript
 // 1. Press F12 on DeviantArt logged-in page
