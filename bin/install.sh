@@ -1,6 +1,6 @@
 #!/bin/bash
 # DeviantArt Downloader 安装脚本
-# 将 'da' 命令安装到系统路径
+# 将 'devart-dl' 命令安装到系统路径
 
 set -e
 
@@ -17,19 +17,22 @@ echo -e "${BOLD}║       DeviantArt Downloader - 安装脚本                  
 echo -e "${BOLD}╚══════════════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-# 获取当前目录
+# 获取当前目录（bin目录）
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "${BLUE}📁 项目目录: $SCRIPT_DIR${NC}"
+# 项目根目录
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+echo -e "${BLUE}📁 项目目录: $PROJECT_DIR${NC}"
 
-# 检查 da 命令是否存在
-if [ ! -f "$SCRIPT_DIR/da" ]; then
-    echo -e "${RED}✗ 错误: 找不到 'da' 命令文件${NC}"
+# 检查 devart-dl 命令是否存在
+if [ ! -f "$SCRIPT_DIR/devart-dl" ]; then
+    echo -e "${RED}✗ 错误: 找不到 'devart-dl' 命令文件${NC}"
+    echo -e "${YELLOW}提示: 请确保在项目根目录运行此脚本${NC}"
     exit 1
 fi
 
-# 确保 da 可执行
-chmod +x "$SCRIPT_DIR/da"
-echo -e "${GREEN}✓ 设置 da 命令为可执行${NC}"
+# 确保 devart-dl 可执行
+chmod +x "$SCRIPT_DIR/devart-dl"
+echo -e "${GREEN}✓ 设置 devart-dl 命令为可执行${NC}"
 
 # 安装选项
 echo ""
@@ -50,9 +53,9 @@ case $choice in
         mkdir -p "$INSTALL_DIR"
         
         # 创建符号链接
-        ln -sf "$SCRIPT_DIR/da" "$INSTALL_DIR/da"
+        ln -sf "$SCRIPT_DIR/devart-dl" "$INSTALL_DIR/devart-dl"
         
-        echo -e "${GREEN}✓ 已安装到: $INSTALL_DIR/da${NC}"
+        echo -e "${GREEN}✓ 已安装到: $INSTALL_DIR/devart-dl${NC}"
         
         # 检查是否在 PATH 中
         if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
@@ -72,9 +75,9 @@ case $choice in
         INSTALL_DIR="/usr/local/bin"
         
         echo -e "${YELLOW}需要 sudo 权限...${NC}"
-        sudo ln -sf "$SCRIPT_DIR/da" "$INSTALL_DIR/da"
+        sudo ln -sf "$SCRIPT_DIR/devart-dl" "$INSTALL_DIR/devart-dl"
         
-        echo -e "${GREEN}✓ 已安装到: $INSTALL_DIR/da${NC}"
+        echo -e "${GREEN}✓ 已安装到: $INSTALL_DIR/devart-dl${NC}"
         ;;
         
     3)
@@ -103,10 +106,10 @@ case $choice in
                 ;;
         esac
         
-        ALIAS_CMD="alias da='$SCRIPT_DIR/da'"
+        ALIAS_CMD="alias devart-dl='$SCRIPT_DIR/devart-dl'"
         
         # 检查是否已存在
-        if grep -q "alias da=" "$SHELL_RC" 2>/dev/null; then
+        if grep -q "alias devart-dl=" "$SHELL_RC" 2>/dev/null; then
             echo -e "${YELLOW}⚠️  别名已存在于 $SHELL_RC${NC}"
         else
             echo "" >> "$SHELL_RC"
@@ -134,17 +137,17 @@ esac
 # 测试安装
 echo ""
 echo -e "${BOLD}测试安装:${NC}"
-if command -v da &> /dev/null; then
-    echo -e "${GREEN}✓ 'da' 命令可用${NC}"
+if command -v devart-dl &> /dev/null; then
+    echo -e "${GREEN}✓ 'devart-dl' 命令可用${NC}"
     echo ""
-    echo -e "${BLUE}运行 'da help' 查看帮助${NC}"
+    echo -e "${BLUE}运行 'devart-dl help' 查看帮助${NC}"
 elif [ "$choice" = "3" ]; then
     echo -e "${YELLOW}⚠️  需要重新加载 shell 配置${NC}"
     echo -e "${BLUE}运行: source $SHELL_RC${NC}"
 elif [ "$choice" = "4" ]; then
-    echo -e "${BLUE}运行: $SCRIPT_DIR/da help${NC}"
+    echo -e "${BLUE}运行: $SCRIPT_DIR/devart-dl help${NC}"
 else
-    echo -e "${YELLOW}⚠️  'da' 命令未找到${NC}"
+    echo -e "${YELLOW}⚠️  'devart-dl' 命令未找到${NC}"
     echo -e "${YELLOW}可能需要重新打开终端或运行:${NC}"
     echo -e "${BLUE}export PATH=\"$INSTALL_DIR:\$PATH\"${NC}"
 fi
@@ -153,9 +156,9 @@ echo ""
 echo -e "${GREEN}${BOLD}安装完成！${NC}"
 echo ""
 echo -e "${BOLD}快速开始:${NC}"
-echo -e "  da help              - 查看帮助"
-echo -e "  da version           - 查看版本"
-echo -e "  da url <URL>         - 下载单个作品"
-echo -e "  da artist <用户名>   - 下载作者所有作品"
-echo -e "  da anti-ban          - 查看防封指南"
+echo -e "  devart-dl help              - 查看帮助"
+echo -e "  devart-dl version           - 查看版本"
+echo -e "  devart-dl url <URL>         - 下载单个作品"
+echo -e "  devart-dl artist <用户名>   - 下载作者所有作品"
+echo -e "  devart-dl anti-ban          - 查看防封指南"
 echo ""
