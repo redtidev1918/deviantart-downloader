@@ -72,17 +72,27 @@ class DeviantArtAPI:
         except:
             pass
         
-        # 检查用户是否存在
-        if '404' in page or 'Page Not Found' in page:
-            logger.error(f"User '{username}' not found!")
+        # 检查用户是否存在（改进检测逻辑，避免误判）
+        # 检查 HTTP 状态码和页面标题
+        if response.status_code == 404:
+            logger.error(f"User '{username}' not found! (HTTP 404)")
             return None
         
-        # 调试：检查页面标题
+        # 检查页面标题
         if '<title>' in page:
-            title_start = page.index('<title>') + 7
-            title_end = page.index('</title>', title_start)
-            page_title = page[title_start:title_end]
-            logger.debug(f"Page title: {page_title}")
+            try:
+                title_start = page.index('<title>') + 7
+                title_end = page.index('</title>', title_start)
+                page_title = page[title_start:title_end]
+                logger.debug(f"Page title: {page_title}")
+                
+                # 检查是否为404页面
+                page_title_lower = page_title.lower()
+                if 'page not found' in page_title_lower or ('404' in page_title_lower and 'error' in page_title_lower):
+                    logger.error(f"User '{username}' not found! (Title indicates 404)")
+                    return None
+            except:
+                pass
         
         # 提取 CSRF token
         try:
