@@ -252,7 +252,20 @@ class DeviantArtDownloader:
         print(f"By: {deviation.author}")
         print(f"URL: {deviation.url}")
         
-        answer = input("Action [y/n/a/s/q/p/f/o]: ").strip().lower()
+        # 显示操作选项说明（首次或按需）
+        if not hasattr(self, '_options_shown'):
+            print("\n操作选项 | Options:")
+            print("  y - YES      下载此作品 | Download this")
+            print("  n - NO       跳过此作品 | Skip this")
+            print("  a - ALL      下载全部（推荐）| Download all (Recommended)")
+            print("  s - SKIP     跳过全部 | Skip all")
+            print("  q - QUIT     退出程序 | Quit")
+            print("  p - PREVIEW  预览质量 | Preview quality")
+            print("  f - FULL     全图质量 | Full quality")
+            print("  o - ORIGINAL 原图质量 | Original quality")
+            self._options_shown = True
+        
+        answer = input("\nAction [y/n/a/s/q/p/f/o]: ").strip().lower()
         
         if answer in self.CMD_QUIT:
             logger.info("User requested quit")

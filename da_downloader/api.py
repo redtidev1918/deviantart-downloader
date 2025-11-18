@@ -55,7 +55,7 @@ class DeviantArtAPI:
     
     def get_csrf_token(self, username: str) -> Optional[str]:
         """获取 CSRF Token"""
-        logger.info(f"Fetching CSRF token for user: {username}")
+        logger.info(f"[v3.1.3] Fetching CSRF token for user: {username}")
         
         response = self._make_request(f"{self.BASE_URL}/{username}")
         if not response:
