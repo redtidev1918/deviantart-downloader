@@ -74,6 +74,12 @@ def print_help():
   {Colors.BLUE}# 批量下载不询问{Colors.RESET}
   python download_artist.py username --ask=0 --delay=2
 
+  {Colors.BLUE}# 使用代理 (国内推荐){Colors.RESET}
+  python download_artist.py username --proxy=http://127.0.0.1:7890
+  
+  {Colors.BLUE}# 完整示例{Colors.RESET}
+  python download_artist.py username --quality=f --delay=2 --proxy=http://127.0.0.1:7890
+
 {Colors.BOLD}下载模式:{Colors.RESET}
   • 默认模式: 下载所有画廊作品
   • 画廊 ID: 下载特定画廊 (从 URL 自动提取)
@@ -168,6 +174,7 @@ def main():
     # 解析选项
     options = {}
     version = 'v2'
+    proxy = None
     
     for arg in sys.argv[2:]:
         if '=' not in arg:
@@ -177,8 +184,14 @@ def main():
         
         if key == '--version':
             version = value
+        elif key == '--proxy':
+            proxy = value
         else:
             options[key] = value
+    
+    # 如果设置了代理，添加到选项中
+    if proxy:
+        options['--proxy'] = proxy
     
     print(f"{Colors.BOLD}{'='*70}{Colors.RESET}")
     print(f"{Colors.BOLD}  DeviantArt Artist Downloader{Colors.RESET}")
