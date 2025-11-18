@@ -16,19 +16,21 @@
     // 样式定义
     const styles = `
         #cookie-export-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 999999;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            font-family: 'Segoe UI', Arial, sans-serif;
-            color: white;
-            min-width: 500px;
-            max-width: 90vw;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 2147483647 !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-radius: 12px !important;
+            padding: 30px !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+            font-family: 'Segoe UI', Arial, sans-serif !important;
+            color: white !important;
+            min-width: 500px !important;
+            max-width: 90vw !important;
+            display: block !important;
+            visibility: visible !important;
         }
         
         #cookie-export-panel h2 {
@@ -95,14 +97,16 @@
         }
         
         #cookie-export-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999998;
-            backdrop-filter: blur(5px);
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(0,0,0,0.7) !important;
+            z-index: 2147483646 !important;
+            backdrop-filter: blur(5px) !important;
+            display: block !important;
+            visibility: visible !important;
         }
     `;
     
@@ -257,8 +261,41 @@
     console.log('%c🍪 DeviantArt Cookie 导出工具', 'font-size: 20px; color: #667eea; font-weight: bold;');
     console.log('%c正在导出 Cookie...', 'font-size: 14px; color: #666;');
     
-    createUI();
-    
-    console.log('%c✓ Cookie 导出面板已打开！', 'font-size: 14px; color: #4ade80; font-weight: bold;');
+    try {
+        createUI();
+        
+        // 验证元素是否创建成功
+        const panel = document.getElementById('cookie-export-panel');
+        const overlay = document.getElementById('cookie-export-overlay');
+        
+        if (panel && overlay) {
+            console.log('%c✓ Cookie 导出面板已打开！', 'font-size: 14px; color: #4ade80; font-weight: bold;');
+            console.log('%c如果看不到面板，请尝试：', 'font-size: 12px; color: #fbbf24;');
+            console.log('1. 滚动到页面顶部');
+            console.log('2. 按 ESC 键可能被其他弹窗遮挡');
+            console.log('3. 或直接运行简化版本：');
+            console.log('%ccopy(document.cookie)', 'background: #222; color: #4ade80; padding: 5px; border-radius: 3px;');
+        } else {
+            console.error('✗ 面板创建失败');
+            // 备用：直接复制
+            const cookies = document.cookie;
+            if (cookies) {
+                navigator.clipboard.writeText(cookies).then(() => {
+                    console.log('%c✓ Cookie 已直接复制到剪贴板！', 'font-size: 14px; color: #4ade80; font-weight: bold;');
+                    alert('✓ Cookie 已复制到剪贴板！\n\n下一步：\n1. 运行: devart-dl login interactive\n2. 粘贴 Cookie');
+                });
+            }
+        }
+    } catch (error) {
+        console.error('执行出错：', error);
+        // 容错：直接复制Cookie
+        const cookies = document.cookie;
+        if (cookies) {
+            console.log('%c使用备用方案...', 'color: #fbbf24;');
+            navigator.clipboard.writeText(cookies).then(() => {
+                alert('✓ Cookie 已复制！（备用方案）\n\n下一步运行:\ndevart-dl login interactive');
+            });
+        }
+    }
     
 })();
