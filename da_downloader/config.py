@@ -29,7 +29,7 @@ class Config:
     timeout: int = 180
     
     # 下载设置
-    quality: str = "o"  # o=original, f=full, p=preview
+    quality: str = "f"  # f=full(推荐), o=original(需Core会员), p=preview
     replace_existing: bool = False  # 默认跳过已存在文件
     separate_folders: bool = True
     
