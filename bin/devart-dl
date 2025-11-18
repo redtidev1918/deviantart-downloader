@@ -8,17 +8,46 @@ import sys
 import subprocess
 from pathlib import Path
 
-# 添加项目根目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# 添加项目根目录到路径（处理符号链接）
+script_path = Path(__file__).resolve()  # 解析符号链接
+project_root = script_path.parent.parent
+sys.path.insert(0, str(project_root))
 
 # 导入国际化
 try:
     from tools.i18n import get_i18n, t
     i18n = get_i18n()
-except:
-    # 如果导入失败，使用英文
+except Exception as e:
+    # 如果导入失败，使用回退函数
     def t(key, **kwargs):
-        return key
+        # 简单的中英文映射
+        fallback = {
+            'cli_title': 'DeviantArt Downloader - 统一命令行工具',
+            'usage': '用法',
+            'cli_common_options': '通用选项',
+            'cli_quick_examples': '快速示例',
+            'cli_get_more_help': '获取更多帮助',
+            'cli_batch_download': '批量下载',
+            'cli_url_download': 'URL 下载',
+            'cli_tools': '工具',
+            'cli_info': '信息',
+            'cmd_gallery': '下载画廊作品',
+            'cmd_search': '搜索并下载',
+            'cmd_fav': '下载收藏夹',
+            'cmd_url': '下载单个作品',
+            'cmd_artist': '下载作者所有作品',
+            'cmd_login': '登录管理（多种方式）',
+            'cmd_anti_ban': '查看防封IP指南',
+            'cmd_test': '测试下载（下载1个文件）',
+            'cmd_config': '查看/编辑配置',
+            'cmd_help': '查看帮助',
+            'cmd_version': '查看版本信息',
+            'cmd_docs': '查看文档列表',
+            'quality_original': '原图',
+            'quality_full': '全图',
+            'quality_preview': '预览',
+        }
+        return fallback.get(key, key)
     i18n = None
 
 # 颜色定义
