@@ -319,7 +319,7 @@ class DeviantArtAPI:
         return url
     
     def download_file(self, url: str, timeout: int = 180) -> Optional[bytes]:
-        """下载文件内容"""
+        """下载文件内容（带进度显示）"""
         logger.debug(f"Downloading: {url}")
         
         for attempt in range(self.max_retries):
@@ -329,10 +329,34 @@ class DeviantArtAPI:
                     headers=self.headers,
                     proxies=self.proxies,
                     allow_redirects=True,
-                    timeout=timeout
+                    timeout=timeout,
+                    stream=True  # 启用流式下载
                 )
                 response.raise_for_status()
-                return response.content
+                
+                # 获取文件大小
+                total_size = int(response.headers.get('content-length', 0))
+                
+                # 流式下载并显示进度
+                if total_size > 0:
+                    downloaded = 0
+                    chunks = []
+                    chunk_size = 8192
+                    
+                    for chunk in response.iter_content(chunk_size=chunk_size):
+                        if chunk:
+                            chunks.append(chunk)
+                            downloaded += len(chunk)
+                            # 每下载1MB显示一次进度
+                            if downloaded % (1024 * 1024) < chunk_size:
+                                progress = (downloaded / total_size) * 100
+                                logger.info(f"  下载中: {progress:.1f}% ({downloaded / 1024 / 1024:.1f} MB / {total_size / 1024 / 1024:.1f} MB)")
+                    
+                    return b''.join(chunks)
+                else:
+                    # 大小未知，直接下载
+                    return response.content
+                    
             except RequestException as e:
                 logger.warning(f"Download failed (attempt {attempt + 1}/{self.max_retries}): {e}")
                 if attempt < self.max_retries - 1:
