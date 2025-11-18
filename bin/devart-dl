@@ -101,6 +101,11 @@ def print_main_help():
   --cookies=<path>       Cookie file / Cookie文件
   --proxy=<url>          Proxy server / 代理服务器
 
+{C.BOLD}Global Options / 全局选项:{C.RESET}
+  --debug, -d            Debug mode with file logging / 调试模式（启用文件日志）
+  --verbose, -v          Verbose output / 详细输出
+  --quiet, -q            Quiet mode / 安静模式（仅错误）
+
 {C.BOLD}{t('cli_quick_examples')}:{C.RESET}
   {C.BLUE}# Download single artwork / 下载单个作品{C.RESET}
   devart-dl url https://www.deviantart.com/user/art/title-123456
@@ -135,12 +140,42 @@ def run_command(script: str, args: list) -> int:
 
 def main():
     """主入口"""
-    if len(sys.argv) < 2:
+    # 解析全局选项
+    import logging
+    debug_mode = '--debug' in sys.argv or '-d' in sys.argv
+    verbose = '--verbose' in sys.argv or '-v' in sys.argv
+    quiet = '--quiet' in sys.argv or '-q' in sys.argv
+    
+    # 移除全局选项
+    filtered_args = []
+    for arg in sys.argv[1:]:
+        if arg not in ['--debug', '-d', '--verbose', '-v', '--quiet', '-q']:
+            filtered_args.append(arg)
+    
+    # 设置日志
+    try:
+        from tools.logger import setup_logger
+        level = logging.DEBUG if (debug_mode or verbose) else (logging.WARNING if quiet else logging.INFO)
+        logger = setup_logger(
+            level=level,
+            enable_file=debug_mode,  # 调试模式启用文件日志
+            colored=True,
+            debug=debug_mode
+        )
+        if debug_mode:
+            logger.debug(f"调试模式已启用")
+            logger.debug(f"命令行参数: {sys.argv}")
+            logger.debug(f"项目根目录: {project_root}")
+    except:
+        # 日志系统失败不影响主功能
+        pass
+    
+    if len(filtered_args) < 1:
         print_main_help()
         return 0
     
-    command = sys.argv[1].lower()
-    args = sys.argv[2:]
+    command = filtered_args[0].lower()
+    args = filtered_args[1:]
     
     # 命令路由
     if command in ['help', '-h', '--help']:
