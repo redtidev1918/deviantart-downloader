@@ -18,7 +18,25 @@ class AuthManager:
         self.is_logged_in: bool = False
         
     def load_cookies(self) -> str:
-        """加载 Cookie 文件"""
+        """加载 Cookie 文件（支持 cookies.txt 和会话文件）"""
+        import json
+        from pathlib import Path
+        
+        # 1. 尝试从会话文件加载
+        session_file = Path.home() / '.deviantart_dl' / 'session.json'
+        if session_file.exists():
+            try:
+                with open(session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+                    cookies = session_data.get('cookies', '')
+                    if cookies:
+                        logger.info(f"✓ Loaded cookies from session file: {session_file}")
+                        self.cookies = cookies
+                        return cookies
+            except Exception as e:
+                logger.debug(f"Failed to load session file: {e}")
+        
+        # 2. 尝试从 cookies.txt 加载
         if not os.path.isfile(self.cookies_path):
             logger.info(f"No cookie file found at {self.cookies_path} (optional for public content)")
             return ""
