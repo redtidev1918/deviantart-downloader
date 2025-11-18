@@ -237,16 +237,10 @@ class DeviantArtDownloader:
         # 获取下载 URL
         download_url = self.api.get_download_url(deviation, quality)
         
-        # 如果是原图且需要登录
+        # 如果是原图且需要登录，自动降级到全图质量
         if quality == 'o' and not download_url:
-            logger.warning("Original quality requires login")
-            if not self._handle_login_required():
-                return DownloadResult(
-                    task=task,
-                    success=False,
-                    error="Login required for original quality"
-                )
-            # 重试获取下载 URL
+            logger.warning(f"[{task.index}] Original quality requires login, falling back to full quality")
+            quality = 'f'
             download_url = self.api.get_download_url(deviation, quality)
         
         if not download_url:
@@ -331,38 +325,6 @@ class DeviantArtDownloader:
             return 'o'
         else:
             return None
-    
-    def _handle_login_required(self) -> bool:
-        """处理需要登录的情况"""
-        attempts = 0
-        max_attempts = 3
-        
-        while attempts < max_attempts:
-            if attempts == 0:
-                AuthManager.show_login_guide()
-            
-            cmd = input("\nAfter updating cookies.txt, press ENTER to retry (or 'q' to quit): ")
-            if cmd.lower() in self.CMD_QUIT:
-                return False
-            
-            # 重新加载 cookies
-            new_cookies = self.auth.reload_cookies()
-            if not new_cookies:
-                logger.warning("Still no cookies found")
-                attempts += 1
-                continue
-            
-            # 更新 headers
-            self.api.headers['cookie'] = new_cookies
-            
-            if self.auth.validate_cookies(new_cookies):
-                logger.info("✓ Cookies updated successfully")
-                return True
-            
-            attempts += 1
-        
-        logger.error("Failed to authenticate after multiple attempts")
-        return False
     
     def _get_destination_folder(self, base_username: str, author: str) -> str:
         """获取目标文件夹路径"""
