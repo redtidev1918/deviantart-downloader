@@ -218,8 +218,8 @@ def main():
         print(f"{Colors.GREEN}开始下载...{Colors.RESET}")
         print(f"{Colors.GREEN}{'='*70}{Colors.RESET}\n")
         
-        # 执行命令
-        result = subprocess.run(cmd, cwd='.')
+        # 执行命令（设置工作目录为项目根目录，以便 Python 能找到模块）
+        result = subprocess.run(cmd, cwd=str(PROJECT_ROOT))
         
         if result.returncode == 0:
             print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.RESET}")
