@@ -11,15 +11,16 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
-    name="deviantart-downloader",
+    name="devart-downloader",  # 使用更短的包名避免冲突
     version="3.0.0",
-    author="DeviantArt Downloader Team",
+    author="zoidberg-xgd",
     author_email="",
-    description="专业的 DeviantArt 作品批量下载工具，支持多种下载模式和防封策略",
+    description="Professional DeviantArt batch downloader with multiple login methods and anti-ban protection",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/deviantart-downloader",
+    url="https://github.com/zoidberg-xgd/deviantart-downloader",
     packages=find_packages(exclude=["tests*", "docs*"]),
+    py_modules=["deviantart_downloader_cli"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: End Users/Desktop",
@@ -36,42 +37,36 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Operating System :: OS Independent",
         "Environment :: Console",
+        "Natural Language :: Chinese (Simplified)",
+        "Natural Language :: English",
     ],
-    keywords="deviantart downloader scraper art gallery download batch",
+    keywords="deviantart downloader scraper art gallery download batch cli anti-ban i18n",
     python_requires=">=3.6",
     install_requires=[
         "requests>=2.25.0",
     ],
     extras_require={
-        "dev": [
-            "pytest>=7.4.3",
-            "pytest-asyncio>=0.21.1",
-            "black>=23.12.0",
-            "mypy>=1.7.1",
-            "ruff>=0.1.7",
+        "browser": [
+            "selenium>=4.0.0",
+            "webdriver-manager>=3.8.0",
         ],
-        "async": [
-            "httpx>=0.25.0",
-            "aiofiles>=23.2.1",
-            "pydantic>=2.5.0",
-            "pydantic-settings>=2.1.0",
+        "dev": [
+            "pytest>=6.0.0",
+            "black>=22.0.0",
+            "ruff>=0.1.0",
         ],
     },
     entry_points={
         "console_scripts": [
             "devart-dl=deviantart_downloader_cli:main",
-            "deviantart-dl=deviantart_downloader_cli:main",
-            "da-dl=deviantart_downloader_cli:main",
         ],
     },
-    scripts=[
-        "devart-dl",
-    ],
     include_package_data=True,
     zip_safe=False,
     project_urls={
-        "Bug Reports": "https://github.com/yourusername/deviantart-downloader/issues",
-        "Source": "https://github.com/yourusername/deviantart-downloader",
-        "Documentation": "https://github.com/yourusername/deviantart-downloader#readme",
+        "Bug Reports": "https://github.com/zoidberg-xgd/deviantart-downloader/issues",
+        "Source": "https://github.com/zoidberg-xgd/deviantart-downloader",
+        "Documentation": "https://github.com/zoidberg-xgd/deviantart-downloader#readme",
+        "Changelog": "https://github.com/zoidberg-xgd/deviantart-downloader/blob/main/CHANGELOG.md",
     },
 )

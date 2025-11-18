@@ -1,0 +1,37 @@
+# Include documentation
+include README.md
+include README_EN.md
+include LICENSE
+include CHANGELOG.md
+
+# Include configuration examples
+include .env.example
+include requirements.txt
+
+# Include tools and scripts
+recursive-include tools *.py *.js *.md
+recursive-include bin *
+recursive-include docs *.md
+
+# Include package data
+recursive-include deviantart_dl *.py
+recursive-include da_downloader *.py
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude *.swp
+global-exclude *.swo
+
+# Exclude test and development files
+exclude .gitignore
+exclude .codeiumignore
+prune tests
+prune .github
+prune Downloads
+prune downloads
