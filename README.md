@@ -1,8 +1,8 @@
 # DeviantArt Downloader
 
-> 🎨 专业的 DeviantArt 作品批量下载工具
-> 
-> Professional DeviantArt Batch Downloader with Browser Auto-Login & Anti-Ban
+一个功能强大、特性丰富的 DeviantArt 作品下载工具，支持智能文件组织、多种身份验证方式和防封IP保护。
+
+A powerful, feature-rich DeviantArt artwork downloader with intelligent file organization, multiple authentication methods, and anti-ban protection.
 
 **中文文档** | [English Documentation](README_EN.md)
 
@@ -18,17 +18,18 @@
 
 -  **统一CLI** - 单一命令 `devart-dl` 访问所有功能
 -  **5种登录方式** - Cookie文件、交互输入、会话保存、环境变量、浏览器
--  **智能防封** - 4种预设模式、自动延迟、速率限制
--  **灵活下载** - URL单图、作者全集、画廊批量、搜索过滤
--  **断点续传**  NEW - 中断后自动继续，智能跳过已下载
--  **失败重试**  NEW - 网络错误自动重试3次
--  **1080p视频**  NEW - 自动选择最高质量视频
--  **自动代理**  NEW - 从环境变量自动加载代理
--  **增强日志** - 彩色输出、文件记录、登录状态显示
--  **国际化** - 中文/英文双语支持，自动检测
--  **高性能** - 异步下载架构，快速跳过已存在文件
--  **零配置** - 开箱即用，渐进增强
--  **模块化** - 清晰的项目结构，易于维护
+-  **智能防封**   - 4种预设模式、自动延迟、速率限制
+-  **灵活下载**   - URL单图、作者全集、画廊批量、搜索过滤
+-  **断点续传**   - 中断后自动继续，智能跳过已下载
+-  **失败重试**   - 网络错误自动重试3次
+-  **1080p视频**   - 自动选择最高质量视频
+-  **自动代理**   - 自动从环境变量加载代理
+-  **增强日志**   - 彩色输出、文件日志、登录状态显示
+-  **国际化**   - 中文/英文双语支持，自动检测
+-  **高性能**   - 异步下载架构，快速跳过已存在文件
+-  **零配置**   - 开箱即用，渐进式增强
+-  **模块化**   - 清晰的项目结构，易于维护
+
 
 ---
 
@@ -63,72 +64,88 @@ pip install -r requirements.txt
 ### 基本使用 | Basic Usage
 
 ```bash
-# 方式1: 使用统一命令
-devart-dl url <作品URL>              # 下载单个作品
-devart-dl artist <用户名>            # 下载作者所有作品
-devart-dl gallery <用户名>           # 下载画廊
+# 下载单个作品
+devart-dl url https://www.deviantart.com/username/art/title-123456
 
-# 方式2: 直接运行脚本
-python download_url.py <作品URL>
-python download_artist.py <用户名>
-python main.py gallery <用户名>
+# 下载作者所有作品
+devart-dl artist username
+
+# 下载画廊
+devart-dl gallery username
+
+# 搜索并下载
+devart-dl search username "keyword"
+```
+
+### ⭐ v3.2.4 新功能快速开始
+
+```bash
+# 1. 自动代理 + 自动登录（推荐设置）
+export ALL_PROXY=http://127.0.0.1:7890  # 设置代理
+devart-dl login interactive              # 一次性登录
+devart-dl artist username                # 自动加载代理和Cookie
+
+# 2. 断点续传（中断后继续）
+devart-dl artist username --ask=0        # 开始下载
+# 按 Ctrl+C 中断
+devart-dl artist username --ask=0        # 重新运行，自动跳过已下载
+
+# 3. 1080p 高清视频下载
+devart-dl artist username --ask=0        # 自动下载1080p视频
+
+# 4. 登录状态显示
+# 启动时自动显示：
+# 🔓 登录状态: ✅ 已登录
+#    您可以下载原图质量和成熟内容
+
+# 5. 高性能批量下载
+devart-dl artist username --ask=0 --proxy=http://127.0.0.1:7890
+# ✓ 自动跳过已存在文件
+# ✓ 失败自动重试3次
+# ✓ 实时进度显示
+# ✓ 1080p视频质量
 ```
 
 ---
 
-## 📋 主要功能 | Main Features
+## 📥 主要功能 | Main Features
 
-### 1. URL 下载 | URL Download
-
-下载单个作品，支持标准URL和短链接
+### 单个URL下载 | Single URL Download
 
 ```bash
-# 标准URL
-devart-dl url https://www.deviantart.com/user/art/title-123456
+# 下载全图质量（默认）
+devart-dl url <artwork_url>
 
-# 短链接
-devart-dl url https://fav.me/de12345
+# 下载原图质量（需要登录）
+devart-dl url <artwork_url> --quality=o
 
-# 自定义质量和目录
-devart-dl url <URL> --quality=o --dest=./downloads
+# 自定义文件名
+devart-dl url <artwork_url> --filename=my_artwork
+
+# 按作者组织
+devart-dl url <artwork_url> --organize=by_author
 ```
 
-### 2. 作者下载 | Artist Download
-
-通过作者主页URL批量下载所有作品
+### 批量下载 | Batch Downloads
 
 ```bash
 # 下载作者所有作品
 devart-dl artist username
 
-# 或使用完整URL
-devart-dl artist https://www.deviantart.com/username
-
-# 指定选项
-devart-dl artist username --quality=f --delay=2
-```
-
-### 3. 画廊下载 | Gallery Download
-
-批量下载画廊内容
-
-```bash
-# 下载所有画廊
-devart-dl gallery username
-
 # 下载特定画廊
-devart-dl gallery username 12345678
+devart-dl gallery username gallery_id
 
-# 安全模式（推荐）
-devart-dl gallery username --delay=3 --limit=10
+# 防封保护下载
+devart-dl gallery username --delay=2 --limit=24
+
+# 下载收藏夹
+devart-dl fav username folder_id
 ```
 
-### 4. 搜索下载 | Search Download
-
-搜索并下载匹配的作品
+### 搜索下载 | Search Downloads
 
 ```bash
-# 在用户作品中搜索
+# 搜索用户作品
 devart-dl search username "landscape"
 
 # 全站搜索
@@ -219,7 +236,7 @@ devart-dl login clear
 ~/.deviantart_dl/session.json
 ```
 
-### 验证 Cookie 是否有效 ⭐新增
+### 验证 Cookie 是否有效
 
 ```bash
 # 验证当前 Cookie
@@ -313,16 +330,17 @@ devart-dl gallery username --delay=1 --limit=50
 
 ### 核心原则
 
-✅ **必须做:**
+✅ **必须做：**
 - 延迟 ≥ 2秒 (`--delay=2`)
 - 限制批次大小 (`--limit=24`)
-- 遇到429错误立即停止
-- 大量下载分多天进行
+- 遇到 429 错误立即停止
+- 将大量下载分散到多天
 
-❌ **禁止做:**
-- 延迟 < 1秒
-- 短时间下载数百文件
-- 忽略速率限制错误
+❌ **绝不能做：**
+- 无延迟或非常短的延迟
+- 一次下载数百个
+- 忽略限速错误
+- IP被封后继续下载
 
 ### 完整指南
 
@@ -389,7 +407,7 @@ rm ~/.deviantart_dl/logs/*.log
 ### 日志级别
 
 | 级别 | 颜色 | 用途 |
-|------|------|------|
+|-------|-------|------|
 | DEBUG | 青色 | 调试信息（仅在 --debug 模式） |
 | INFO | 绿色 | 一般信息 |
 | WARNING | 黄色 | 警告信息 |
@@ -411,23 +429,11 @@ devart-dl --quiet artist username > /dev/null 2>&1 &
 
 ---
 
-## ⚙️ 配置选项 | Options
-
-### 通用选项
-
-| 选项 | 说明 | 默认值 |
-|------|------|--------|
-| `--quality=<o\|f\|p>` | 质量：o=原图, f=全图, p=预览 | `f` |
-| `--dest=<path>` | 下载目录 | `./downloads` |
-| `--delay=<seconds>` | 延迟时间（防封） | `1` |
-| `--limit=<number>` | 每批数量 | `24` |
-| `--organize=<mode>` | 文件组织模式 ⭐新增 | `by_author` |
-
-### 文件组织模式 ⭐新增
+## 📁 文件组织 | File Organization
 
 智能管理下载的文件，自动分类整理：
 
-**可用模式：**
+### 组织模式 | Organization Modes
 
 | 模式 | 说明 | 目录结构示例 |
 |------|------|-------------|
@@ -438,7 +444,7 @@ devart-dl --quiet artist username > /dev/null 2>&1 &
 | `mixed` | 混合模式（作者+日期） | `downloads/artist/2025-01/artwork.jpg` |
 | `flat` | 扁平结构（无分类） | `downloads/artwork.jpg` |
 
-**使用示例：**
+### 使用示例 | Usage Examples
 
 ```bash
 # 按作者分类（默认）
@@ -458,7 +464,7 @@ devart-dl gallery username --organize=mixed
 devart-dl url <URL> --organize=flat
 ```
 
-**元数据保存：**
+### 元数据保存 | Metadata Saving
 
 每个下载的文件都会保存元数据到 `.metadata/` 目录：
 - 作品标题、作者、URL
@@ -466,15 +472,36 @@ devart-dl url <URL> --organize=flat
 - 质量设置、deviation ID
 - JSON 格式，易于查询和管理
 
-**查看目录结构：**
+### 查看目录结构 | View Directory Structure
 
 ```bash
 python tools/file_organizer.py --mode=by_author --show-structure
 python tools/file_organizer.py --mode=by_date --show-structure
 ```
+
+---
+
+## ⚙️ 配置选项 | Configuration Options
+
+### 通用选项
+
+| 选项 | 说明 | 默认值 |
+|------|------|--------|
+| `--quality=<o\|f\|p>` | 质量：o=原图, f=全图, p=预览 | `f` |
+| `--dest=<path>` | 下载目录 | `./downloads` |
+| `--delay=<seconds>` | 延迟时间（防封） | `1` |
+| `--limit=<number>` | 每批数量 | `24` |
+| `--organize=<mode>` | 文件组织模式 | `by_author` |
 | `--cookies=<path>` | Cookie文件路径 | `cookies.txt` |
 | `--proxy=<url>` | 代理服务器 | - |
-| `--ask=<0\|1>` | 是否询问 | `1` |
+
+### 全局选项
+
+| 选项 | 说明 |
+|------|------|
+| `--debug, -d` | 调试模式，启用文件日志 |
+| `--verbose, -v` | 详细输出 |
+| `--quiet, -q` | 安静模式（仅错误） |
 
 ### 示例
 
@@ -482,75 +509,70 @@ python tools/file_organizer.py --mode=by_date --show-structure
 # 下载原图，延迟3秒
 devart-dl gallery user --quality=o --delay=3
 
-# 使用代理，批量下载
-devart-dl gallery user --proxy=http://127.0.0.1:7890 --ask=0
+# 使用代理
+devart-dl url <URL> --proxy=http://127.0.0.1:7890
 
-# 自定义目录
-devart-dl artist user --dest=~/MyArt --quality=f
+# 调试模式与文件组织
+devart-dl --debug artist username --organize=mixed
+
+# 安静模式，按日期组织
+devart-dl --quiet gallery username --organize=by_date
 ```
 
 ---
 
-## 📖 命令参考 | Command Reference
+## 📚 命令参考 | Command Reference
 
-### 核心命令
-
-```bash
-devart-dl url <URL>               # URL下载
-devart-dl artist <username>       # 作者下载
-devart-dl gallery <username>      # 画廊下载
-devart-dl search <user> <query>   # 搜索下载
-devart-dl fav <user> <folder_id>  # 收藏夹下载
-```
-
-### 工具命令
+### 下载命令 | Download Commands
 
 ```bash
-devart-dl login [interactive|clear]  # 登录管理
-devart-dl anti-ban                   # 防封指南
-devart-dl config                     # 配置管理
-devart-dl test <username>            # 测试下载
+# 单个作品下载
+devart-dl url <artwork_url> [options]
+
+# 作者所有作品
+devart-dl artist <username> [options]
+
+# 画廊下载
+devart-dl gallery <username> [gallery_id] [options]
+
+# 搜索下载
+devart-dl search <username|all> <query> [options]
+
+# 收藏夹下载
+devart-dl fav <username> <folder_id> [options]
 ```
 
-### 信息命令
+### 工具命令 | Tool Commands
 
 ```bash
-devart-dl help              # 帮助
-devart-dl help <command>    # 命令帮助
-devart-dl version           # 版本
-devart-dl docs              # 文档
+# 登录管理
+devart-dl login interactive    # 交互式登录
+devart-dl login browser        # 浏览器登录
+devart-dl login validate       # 验证Cookie
+devart-dl login clear          # 清除会话
+
+# 防封指南
+devart-dl anti-ban
+
+# 测试下载
+devart-dl test <username>
+
+# 配置管理
+devart-dl config
 ```
 
----
+### 信息命令 | Info Commands
 
-## 🏗️ 项目结构 | Project Structure
+```bash
+# 帮助
+devart-dl help                 # 主要帮助
+devart-dl help <command>       # 命令具体帮助
 
-```
-deviantart-downloader/
-├── devart-dl              # 统一CLI入口
-├── install.sh             # 安装脚本
-│
-├── 核心工具 | Core Tools
-│   ├── download_url.py       # URL下载器
-│   ├── download_artist.py    # 作者下载器
-│   ├── main.py               # 批量下载器
-│   └── deviantart_downloader.py  # 原始脚本（兼容）
-│
-├── 功能模块 | Modules
-│   ├── da_downloader/        # 稳定版模块
-│   ├── deviantart_dl/        # 异步版模块
-│   ├── auth_manager.py       # 多种登录
-│   ├── anti_ban_config.py    # 防封配置
-│   └── i18n.py               # 国际化
-│
-├── 配置 | Config
-│   ├── requirements.txt      # 依赖
-│   ├── pyproject.toml        # 项目配置
-│   ├── setup.py              # 安装配置
-│   └── .gitignore
-│
-└── 文档 | Docs
-    └── README.md             # 本文档
+# 版本
+devart-dl version
+
+# 文档
+devart-dl docs
 ```
 
 ---
@@ -561,92 +583,94 @@ deviantart-downloader/
 
 ```bash
 # HTTP代理
-devart-dl gallery user --proxy=http://127.0.0.1:7890
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
 
-# SOCKS代理（需要额外依赖）
-pip install requests[socks]
-devart-dl gallery user --proxy=socks5://127.0.0.1:1080
+# SOCKS代理
+export ALL_PROXY=socks5://127.0.0.1:1080
+
+# 命令行代理
+devart-dl url <URL> --proxy=http://127.0.0.1:7890
 ```
 
 ### 批处理
 
 ```bash
 # 批量下载多个用户
-for user in user1 user2 user3; do
-    devart-dl artist $user --delay=3
-    sleep 300  # 用户间休息5分钟
+for user in artist1 artist2 artist3; do
+    devart-dl artist $user --delay=3 --organize=by_author
+    sleep 60  # 用户间休息1分钟
+done
+
+# 从URL列表下载
+cat urls.txt | while read url; do
+    devart-dl url "$url" --delay=2
 done
 ```
 
-### 分批下载
-
-```bash
-# 避免一次下载太多
-devart-dl gallery user --limit=50 --offset=0
-devart-dl gallery user --limit=50 --offset=50
-devart-dl gallery user --limit=50 --offset=100
-```
-
-### 作为Python库
+### 自定义下载脚本
 
 ```python
-from da_downloader import DeviantArtDownloader, Config
+from deviantart_dl import DeviantArtDownloader
 
-config = Config(
+# 创建下载器实例
+dl = DeviantArtDownloader(
+    cookies_file='cookies.txt',
     quality='f',
-    delay_seconds=2.0,
-    ask_before_download=False
+    delay=2
 )
 
-downloader = DeviantArtDownloader(config)
-downloader.download_gallery('username')
+# 下载单个作品
+dl.download_url('https://www.deviantart.com/...')
+
+# 批量下载
+artworks = dl.search_user('username', 'keyword')
+for art in artworks:
+    dl.download(art)
 ```
 
 ---
 
 ## ❓ 常见问题 | FAQ
 
-### Q: 需要登录吗？
+### Q: 下载非常慢？
+**A:** 尝试这些解决方法：
+1. 使用代理：`--proxy=http://...`
+2. 降低质量：`--quality=p`
+3. 检查网络连接
+4. 增加延迟：`--delay=3`
 
-**部分功能需要：**
-- 下载原图 (`--quality=o`)
-- 成熟内容
-- 私密作品
-- 收藏夹
+### Q: 遇到 403 Forbidden 错误？
+**A:** 需要登录：
+1. 运行 `devart-dl login interactive`
+2. 或提供 Cookie 文件
+3. 检查 Cookie 是否过期
 
-**不需要登录：**
-- 下载全图/预览图
-- 公开作品
-- 大部分画廊
+### Q: 遇到 429 Too Many Requests？
+**A:** IP 被限速：
+1. 立即停止下载
+2. 等待几小时
+3. 使用更长延迟：`--delay=5`
+4. 减少批次大小：`--limit=10`
 
-### Q: 如何避免被封IP？
+### Q: Cookie 能用多久？
+**A:** 通常几天到几周。过期后重新导出。
 
-1. 设置延迟 ≥ 2秒
-2. 限制批次大小
-3. 使用代理轮换
-4. 遇到429立即停止
-5. 查看完整指南：`devart-dl anti-ban`
+### Q: 可以在多台电脑使用同一个 Cookie 吗？
+**A:** 可以，但 DeviantArt 可能会检测异常登录。
 
-### Q: 支持哪些URL格式？
+### Q: 浏览器登录有效吗？
+**A:** 可能被反自动化检测阻止。推荐手动导出 Cookie。
 
-- 标准: `https://www.deviantart.com/user/art/title-123456`
-- 短链: `https://fav.me/dxxxxxx`
-- 主页: `https://www.deviantart.com/username`
-- 画廊: `https://www.deviantart.com/user/gallery/12345`
+### Q: 如何组织下载的文件？
+**A:** 使用 `--organize` 选项：
+- `by_author`: 按作者（推荐）
+- `by_date`: 按日期
+- `mixed`: 作者 + 日期
 
-### Q: 下载速度慢？
+### Q: 元数据文件保存在哪里？
+**A:** 在下载目录下的 `.metadata/` 目录中，JSON 格式。
 
-- 减少延迟（风险：可能被封）
-- 使用代理
-- 检查网络连接
-- 注意：为防封，不建议过快
-
-### Q: 如何更新？
-
-```bash
-git pull origin main
-pip install -r requirements.txt --upgrade
-```
 
 ---
 
@@ -662,18 +686,27 @@ pip install -r requirements.txt --upgrade
 
 ## 📄 许可证 | License
 
-MIT License - 仅供学习和个人使用
+MIT License - 查看 [LICENSE](LICENSE) 文件
+
 
 ---
 
-## 🔗 相关链接 | Links
-
-- **GitHub**: https://github.com/zoidberg-xgd/deviantart-downloader
-- **Issues**: https://github.com/zoidberg-xgd/deviantart-downloader/issues
-- **Discussions**: https://github.com/zoidberg-xgd/deviantart-downloader/discussions
-- **DeviantArt**: https://www.deviantart.com
+- 感谢开源社区
 
 ---
 
-[⬆ 返回顶部](#deviantart-downloader)
+## 📮 联系方式 | Contact
+
+- Issues: [GitHub Issues](https://github.com/zoidberg-xgd/deviantart-downloader/issues)
+- Discussions: [GitHub Discussions](https://github.com/zoidberg-xgd/deviantart-downloader/discussions)
+
+---
+
+## 🌟 Star History
+
+如果觉得这个项目有帮助，请给个 Star！⭐
+
+---
+
+**Happy Downloading! 🎨**
 

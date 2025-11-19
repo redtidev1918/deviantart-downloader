@@ -12,7 +12,7 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 ---
 
-## Core Features
+## ✨ Core Features | 核心特性
 
 -  **Unified CLI** - Single `devart-dl` command for all features
 -  **5 Login Methods** - Cookie file, interactive, session save, env var, browser
@@ -28,11 +28,12 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 -  **Zero Config** - Works out of box, progressive enhancement
 -  **Modular** - Clean project structure, easy to maintain
 
+
 ---
 
-## Quick Start
+## 🚀 Quick Start | 快速开始
 
-### Installation
+### Installation | 安装
 
 **Method 1: Install from PyPI (Recommended) ⭐**
 
@@ -60,7 +61,7 @@ pip install -r requirements.txt
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-### Basic Usage
+### Basic Usage | 基本使用
 
 ```bash
 # Download single artwork
@@ -76,7 +77,7 @@ devart-dl gallery username
 devart-dl search username "keyword"
 ```
 
-### ⭐ v3.2.4 New Features Quick Start
+### ⭐ v3.2.4 New Features Quick Start | 新功能快速开始
 
 ```bash
 # 1. Auto Proxy + Auto Login (Recommended Setup)
@@ -107,9 +108,9 @@ devart-dl artist username --ask=0 --proxy=http://127.0.0.1:7890
 
 ---
 
-## 📥 Main Features
+## 📥 Main Features | 主要功能
 
-### Single URL Download
+### Single URL Download | 单个URL下载
 
 ```bash
 # Download with full quality (default)
@@ -125,7 +126,7 @@ devart-dl url <artwork_url> --filename=my_artwork
 devart-dl url <artwork_url> --organize=by_author
 ```
 
-### Batch Downloads
+### Batch Downloads | 批量下载
 
 ```bash
 # Download all artworks from artist
@@ -141,7 +142,7 @@ devart-dl gallery username --delay=2 --limit=24
 devart-dl fav username folder_id
 ```
 
-### Search Downloads
+### Search Downloads | 搜索下载
 
 ```bash
 # Search user's artworks
@@ -153,7 +154,7 @@ devart-dl search all "digital art"
 
 ---
 
-## 🔐 Authentication Methods
+## 🔐 Authentication Methods | 身份验证方式
 
 5 flexible authentication methods supported:
 
@@ -310,11 +311,11 @@ cat tools/COOKIE_EXPORT_GUIDE.md
 
 ---
 
-## 🛡️ Anti-Ban Protection
+## 🛡️ Anti-Ban Protection | 防封IP保护
 
 **Important: Must-read for batch downloads**
 
-### Recommended Config
+### Recommended Config | 推荐配置
 
 ```bash
 # Safe mode (recommended for beginners)
@@ -327,7 +328,7 @@ devart-dl gallery username --delay=2 --limit=24
 devart-dl gallery username --delay=1 --limit=50
 ```
 
-### Core Principles
+### Core Principles | 核心原则
 
 ✅ **Must do:**
 - Delay ≥ 2 seconds (`--delay=2`)
@@ -341,7 +342,7 @@ devart-dl gallery username --delay=1 --limit=50
 - Ignore rate limit errors
 - Continue downloading after IP ban
 
-### Complete Guide
+### Complete Guide | 完整指南
 
 ```bash
 devart-dl anti-ban
@@ -349,11 +350,11 @@ devart-dl anti-ban
 
 ---
 
-## 🌍 Internationalization
+## 🌍 Internationalization | 国际化
 
 Supports Chinese and English bilingual
 
-### Set Language
+### Set Language | 设置语言
 
 ```bash
 # Method 1: Environment variable
@@ -370,11 +371,11 @@ python i18n.py --lang=en_US --test
 
 ---
 
-## 📝 Logging System
+## 📝 Logging System | 日志系统
 
 Enhanced colored logging system with debug and file recording support
 
-### Log Options
+### Log Options | 日志选项
 
 ```bash
 # Debug mode (enable file logging)
@@ -390,7 +391,7 @@ devart-dl --quiet gallery username
 devart-dl -q url <URL>
 ```
 
-### Log File Location
+### Log File Location | 日志文件位置
 
 ```bash
 # In debug mode, logs auto-saved to:
@@ -403,7 +404,7 @@ tail -f ~/.deviantart_dl/logs/devart-dl_*.log
 rm ~/.deviantart_dl/logs/*.log
 ```
 
-### Log Levels
+### Log Levels | 日志级别
 
 | Level | Color | Purpose |
 |-------|-------|---------|
@@ -413,7 +414,7 @@ rm ~/.deviantart_dl/logs/*.log
 | ERROR | Red | Error info |
 | CRITICAL | Purple | Critical errors |
 
-### Examples
+### Examples | 示例
 
 ```bash
 # Debug download issues
@@ -428,11 +429,11 @@ devart-dl --quiet artist username > /dev/null 2>&1 &
 
 ---
 
-## 📁 File Organization 
+## 📁 File Organization | 文件组织
 
 Smart file management with automatic categorization:
 
-### Organization Modes
+### Organization Modes | 组织模式
 
 | Mode | Description | Directory Structure |
 |------|-------------|---------------------|
@@ -443,7 +444,7 @@ Smart file management with automatic categorization:
 | `mixed` | Hybrid (artist+date) | `downloads/artist/2025-01/artwork.jpg` |
 | `flat` | Flat (no organization) | `downloads/artwork.jpg` |
 
-### Usage Examples
+### Usage Examples | 使用示例
 
 ```bash
 # By artist (default)
@@ -463,7 +464,7 @@ devart-dl gallery username --organize=mixed
 devart-dl url <URL> --organize=flat
 ```
 
-### Metadata Saving
+### Metadata Saving | 元数据保存
 
 Each downloaded file saves metadata to `.metadata/` directory:
 - Artwork title, author, URL
@@ -471,7 +472,7 @@ Each downloaded file saves metadata to `.metadata/` directory:
 - Quality setting, deviation ID
 - JSON format, easy to query and manage
 
-### View Directory Structure
+### View Directory Structure | 查看目录结构
 
 ```bash
 python tools/file_organizer.py --mode=by_author --show-structure
@@ -480,9 +481,9 @@ python tools/file_organizer.py --mode=by_date --show-structure
 
 ---
 
-## ⚙️ Configuration Options
+## ⚙️ Configuration Options | 配置选项
 
-### Common Options
+### Common Options | 通用选项
 
 | Option | Description | Default |
 |--------|-------------|---------|
@@ -494,7 +495,7 @@ python tools/file_organizer.py --mode=by_date --show-structure
 | `--cookies=<path>` | Cookie file path | `cookies.txt` |
 | `--proxy=<url>` | Proxy server | - |
 
-### Global Options
+### Global Options | 全局选项
 
 | Option | Description |
 |--------|-------------|
@@ -502,7 +503,7 @@ python tools/file_organizer.py --mode=by_date --show-structure
 | `--verbose, -v` | Verbose output |
 | `--quiet, -q` | Quiet mode (errors only) |
 
-### Examples
+### Examples | 示例
 
 ```bash
 # Download original, delay 3 seconds
@@ -520,9 +521,9 @@ devart-dl --quiet gallery username --organize=by_date
 
 ---
 
-## 📚 Command Reference
+## 📚 Command Reference | 命令参考
 
-### Download Commands
+### Download Commands | 下载命令
 
 ```bash
 # Single artwork download
@@ -541,7 +542,7 @@ devart-dl search <username|all> <query> [options]
 devart-dl fav <username> <folder_id> [options]
 ```
 
-### Tool Commands
+### Tool Commands | 工具命令
 
 ```bash
 # Login management
@@ -560,7 +561,7 @@ devart-dl test <username>
 devart-dl config
 ```
 
-### Info Commands
+### Info Commands | 信息命令
 
 ```bash
 # Help
@@ -576,7 +577,7 @@ devart-dl docs
 
 ---
 
-## 🏗️ Project Structure
+## 🏗️ Project Structure | 项目结构
 
 ```
 deviantart_downloader/
@@ -613,9 +614,9 @@ deviantart_downloader/
 
 ---
 
-## 🔧 Advanced Usage
+## 🔧 Advanced Usage | 高级用法
 
-### Custom Download Script
+### Custom Download Script | 自定义下载脚本
 
 ```python
 from deviantart_dl import DeviantArtDownloader
@@ -636,7 +637,7 @@ for art in artworks:
     dl.download(art)
 ```
 
-### Using Proxy
+### Using Proxy | 使用代理
 
 ```bash
 # HTTP proxy
@@ -650,7 +651,7 @@ export ALL_PROXY=socks5://127.0.0.1:1080
 devart-dl url <URL> --proxy=http://127.0.0.1:7890
 ```
 
-### Batch Processing
+### Batch Processing | 批处理
 
 ```bash
 # Download multiple artists
@@ -667,7 +668,7 @@ done
 
 ---
 
-## ❓ FAQ
+## ❓ FAQ | 常见问题
 
 ### Q: Downloads are very slow?
 **A:** Try these solutions:
@@ -709,7 +710,7 @@ done
 
 ---
 
-## 📄 License
+## 📄 License | 许可证
 
 MIT License - See [LICENSE](LICENSE) file
 
@@ -722,7 +723,7 @@ MIT License - See [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Acknowledgments | 致谢
 
 - DeviantArt for providing the platform
 - All contributors and users
@@ -730,14 +731,14 @@ MIT License - See [LICENSE](LICENSE) file
 
 ---
 
-## 📮 Contact
+## 📮 Contact | 联系方式
 
 - Issues: [GitHub Issues](https://github.com/zoidberg-xgd/deviantart-downloader/issues)
 - Discussions: [GitHub Discussions](https://github.com/zoidberg-xgd/deviantart-downloader/discussions)
 
 ---
 
-## 🌟 Star History
+## 🌟 Star History | 星标历史
 
 If you find this project helpful, please give it a star! ⭐
 
