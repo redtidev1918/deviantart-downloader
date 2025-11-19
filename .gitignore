@@ -29,6 +29,12 @@ htmlcov/
 .tox/
 .nox/
 
+# Temporary test/debug scripts (root only, not in tests/)
+/test_*.py
+/debug_*.py
+/*_test.py
+/*_debug.py
+
 # Virtual Environment
 venv/
 ENV/
