@@ -25,22 +25,21 @@ DeviantArt 登录后快速导出 Cookie 的多种方法
 
 ---
 
-## 方法2: 完整可视化脚本
+## 方法2: 浏览器扩展
 
-**带UI界面，功能更强大**
+**使用浏览器扩展快速导出**
 
-1. 登录 DeviantArt
-2. 按 `F12` → `Console`
-3. 复制粘贴 `tools/export_cookies.js` 的完整内容
-4. 会弹出一个漂亮的导出面板
-5. 点击"复制关键 Cookie"或"复制完整 Cookie"
+### EditThisCookie (推荐)
+1. 安装扩展（Chrome/Firefox）
+2. 登录 DeviantArt
+3. 点击扩展图标
+4. 点击"Export"导出
 
-### 特点：
-- ✓ 可视化界面
-- ✓ 区分关键Cookie和完整Cookie
-- ✓ 可保存为文件
-- ✓ 一键复制
-- ✓ 使用说明
+### Cookie-Editor
+1. 安装 Cookie-Editor 扩展
+2. 登录 DeviantArt
+3. 点击扩展 → "Export" → "Header String"
+4. 复制 Cookie 字符串
 
 ---
 
@@ -95,38 +94,13 @@ javascript:(function(){let c=document.cookie;if(!c){alert('未检测到Cookie，
 
 ---
 
-## 方法5: 浏览器扩展
-
-### EditThisCookie (推荐)
-
-1. 安装扩展：
-   - Chrome: [EditThisCookie](https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg)
-   - Firefox: 在附加组件商店搜索
-   
-2. 使用方法：
-   - 登录 DeviantArt
-   - 点击扩展图标
-   - 点击"Export" → 选择格式
-   - 复制导出的 Cookie
-
-### Cookie-Editor
-
-1. 安装 [Cookie-Editor](https://cookie-editor.cgagnier.ca/)
-2. 登录 DeviantArt
-3. 点击扩展图标
-4. 点击"Export" → "Header String"
-5. 复制 Cookie 字符串
-
----
-
 ## 快速对比
 
 | 方法 | 速度 | 难度 | 推荐 |
 |------|------|------|------|
 | **控制台脚本** | ⚡⚡⚡ 最快 | ⭐ 简单 | ✅ 推荐 |
 | **书签工具** | ⚡⚡⚡ 最快 | ⭐ 简单 | ✅ 推荐 |
-| **可视化脚本** | ⚡⚡ 快 | ⭐⭐ 中等 | - |
-| **浏览器扩展** | ⚡⚡ 快 | ⭐ 简单 | ✅ |
+| **浏览器扩展** | ⚡⚡ 快 | ⭐ 简单 | ✅ 推荐 |
 | **手动复制** | ⚡ 慢 | ⭐⭐⭐ 复杂 | - |
 
 ---
@@ -211,21 +185,21 @@ A: 确保：
 
 ## 推荐方案
 
-**日常使用：**
+**日常使用（最简单）：**
 1. 设置书签工具
 2. 需要时点击书签
 3. 自动复制 Cookie
 4. 粘贴到工具
 
-**首次设置：**
+**首次设置（最快）：**
 1. 使用控制台脚本
-2. 或使用可视化界面
-3. 保存为文件备用
+2. Cookie 自动复制
+3. 直接粘贴使用
 
 **技术用户：**
-1. 安装浏览器扩展
-2. 设置自动导出
-3. 或使用 API 方式
+1. 安装浏览器扩展（EditThisCookie 或 Cookie-Editor）
+2. 一键导出 Cookie
+3. 支持多种格式
 
 ---
 

@@ -279,7 +279,7 @@ devart-dl url <URL>          # ✅ Auto-loads session
 
 ### Quick Cookie Export
 
-**Method 1: One-click export script (Fastest)**
+**Method 1: Console Script (Recommended ⭐)**
 
 ```javascript
 // 1. Press F12 on DeviantArt logged-in page
@@ -289,19 +289,15 @@ devart-dl url <URL>          # ✅ Auto-loads session
 // 4. Cookie automatically copied to clipboard!
 ```
 
-**Method 2: Visual export (with UI)**
-- Use complete `tools/export_cookies.js` script
-- Beautiful export panel appears
-- Distinguish key cookies and full cookies
+**Method 2: Bookmarklet (Most convenient)**
+- Create bookmark, name: `Export DA Cookie`
+- URL: `javascript:(function(){...})()`
+- Click bookmark on DeviantArt page to export
 
-**Method 3: Bookmarklet (Most convenient)**
-- Create bookmark, fill URL with above script
-- Click bookmark on DeviantArt page
-- One-click export
-
-**Method 4: Manual copy (Traditional)**
+**Method 3: Manual copy (Traditional)**
 - Chrome/Edge: `F12` → `Application` → `Cookies`
 - Firefox: `F12` → `Storage` → `Cookie`
+- Only need key cookies: `auth`, `auth_secure`, `userinfo`
 
 **📖 Complete export guide:**
 ```bash

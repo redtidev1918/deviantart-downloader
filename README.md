@@ -279,7 +279,7 @@ devart-dl url <URL>          # ✅ 自动加载会话
 
 ### 快速获取 Cookie
 
-**方法1: 一键导出脚本（最快）**
+**方法1: 控制台脚本（推荐⭐）**
 
 ```javascript
 // 1. 在 DeviantArt 登录后的页面按 F12
@@ -289,19 +289,15 @@ devart-dl url <URL>          # ✅ 自动加载会话
 // 4. Cookie 自动复制到剪贴板！
 ```
 
-**方法2: 可视化导出（带UI）**
-- 使用 `tools/export_cookies.js` 完整脚本
-- 弹出漂亮的导出面板
-- 区分关键Cookie和完整Cookie
+**方法2: 书签工具（最方便）**
+- 创建书签，名称：`导出DA Cookie`
+- 网址填入：`javascript:(function(){...})()`
+- 在 DeviantArt 页面点击书签即可导出
 
-**方法3: 书签工具（最方便）**
-- 创建书签，网址填入上面的脚本
-- 在 DeviantArt 页面点击书签
-- 一键导出
-
-**方法4: 手动复制（传统）**
+**方法3: 手动复制（传统）**
 - Chrome/Edge: `F12` → `Application` → `Cookies`
 - Firefox: `F12` → `存储` → `Cookie`
+- 只需复制关键Cookie：`auth`, `auth_secure`, `userinfo`
 
 **📖 完整导出指南:**
 ```bash
