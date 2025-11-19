@@ -688,9 +688,19 @@ for art in artworks:
 
 MIT License - 查看 [LICENSE](LICENSE) 文件
 
+**重要声明：**
+- 本工具仅供个人学习和研究使用
+- 请尊重版权和服务条款
+- 请勿用于商业目的
+- 请勿滥用或超载服务器
+- 作者不对任何滥用后果负责
 
 ---
 
+## 🙏 致谢 | Acknowledgments
+
+- 感谢 DeviantArt 提供的平台
+- 感谢所有贡献者和用户
 - 感谢开源社区
 
 ---
