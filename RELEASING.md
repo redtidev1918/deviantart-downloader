@@ -31,20 +31,44 @@ the GitHub Release, and publishes to PyPI.
       在干净 venv 里安装 wheel 并运行 `devart-dl version` 冒烟测试；
    2. `github-release`: 从 CHANGELOG 提取对应小节，创建 GitHub Release
       并附上 `dist/*` 产物；
-   3. `pypi-publish`: 若配置了 PyPI token，则发布到 PyPI（未配置则跳过）。
+   3. `pypi-publish`: 通过 PyPI Trusted Publishing（OIDC，免 token）
+      发布到 PyPI。
 
-## 配置 PyPI 发布（可选 / one-time setup)
+## 配置 PyPI Trusted Publishing（一次性 / one-time setup）
 
-1. 在 [PyPI](https://pypi.org/account/manage/api-tokens/) 创建 API token
-   （scope 限定为 `devart-dl` 项目）；
-2. 仓库 → Settings → Secrets and variables → Actions →
-   New repository secret，名称 `PYPI_API_TOKEN`，值为 token；
-3. （可选）Settings → Environments 创建 `pypi` 环境并配置保护规则。
+`pypi-publish` 使用 PyPI 的 Trusted Publisher（OIDC）认证，**不需要在
+GitHub 存放任何 API token**。项目所有者只需在 PyPI 网站上做一次登记：
 
-未配置该 secret 时，`pypi-publish` job 会自动跳过，只发布 GitHub Release。
+1. 用拥有 `devart-dl` 项目的 PyPI 账号登录
+   [pypi.org](https://pypi.org/)
+   （已有项目直达：
+   [Manage → Publishing](https://pypi.org/manage/project/devart-dl/settings/publishing/)
+   ，即 Trusted Publisher Management 页面）；
+2. **Add a Trusted Publisher**（已有项目选 "Add trusted publisher"；
+   全新项目在 Publishing 页添加 "pending publisher"），按以下内容填写：
 
-If `PYPI_API_TOKEN` is not set, the PyPI job is skipped and only the GitHub
-Release is published.
+   | 字段 | 值 |
+   |------|------|
+   | PyPI project name | `devart-dl` |
+   | Owner | `redtidev1918` |
+   | Repository | `deviantart-downloader` |
+   | Workflow name | `release.yml` |
+   | Environment name | `pypi` |
+
+3. 保存。之后每次推送 `v*` 标签，`pypi-publish` job 会用 OIDC 换取
+   短时上传凭据并自动发布。
+
+> 注意：在 PyPI 上完成登记之前，发版时 `pypi-publish` job 会因 OIDC
+> 校验失败而报错（GitHub Release 部分不受影响，正常发布）。登记完成
+> 后即恢复，无需改仓库。
+
+### 备选：API token / Alternative: API token
+
+不便使用 Trusted Publishing 时，可退回传统方式：在
+[PyPI API tokens](https://pypi.org/account/manage/api-tokens/) 创建
+scope 限定为 `devart-dl` 的 token，在 仓库 → Settings → Secrets and
+variables → Actions 添加 secret `PYPI_API_TOKEN`，并把
+`release.yml` 里的 `pypi-publish` job 换成 twine + token 的上传方式。
 
 ## 常见问题 / Notes
 
