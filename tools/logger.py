@@ -312,7 +312,7 @@ def main():
     print()
     
     # 设置日志
-    logger = setup_logger(
+    setup_logger(
         level=logging.DEBUG,
         enable_file=True,
         colored=True,
@@ -335,7 +335,7 @@ def main():
     # 测试进度
     section("测试进度显示")
     for i in range(0, 101, 20):
-        progress(i, 100, f"下载中...")
+        progress(i, 100, "下载中...")
         import time
         time.sleep(0.3)
     
@@ -348,7 +348,7 @@ def main():
     
     print()
     print("✓ 日志系统测试完成")
-    print(f"✓ 日志文件已保存")
+    print("✓ 日志文件已保存")
 
 
 if __name__ == '__main__':

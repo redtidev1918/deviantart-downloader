@@ -1,0 +1,61 @@
+name: 🐛 Bug 报告 / Bug Report
+description: 报告下载失败、安装问题或异常行为 / Report a download, install, or behavior problem
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请尽量填写以下信息，否则很难定位问题。
+        Thanks for reporting! Please fill in as much as you can — without details we usually cannot reproduce the issue.
+  - type: input
+    id: version
+    attributes:
+      label: devart-dl 版本 / Version
+      description: 运行 `devart-dl version` 的输出 / Output of `devart-dl version`
+      placeholder: devart-dl 3.3.1
+    validations:
+      required: true
+  - type: input
+    id: python-os
+    attributes:
+      label: Python 与操作系统 / Python & OS
+      placeholder: Python 3.12.4, Windows 11
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: 安装方式 / Install method
+      options:
+        - pip install devart-dl
+        - pip install . (源码 / from source)
+        - 直接运行脚本 / running scripts directly
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: 完整命令 / Full command
+      placeholder: devart-dl gallery someuser --quality=f
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 / Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为 / Actual behavior
+      description: 请粘贴完整报错或日志；若涉及具体作品请提供作品链接 / Paste the full error or log; include artwork URLs if relevant
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 检查项 / Checks
+      options:
+        - label: 我已升级到最新版本 / I am on the latest release
+        - label: 我已搜索过现有 issue / I searched existing issues

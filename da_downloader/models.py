@@ -37,16 +37,35 @@ class Deviation:
         # 处理嵌套的 deviation 结构
         if 'deviation' in data:
             data = data['deviation']
+
+        deviation_id = data.get('deviationId', data.get('deviationid'))
+        if deviation_id in (None, ''):
+            raise ValueError("deviation ID is missing")
+
+        author = data.get('author') or {}
+        if not isinstance(author, dict):
+            author = {}
+        media = data.get('media') or {}
+        if not isinstance(media, dict):
+            media = {}
+
+        deviation_type = data.get('type', 'unknown')
+        if data.get('isVideo'):
+            deviation_type = 'video'
+        elif data.get('isJournal'):
+            deviation_type = 'literature'
         
         return cls(
-            deviation_id=data.get('deviationId', ''),
-            title=data.get('title', 'Untitled'),
-            url=data.get('url', ''),
-            author=data.get('author', {}).get('username', 'Unknown'),
-            media=data.get('media', {}),
-            is_downloadable=data.get('isDownloadable', False),
-            is_mature=data.get('isMature', False),
-            deviation_type=data.get('type', 'unknown')
+            deviation_id=str(deviation_id),
+            title=str(data.get('title') or 'Untitled'),
+            url=str(data.get('url') or ''),
+            author=str(author.get('username') or 'Unknown'),
+            media=media,
+            is_downloadable=bool(
+                data.get('isDownloadable', data.get('is_downloadable', False))
+            ),
+            is_mature=bool(data.get('isMature', data.get('is_mature', False))),
+            deviation_type=str(deviation_type),
         )
     
     def get_filename(self) -> str:
@@ -55,7 +74,7 @@ class Deviation:
         if not media or 'prettyName' not in media:
             # 根据类型确定默认扩展名
             default_ext = '.mp4' if self.deviation_type in ['video', 'film'] else '.jpg'
-            return f"{self.title}{default_ext}"
+            return f"{self.title}_{self.deviation_id}{default_ext}"
         
         pretty_name = media['prettyName']
         

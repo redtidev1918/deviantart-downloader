@@ -1,0 +1,103 @@
+name: Release
+
+# Tag-driven release: push a tag like v3.3.1 and this workflow builds the
+# distributions, creates the GitHub Release, and publishes to PyPI when the
+# PYPI_API_TOKEN secret is configured. See RELEASING.md.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  HAS_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN != '' }}
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build tools
+        run: pip install build twine
+      - name: Build sdist and wheel
+        run: python -m build
+      - name: Twine metadata check
+        run: twine check dist/*
+      - name: Verify tag matches package version
+        run: |
+          PKG_VERSION="v$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")"
+          echo "package: ${PKG_VERSION}, tag: ${GITHUB_REF_NAME}"
+          test "${PKG_VERSION}" = "${GITHUB_REF_NAME}" || {
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version ${PKG_VERSION}"
+            exit 1
+          }
+      - name: Smoke test installed wheel
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install dist/*.whl
+          /tmp/smoke/bin/devart-dl version
+          /tmp/smoke/bin/devart-dl --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 30
+
+  github-release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Extract changelog section for this tag
+        id: notes
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk "/^## \[${VERSION}\]/{flag=1; next} /^## \[/{if (flag) exit} flag" CHANGELOG.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "No changelog section found for ${VERSION}; using generated notes."
+            echo "generated=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=("create" "${GITHUB_REF_NAME}" --title "devart-dl ${GITHUB_REF_NAME}" --generate-notes)
+          if [ "${{ steps.notes.outputs.generated }}" != "true" ]; then
+            ARGS+=(--notes-file release_notes.md)
+          fi
+          gh release create "${ARGS[@]}" dist/*
+
+  pypi-publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    if: env.HAS_PYPI_TOKEN == 'true'
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          pip install twine
+          twine upload --non-interactive dist/*

@@ -2,8 +2,9 @@
 
 import json
 import logging
+import os
 from pathlib import Path
-from typing import Dict, Set, Optional
+from typing import Dict, Optional
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -26,57 +27,79 @@ class ProgressManager:
         
         self.progress_file = self.progress_dir / f"{session_name}.json"
         self.data = self._load()
+
+    def _empty_data(self) -> Dict:
+        now = datetime.now().isoformat()
+        return {
+            'session_name': self.session_name,
+            'created_at': now,
+            'last_updated': now,
+            'downloaded': {},
+            'failed': {},
+            'skipped': set(),
+            'last_offset': 0,
+            'last_cursor': ''
+        }
     
     def _load(self) -> Dict:
         """加载进度文件"""
         if not self.progress_file.exists():
-            return {
-                'session_name': self.session_name,
-                'created_at': datetime.now().isoformat(),
-                'last_updated': datetime.now().isoformat(),
-                'downloaded': set(),
-                'failed': {},
-                'skipped': set(),
-                'last_offset': 0,
-                'last_cursor': ''
-            }
+            return self._empty_data()
         
         try:
             with open(self.progress_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                # 转换列表为集合
-                data['downloaded'] = set(data.get('downloaded', []))
+                # v2 stored only a list of IDs. Treat those entries as legacy
+                # hints, not proof that the file still exists on disk.
+                downloaded = data.get('downloaded', {})
+                if isinstance(downloaded, list):
+                    downloaded = {str(item): None for item in downloaded}
+                elif not isinstance(downloaded, dict):
+                    downloaded = {}
+                data['downloaded'] = downloaded
                 data['skipped'] = set(data.get('skipped', []))
                 data['failed'] = data.get('failed', {})
+                data.setdefault('created_at', datetime.now().isoformat())
+                data.setdefault('last_offset', 0)
+                data.setdefault('last_cursor', '')
                 return data
         except Exception as e:
             logger.warning(f"Failed to load progress file: {e}")
-            return self._load()
+            return self._empty_data()
     
     def save(self):
         """保存进度到文件"""
+        temporary = self.progress_file.with_suffix('.json.tmp')
         try:
             data = {
                 'session_name': self.session_name,
                 'created_at': self.data.get('created_at'),
                 'last_updated': datetime.now().isoformat(),
-                'downloaded': list(self.data['downloaded']),
+                'downloaded': self.data['downloaded'],
                 'failed': self.data['failed'],
                 'skipped': list(self.data['skipped']),
                 'last_offset': self.data['last_offset'],
                 'last_cursor': self.data['last_cursor']
             }
             
-            with open(self.progress_file, 'w', encoding='utf-8') as f:
+            with open(temporary, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
+            os.replace(temporary, self.progress_file)
             
             logger.debug(f"Progress saved to {self.progress_file}")
         except Exception as e:
+            if temporary.exists():
+                try:
+                    temporary.unlink()
+                except OSError:
+                    pass
             logger.error(f"Failed to save progress: {e}")
     
-    def is_downloaded(self, deviation_id: str) -> bool:
-        """检查作品是否已下载"""
-        return deviation_id in self.data['downloaded']
+    def is_downloaded(self, deviation_id: str, expected_path: Optional[str] = None) -> bool:
+        """Return true only when the recorded output file still exists."""
+        recorded_path = self.data['downloaded'].get(deviation_id)
+        candidate = recorded_path or expected_path
+        return bool(candidate and Path(candidate).is_file())
     
     def is_failed(self, deviation_id: str) -> bool:
         """检查作品是否下载失败"""
@@ -88,9 +111,9 @@ class ProgressManager:
             return self.data['failed'][deviation_id].get('retry_count', 0)
         return 0
     
-    def mark_downloaded(self, deviation_id: str):
+    def mark_downloaded(self, deviation_id: str, file_path: Optional[str] = None):
         """标记作品已下载"""
-        self.data['downloaded'].add(deviation_id)
+        self.data['downloaded'][deviation_id] = file_path
         # 从失败列表移除
         if deviation_id in self.data['failed']:
             del self.data['failed'][deviation_id]

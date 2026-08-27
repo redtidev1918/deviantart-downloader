@@ -1,7 +1,6 @@
 """Tests for Pydantic models"""
 
 import pytest
-from pathlib import Path
 from pydantic import ValidationError
 
 from ..models.config import AppConfig, DownloadQuality

@@ -4,10 +4,13 @@ DeviantArt 作品批量下载工具。支持智能文件分类、多账号登录
 
 [English Documentation](README_EN.md)
 
+[![CI](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![Python](https://img.shields.io/pypi/pyversions/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![Downloads](https://img.shields.io/pypi/dm/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+更新日志见 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 
@@ -42,10 +45,12 @@ pip install "devart-dl[browser]"
 也可以从源码安装：
 
 ```bash
-git clone https://github.com/zoidberg-xgd/deviantart-downloader.git
+git clone https://github.com/redtidev1918/deviantart-downloader.git
 cd deviantart-downloader
-pip install -r requirements.txt
+pip install .
 ```
+
+需要 Python 3.10 或更高版本。
 
 ### 基本用法
 
@@ -88,6 +93,11 @@ devart-dl artist username --ask=0
 # 下载 1080p 视频
 # 工具会自动选择最高画质，无需额外配置
 ```
+
+> **提示**：画廊下载会遍历**所有**画廊文件夹（包括非 Featured 文件夹）。
+> 下载进度保存在 `~/.deviantart_dl/progress/`，中断后重新运行同一命令即可
+> 续传；上次失败的文件会自动重试。如需完全重新下载，删除对应的进度
+> `.json` 文件并加 `--replace=1`。
 
 ---
 
@@ -167,31 +177,29 @@ export DEVART_LANG=en_US  # 强制英文
 
 ```bash
 # 调试模式（详细日志并保存到文件）
-devart-dl --debug gallery username
+devart-dl gallery username --debug=1
 
-# 安静模式（仅显示错误）
-devart-dl --quiet gallery username
-
-# 日志文件默认保存位置
-# ~/.deviantart_dl/logs/
+# 下载目录默认为 ./Downloads，可用 --dest 调整
+devart-dl gallery username --dest=./my_downloads
 ```
 
 ---
 
 ## 文件管理
 
-下载的文件默认按作者分类，也可以通过 `--organize` 参数调整。
+画廊/收藏夹下载默认**按作者分文件夹**保存，可用 `--separate` 控制：
+
+```bash
+devart-dl gallery username --separate=1   # 每位作者一个文件夹（默认）
+devart-dl gallery username --separate=0   # 全部保存到同一目录
+```
+
+`devart-dl url` 单图下载额外支持 `--organize=<模式>` 分类归档：
 
 | 模式 | 说明 | 示例路径 |
 |------|------|-------------|
 | `by_author` | 按作者分类（默认） | `downloads/artist_name/artwork.jpg` |
-| `by_date` | 按日期分类 | `downloads/2025/01/15/artwork.jpg` |
-| `by_type` | 按类型分类 | `downloads/images/artwork.jpg` |
-| `by_gallery` | 按画廊分类 | `downloads/artist/gallery_name/artwork.jpg` |
-| `mixed` | 混合模式 | `downloads/artist/2025-01/artwork.jpg` |
 | `flat` | 不分类 | `downloads/artwork.jpg` |
-
-此外，每次下载都会在 `.metadata/` 目录下保存对应的元数据（JSON格式），方便后续整理。
 
 
 ---
@@ -202,12 +210,15 @@ devart-dl --quiet gallery username
 
 | 选项 | 说明 | 默认值 |
 |------|------|--------|
-| `--quality` | 图片质量：`o` (原图), `f` (全图), `p` (预览) | `f` |
-| `--dest` | 下载目录 | `./downloads` |
+| `--quality` | 图片质量：`o` (原图, 需登录), `f` (全图), `p` (预览) | `f` |
+| `--dest` | 下载目录 | `./Downloads` |
 | `--delay` | 下载间隔（秒），用于防封 | `1` |
-| `--limit` | 批量下载时的数量限制 | `24` |
-| `--organize` | 文件分类模式 | `by_author` |
-| `--proxy` | 代理地址 (HTTP/SOCKS) | - |
+| `--limit` | 每页加载数量（1–60） | `24` |
+| `--offset` | 起始偏移（配合续传使用） | `0` |
+| `--separate` | 是否按作者分文件夹 `0\|1` | `1` |
+| `--replace` | 是否覆盖已存在文件 `0\|1` | `0`（跳过） |
+| `--cookies` | Cookie 文件路径 | `./cookies.txt` |
+| `--proxy` | 代理地址 (HTTP/SOCKS) | 自动读取环境变量 |
 
 ### 调试选项
 
@@ -252,29 +263,38 @@ export ALL_PROXY=socks5://127.0.0.1:1080
 
 ### Python 脚本调用
 
-支持在 Python 代码中直接调用：
+支持在 Python 代码中直接调用（异步核心库）：
 
 ```python
-from deviantart_dl import DeviantArtDownloader
+import asyncio
+from pathlib import Path
+from deviantart_dl import DeviantArtDownloader, AppConfig
 
-dl = DeviantArtDownloader(
-    cookies_file='cookies.txt',
-    quality='f',
-    delay=2
+config = AppConfig(
+    cookies_file=Path('cookies.txt'),
+    destination=Path('downloads'),
+    quality='full',
+    ask_before_download=False,
 )
 
-# 下载单个作品
-dl.download_url('https://www.deviantart.com/example/art/work-123')
+async def main():
+    async with DeviantArtDownloader(config) as dl:
+        await dl.download_gallery('username')
 
-# 搜索并下载
-artworks = dl.search_user('username', 'keyword')
-for art in artworks:
-    dl.download(art)
+asyncio.run(main())
 ```
 
 ---
 
 ## 常见问题
+
+**Q: 下载不完整 / 只下了一部分 / 像是跳着下？**
+A: 请升级到 **v3.3.1+**。旧版本只下载 Featured（精选）文件夹，其他画廊
+文件夹里的作品会被跳过；v3.3.1 起会遍历全部画廊文件夹。同时网络请求失败
+不再被误判为"下载完毕"，会明确报错并在下次运行时自动重试。
+
+**Q: pip 安装后运行 `devart-dl` 报 ModuleNotFoundError？**
+A: 请升级到 **v3.3.1+**（`pip install -U devart-dl`），安装入口已修复。
 
 **Q: 下载速度慢？**
 A: 建议配置代理（`--proxy`），或适当降低图片质量（`--quality=p`）。
@@ -295,5 +315,3 @@ A: 推荐使用 Chrome/Edge 开发者工具 (F12) -> Application -> Cookies，�
 本项目基于 [MIT License](LICENSE) 开源。
 
 **注意**：本工具仅供个人学习和研究使用。使用者应遵守 DeviantArt 服务条款及版权规定，请勿用于商业用途或大规模抓取导致服务器过载。作者不对任何滥用后果负责。
-
-

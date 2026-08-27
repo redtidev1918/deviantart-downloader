@@ -9,12 +9,8 @@ DeviantArt Downloader v2.0 - 重构版主入口
 """
 
 import sys
-import argparse
-from typing import Dict
 
 from da_downloader import DeviantArtDownloader, Config
-from da_downloader.auth import AuthManager
-from da_downloader.models import ActionType
 from da_downloader.utils import setup_logging, print_banner
 
 
@@ -83,7 +79,7 @@ NEW IN v2.0:
   ✓ Better error handling - more robust
   ✓ Progress tracking - see download status
   ✓ Type hints - better IDE support
-  ✓ Python 3.6+ support - wider compatibility
+  ✓ Python 3.10+ support
 
 For detailed documentation, see README.md
 '''

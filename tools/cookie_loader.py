@@ -141,7 +141,7 @@ def main():
     source = get_cookie_source()
     
     if cookies:
-        print(f"✓ 找到 Cookie")
+        print("✓ 找到 Cookie")
         print(f"  来源: {source}")
         print(f"  长度: {len(cookies)} 字符")
         print(f"  预览: {cookies[:50]}..." if len(cookies) > 50 else cookies)

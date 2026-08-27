@@ -5,10 +5,8 @@
 """
 
 import sys
-import json
-import time
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional
 
 # 颜色
 class C:
@@ -114,7 +112,7 @@ class BrowserLogin:
             print(f"{C.GREEN}  请在浏览器中登录 DeviantArt{C.RESET}")
             print(f"{C.GREEN}{'='*70}{C.RESET}\n")
             print(f"{C.YELLOW}提示：{C.RESET}")
-            print(f"  1. 在打开的浏览器中输入用户名和密码")
+            print("  1. 在打开的浏览器中输入用户名和密码")
             print(f"  2. 完成登录后，{C.BOLD}保持浏览器打开{C.RESET}")
             print(f"  3. 回到终端，按 {C.GREEN}Enter{C.RESET} 继续\n")
             
@@ -161,7 +159,6 @@ class BrowserLogin:
     
     def _create_driver(self, browser: str):
         """创建浏览器驱动"""
-        from selenium import webdriver
         
         try:
             if browser.lower() == "chrome":
@@ -176,9 +173,9 @@ class BrowserLogin:
         except Exception as e:
             print(f"{C.RED}创建浏览器失败: {e}{C.RESET}")
             print(f"\n{C.YELLOW}建议：{C.RESET}")
-            print(f"  1. 确保已安装浏览器")
-            print(f"  2. 安装 webdriver-manager: pip install webdriver-manager")
-            print(f"  3. 或手动下载对应的浏览器驱动")
+            print("  1. 确保已安装浏览器")
+            print("  2. 安装 webdriver-manager: pip install webdriver-manager")
+            print("  3. 或手动下载对应的浏览器驱动")
             return None
     
     def _create_chrome_driver(self):
@@ -398,8 +395,8 @@ def main():
         if save:
             print(f"{C.GREEN}Cookie 已保存，现在可以开始下载了{C.RESET}\n")
             print(f"{C.BLUE}试试:{C.RESET}")
-            print(f"  devart-dl gallery username")
-            print(f"  devart-dl artist username")
+            print("  devart-dl gallery username")
+            print("  devart-dl artist username")
         else:
             print(f"{C.YELLOW}Cookie 未保存，请手动保存以下内容到 cookies.txt:{C.RESET}")
             print(f"\n{cookies[:100]}...\n")
@@ -407,9 +404,9 @@ def main():
     else:
         print(f"\n{C.RED}✗ 登录失败{C.RESET}")
         print(f"{C.YELLOW}请检查:{C.RESET}")
-        print(f"  1. 是否已安装 Selenium")
-        print(f"  2. 浏览器是否正确安装")
-        print(f"  3. 是否在浏览器中成功登录")
+        print("  1. 是否已安装 Selenium")
+        print("  2. 浏览器是否正确安装")
+        print("  3. 是否在浏览器中成功登录")
         return 1
 
 

@@ -9,8 +9,6 @@ Internationalization Support
 """
 
 import os
-import json
-from pathlib import Path
 from typing import Dict, Optional
 
 

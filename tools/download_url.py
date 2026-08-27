@@ -10,7 +10,6 @@ DeviantArt URL Downloader - 直接下载单个作品
 
 import html
 import json
-import os
 import re
 import sys
 from datetime import datetime

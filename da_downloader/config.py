@@ -89,7 +89,6 @@ class Config:
     
     def get_proxies(self) -> Dict[str, str]:
         """获取代理配置（优先级：参数 > 环境变量）"""
-        import os
         
         # 优先使用命令行参数指定的代理
         if self.proxy:

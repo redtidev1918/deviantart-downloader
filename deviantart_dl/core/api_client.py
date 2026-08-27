@@ -50,7 +50,7 @@ class DeviantArtAPI:
         # Create async client
         self.client = httpx.AsyncClient(
             headers=config.get_headers(cookies),
-            proxies=config.get_proxies(),
+            proxy=config.proxy,
             timeout=config.timeout,
             follow_redirects=True,
             limits=httpx.Limits(
@@ -282,25 +282,38 @@ class DeviantArtAPI:
             raise APIError(f"API Error: {error_msg}")
 
         # Extract deviations
-        deviations_data = data.get("results") or data.get("deviations", [])
-        if not deviations_data:
-            logger.warning("No deviations found in response")
-            return [], False, offset, ""
+        deviations_data = data.get("results")
+        if deviations_data is None:
+            deviations_data = data.get("deviations", [])
+        if not isinstance(deviations_data, list):
+            raise APIError("API page does not contain a results list")
 
         # Parse deviations
         deviations = []
-        for item in deviations_data:
+        for position, item in enumerate(deviations_data):
             try:
                 deviation = Deviation.from_api_response(item)
                 deviations.append(deviation)
             except Exception as e:
-                logger.warning(f"Failed to parse deviation: {e}")
-                continue
+                raise APIError(
+                    f"Failed to parse deviation at offset {offset + position}"
+                ) from e
 
         # Pagination info
-        has_more = data.get("hasMore", False)
-        next_offset = data.get("nextOffset", offset + len(deviations))
-        next_cursor = data.get("nextCursor", "")
+        has_more = bool(data.get("hasMore", data.get("has_more", False)))
+        raw_next_offset = data.get(
+            "nextOffset", data.get("next_offset", offset + len(deviations_data))
+        )
+        next_cursor = data.get("nextCursor", data.get("next_cursor", "")) or ""
+        if raw_next_offset is None and not has_more:
+            next_offset = offset + len(deviations_data)
+        else:
+            try:
+                next_offset = int(raw_next_offset)
+            except (TypeError, ValueError) as error:
+                raise APIError("API returned an invalid next offset") from error
+        if has_more and not next_cursor and next_offset <= offset:
+            raise APIError("API reported another page without a continuation")
 
         logger.info(f"Fetched {len(deviations)} deviations (has_more={has_more})")
 
@@ -327,8 +340,13 @@ class DeviantArtAPI:
         offset = self.config.offset
         cursor = ""
         fetched_count = 0
+        seen_pages: set[tuple[int, str]] = set()
 
         while True:
+            page_key = (offset, cursor)
+            if page_key in seen_pages:
+                raise APIError("Pagination did not advance")
+            seen_pages.add(page_key)
             deviations, has_more, offset, cursor = await self.fetch_deviations(
                 url, offset, cursor
             )

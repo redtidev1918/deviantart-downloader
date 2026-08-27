@@ -5,7 +5,6 @@ DeviantArt Downloader CLI Entry Point
 """
 
 import sys
-import os
 from pathlib import Path
 
 

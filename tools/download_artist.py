@@ -10,14 +10,9 @@ DeviantArt Artist Downloader - 通过作者 URL 批量下载所有作品
 """
 
 import os
-import re
 import sys
 import subprocess
-from pathlib import Path
 from urllib.parse import urlparse
-
-# 获取项目根目录
-PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 # 颜色输出
 class Colors:
@@ -142,11 +137,9 @@ def build_command(username: str, gallery_id: str | None, options: dict, version:
         命令列表
     """
     if version == 'v2':
-        script_path = PROJECT_ROOT / 'legacy' / 'main.py'
-        cmd = ['python3', str(script_path)]
+        cmd = [sys.executable, '-m', 'legacy.main']
     else:
-        script_path = PROJECT_ROOT / 'legacy' / 'deviantart_downloader.py'
-        cmd = ['python3', str(script_path)]
+        cmd = [sys.executable, '-m', 'legacy.deviantart_downloader']
     
     # 添加操作类型
     cmd.append('gallery')
@@ -236,7 +229,7 @@ def main():
         # 使用 PYTHONUNBUFFERED 确保实时显示输出
         env = os.environ.copy()
         env['PYTHONUNBUFFERED'] = '1'
-        result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env)
+        result = subprocess.run(cmd, env=env)
         
         if result.returncode == 0:
             print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.RESET}")

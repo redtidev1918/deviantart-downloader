@@ -41,7 +41,7 @@ class Deviation(BaseModel):
     This model validates and normalizes data from the DeviantArt API.
     """
 
-    deviation_id: str = Field(..., description="Unique deviation ID")
+    deviation_id: str = Field(..., min_length=1, description="Unique deviation ID")
     title: str = Field(..., description="Deviation title")
     url: HttpUrl = Field(..., description="Deviation page URL")
     author: str = Field(..., description="Author username")
@@ -113,13 +113,17 @@ class Deviation(BaseModel):
             title=data.get("title", "Untitled"),
             url=data.get("url", "https://deviantart.com"),
             author=author,
-            published_time=data.get("publishedTime"),
+            published_time=data.get("publishedTime", data.get("published_time")),
             media=media,
             thumbnail_url=data.get("thumbs", [{}])[0].get("src") if data.get("thumbs") else None,
             deviation_type=data.get("type", "unknown"),
-            is_downloadable=data.get("isDownloadable", False),
-            is_mature=data.get("isMature", False),
-            is_favourited=data.get("isFavourited", False),
+            is_downloadable=data.get(
+                "isDownloadable", data.get("is_downloadable", False)
+            ),
+            is_mature=data.get("isMature", data.get("is_mature", False)),
+            is_favourited=data.get(
+                "isFavourited", data.get("is_favourited", False)
+            ),
             stats_comments=stats.get("comments", 0),
             stats_favourites=stats.get("favourites", 0),
             raw_data=data,

@@ -6,9 +6,8 @@
 
 import os
 import json
-import getpass
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Dict
 from datetime import datetime, timedelta
 
 # 颜色
@@ -185,7 +184,7 @@ class MultiAuthManager:
                 return True, cookies
             
             return False, ""
-        except Exception as e:
+        except Exception:
             return False, ""
     
     def _save_session(self, cookies: str) -> bool:

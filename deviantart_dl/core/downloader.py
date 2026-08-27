@@ -1,12 +1,10 @@
 """Async downloader implementation - simplified for testing"""
 
 import logging
-from pathlib import Path
 from typing import Optional
 
 from ..models.config import AppConfig
-from ..models.deviation import Deviation
-from ..models.download import DownloadTask, DownloadResult, DownloadStatus
+from ..models.download import DownloadResult
 
 logger = logging.getLogger(__name__)
 

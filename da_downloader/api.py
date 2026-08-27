@@ -3,14 +3,23 @@
 import logging
 import json
 import html
+import os
+import re
 from time import sleep
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from urllib.parse import urlencode
+
 import requests
 from requests.exceptions import RequestException
 
 from .models import Deviation, ActionType
 
 logger = logging.getLogger(__name__)
+
+
+class APIError(RuntimeError):
+    """A request or response error that must not be treated as end-of-list."""
 
 
 class DeviantArtAPI:
@@ -26,51 +35,48 @@ class DeviantArtAPI:
         self.retry_delay = retry_delay
         self.max_retries = max_retries
         self.csrf_token: Optional[str] = None
+        self.session = requests.Session()
+        self.session.headers.update(headers)
+        self.session.proxies.update(proxies)
         
         # 记录代理使用情况
         if self.proxies:
-            logger.info(f"Using proxy: {self.proxies.get('http') or self.proxies.get('https')}")
+            logger.info("Using configured proxy")
         else:
             logger.info("No proxy configured")
         
-    def _make_request(self, url: str, timeout: int = 30) -> Optional[requests.Response]:
+    def _make_request(self, url: str, timeout: int = 30) -> requests.Response:
         """发起 HTTP 请求并处理重试"""
         for attempt in range(self.max_retries):
             try:
-                response = requests.get(
+                response = self.session.get(
                     url,
-                    headers=self.headers,
-                    proxies=self.proxies,
                     timeout=timeout
                 )
                 response.raise_for_status()
                 return response
             except RequestException as e:
-                logger.warning(f"Request failed (attempt {attempt + 1}/{self.max_retries}): {e}")
+                status = getattr(getattr(e, 'response', None), 'status_code', None)
+                logger.warning(
+                    "Request failed (attempt %s/%s, type=%s%s)",
+                    attempt + 1,
+                    self.max_retries,
+                    type(e).__name__,
+                    f", status={status}" if status is not None else "",
+                )
                 if attempt < self.max_retries - 1:
                     sleep(self.retry_delay)
                 else:
-                    logger.error(f"Failed after {self.max_retries} attempts")
-                    return None
+                    raise APIError(
+                        f"Request failed after {self.max_retries} attempts"
+                    ) from e
     
     def get_csrf_token(self, username: str) -> Optional[str]:
         """获取 CSRF Token"""
         logger.info(f"[v3.1.3] Fetching CSRF token for user: {username}")
         
         response = self._make_request(f"{self.BASE_URL}/{username}")
-        if not response:
-            return None
-        
         page = response.text
-        
-        # 调试：保存响应到文件
-        try:
-            debug_file = f"/tmp/deviantart_{username}_response.html"
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(page)
-            logger.debug(f"Response saved to: {debug_file}")
-        except:
-            pass
         
         # 检查用户是否存在（改进检测逻辑，避免误判）
         # 检查 HTTP 状态码和页面标题
@@ -91,7 +97,7 @@ class DeviantArtAPI:
                 if 'page not found' in page_title_lower or ('404' in page_title_lower and 'error' in page_title_lower):
                     logger.error(f"User '{username}' not found! (Title indicates 404)")
                     return None
-            except:
+            except (ValueError, IndexError):
                 pass
         
         # 提取 CSRF token
@@ -123,36 +129,47 @@ class DeviantArtAPI:
         if not self.csrf_token:
             raise ValueError("CSRF token not set. Call get_csrf_token first.")
         
-        lazy_params = "&offset=<OFFSET>&limit=<LIMIT>"
-        csrf_param = f"&csrf_token={self.csrf_token}"
-        
+        params = {"csrf_token": self.csrf_token}
+
         if action == ActionType.GALLERY:
-            url = (f"{self.BASE_URL}/_puppy/dashared/gallection/contents"
-                  f"?username={username}&type=gallery{lazy_params}{csrf_param}")
-            
+            url = f"{self.BASE_URL}/_puppy/dashared/gallection/contents"
+            params.update({"username": username, "type": "gallery"})
             if folder_id:
-                url += f"&folderid={folder_id}"
-            # 移除 all_folder=true，可能导致 400 错误
+                params["folderid"] = folder_id
+            else:
+                # Without this flag the private endpoint returns only Featured,
+                # which silently omits works stored in other gallery folders.
+                params["all_folder"] = "true"
+            pagination = "offset=<OFFSET>&limit=<LIMIT>"
                 
         elif action == ActionType.SEARCH:
             if username.lower() == 'all':
-                # 全局搜索
-                url = (f"{self.BASE_URL}/_puppy/da-browse/api/networkbar/search/deviations"
-                      f"?q={query}&cursor=<CURSOR>{csrf_param}")
+                url = f"{self.BASE_URL}/_puppy/da-browse/api/networkbar/search/deviations"
+                params["q"] = query or ""
+                pagination = "cursor=<CURSOR>"
             else:
-                # 用户内搜索
-                url = (f"{self.BASE_URL}/_puppy/dashared/gallection/search"
-                      f"?username={username}&type=gallery&order=most-recent"
-                      f"&q={query}&init=true{lazy_params}{csrf_param}")
+                url = f"{self.BASE_URL}/_puppy/dashared/gallection/search"
+                params.update({
+                    "username": username,
+                    "type": "gallery",
+                    "order": "most-recent",
+                    "q": query or "",
+                    "init": "true",
+                })
+                pagination = "offset=<OFFSET>&limit=<LIMIT>"
                       
         elif action == ActionType.FAVORITE:
-            url = (f"{self.BASE_URL}/_puppy/dashared/gallection/contents"
-                  f"?username={username}&type=collection{lazy_params}"
-                  f"&folderid={folder_id}{csrf_param}")
+            url = f"{self.BASE_URL}/_puppy/dashared/gallection/contents"
+            params.update({
+                "username": username,
+                "type": "collection",
+                "folderid": folder_id or "",
+            })
+            pagination = "offset=<OFFSET>&limit=<LIMIT>"
         else:
             raise ValueError(f"Unknown action type: {action}")
         
-        return url
+        return f"{url}?{urlencode(params)}&{pagination}"
     
     def fetch_deviations(self, url: str, offset: int = 0, 
                         cursor: str = "") -> Tuple[List[Deviation], bool, int, str]:
@@ -165,44 +182,58 @@ class DeviantArtAPI:
         # 替换 URL 中的占位符
         request_url = url.replace('<OFFSET>', str(offset)).replace('<CURSOR>', cursor)
         
-        logger.debug(f"Fetching from: {request_url}")
+        logger.debug("Fetching deviations (offset=%s, cursor=%s)", offset, bool(cursor))
         response = self._make_request(request_url, timeout=30)
-        
-        if not response:
-            logger.error("Failed to fetch deviations")
-            return [], False, offset, ""
         
         try:
             data = response.json()
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response: {e}")
-            return [], False, offset, ""
+        except (json.JSONDecodeError, ValueError) as e:
+            raise APIError("DeviantArt returned invalid JSON") from e
+
+        if not isinstance(data, dict):
+            raise APIError("DeviantArt returned an invalid page object")
         
         # 检查错误
-        if 'errorCode' in data:
-            logger.error(f"API Error: {data}")
-            return [], False, offset, ""
+        if 'errorCode' in data or 'error_code' in data:
+            message = data.get('errorDescription') or data.get('error_description')
+            raise APIError(f"DeviantArt API error: {message or 'unknown error'}")
         
         # 提取作品列表
-        deviations_data = data.get('results') or data.get('deviations', [])
-        if not deviations_data:
-            logger.warning("No deviations found in response")
-            return [], False, offset, ""
+        deviations_data = data.get('results')
+        if deviations_data is None:
+            deviations_data = data.get('deviations', [])
+        if not isinstance(deviations_data, list):
+            raise APIError("DeviantArt page does not contain a results list")
         
         # 转换为 Deviation 对象
         deviations = []
-        for item in deviations_data:
+        for position, item in enumerate(deviations_data):
             try:
+                if not isinstance(item, dict):
+                    raise ValueError("result is not an object")
                 deviation = Deviation.from_api_response(item)
                 deviations.append(deviation)
             except Exception as e:
-                logger.warning(f"Failed to parse deviation: {e}")
-                continue
+                raise APIError(
+                    f"Failed to parse deviation at offset {offset + position}"
+                ) from e
         
         # 获取分页信息
-        has_more = data.get('hasMore', False)
-        next_offset = data.get('nextOffset', offset + len(deviations))
-        next_cursor = data.get('nextCursor', '')
+        has_more = bool(data.get('hasMore', data.get('has_more', False)))
+        raw_next_offset = data.get(
+            'nextOffset', data.get('next_offset', offset + len(deviations_data))
+        )
+        next_cursor = data.get('nextCursor', data.get('next_cursor', '')) or ''
+        if raw_next_offset is None and not has_more:
+            next_offset = offset + len(deviations_data)
+        else:
+            try:
+                next_offset = int(raw_next_offset)
+            except (TypeError, ValueError) as e:
+                raise APIError("DeviantArt returned an invalid next offset") from e
+
+        if has_more and not next_cursor and next_offset <= offset:
+            raise APIError("DeviantArt reported another page without a continuation")
         
         logger.info(f"Fetched {len(deviations)} deviations (has_more={has_more})")
         
@@ -217,7 +248,14 @@ class DeviantArtAPI:
             return None
         
         base_uri = media.get('baseUri', '')
-        token = media.get('token', [''])[0] if 'token' in media else ''
+        if not base_uri:
+            logger.error(f"No media URI for: {deviation.title}")
+            return None
+        raw_token = media.get('token', [])
+        if isinstance(raw_token, list):
+            token = str(raw_token[0]) if raw_token else ''
+        else:
+            token = str(raw_token or '')
         pretty_name = media.get('prettyName', '')
         
         # 原图下载
@@ -235,9 +273,6 @@ class DeviantArtAPI:
     def _get_original_download_url(self, deviation: Deviation) -> Optional[str]:
         """获取原图下载链接"""
         response = self._make_request(deviation.url)
-        if not response:
-            return None
-        
         html_text = response.text
         
         if self.DOWNLOAD_STARTER not in html_text:
@@ -245,14 +280,14 @@ class DeviantArtAPI:
             return None
         
         # 提取下载链接
-        try:
-            fragment = html_text.split(self.DOWNLOAD_STARTER)[1]
-            download_path = fragment.split('"')[0]
-            download_url = html.unescape(self.DOWNLOAD_STARTER + download_path)
-            return download_url
-        except (IndexError, ValueError) as e:
-            logger.error(f"Failed to extract download URL: {e}")
-            return None
+        match = re.search(
+            r'https://www\.deviantart\.com/download/[^"\'\\\s<]+',
+            html_text,
+        )
+        if match:
+            return html.unescape(match.group(0).replace('\\u0026', '&'))
+        logger.error("Failed to extract original download URL")
+        return None
     
     def _get_full_view_url(self, media: Dict, base_uri: str, 
                           token: str, pretty_name: str) -> Optional[str]:
@@ -260,7 +295,7 @@ class DeviantArtAPI:
         types = media.get('types', [])
         
         # 查找所有视频类型并选择最高质量
-        videos = [t for t in types if t.get('t') == 'video']
+        videos = [t for t in types if isinstance(t, dict) and t.get('t') == 'video']
         
         if videos:
             # 按质量排序（1080p > 720p > 480p > 360p）
@@ -278,22 +313,27 @@ class DeviantArtAPI:
             # 视频URL在 'b' 字段中（完整URL）
             if 'b' in best_video:
                 url = best_video['b']
-                logger.info(f"Video URL ({quality}): {url[:80]}...")
+                logger.info("Selected video quality: %s", quality)
                 return url
         
         # 查找全图
-        full_view = next((t for t in types if t.get('t') == 'fullview'), None)
+        full_view = next(
+            (t for t in types if isinstance(t, dict) and t.get('t') == 'fullview'),
+            None,
+        )
         
         if not full_view:
             logger.warning("Full view not found, using base URI")
             url = base_uri
+        elif full_view.get('b'):
+            url = full_view['b']
         elif 'c' in full_view:
             url = base_uri + full_view['c'].replace('<prettyName>', pretty_name)
         else:
             url = base_uri
         
         if token:
-            url += f"?token={token}"
+            url += f"{'&' if '?' in url else '?'}token={token}"
         
         return url
     
@@ -301,33 +341,34 @@ class DeviantArtAPI:
                         token: str, pretty_name: str) -> Optional[str]:
         """获取预览 URL"""
         types = media.get('types', [])
-        preview = next((t for t in types if t.get('t') == 'preview'), None)
+        preview = next(
+            (t for t in types if isinstance(t, dict) and t.get('t') == 'preview'),
+            None,
+        )
         
         if not preview:
-            logger.error("Preview not found")
-            return None
+            logger.warning("Preview not found, using full view")
+            return self._get_full_view_url(media, base_uri, token, pretty_name)
         
         if 'c' not in preview:
-            logger.error("Preview content path not found")
-            return None
+            logger.warning("Preview path not found, using full view")
+            return self._get_full_view_url(media, base_uri, token, pretty_name)
         
         url = base_uri + preview['c'].replace('<prettyName>', pretty_name)
         
         if token:
-            url += f"?token={token}"
+            url += f"{'&' if '?' in url else '?'}token={token}"
         
         return url
     
     def download_file(self, url: str, timeout: int = 180) -> Optional[bytes]:
         """下载文件内容（带进度显示）"""
-        logger.debug(f"Downloading: {url}")
+        logger.debug("Downloading media")
         
         for attempt in range(self.max_retries):
             try:
-                response = requests.get(
+                response = self.session.get(
                     url,
-                    headers=self.headers,
-                    proxies=self.proxies,
                     allow_redirects=True,
                     timeout=timeout,
                     stream=True  # 启用流式下载
@@ -363,8 +404,57 @@ class DeviantArtAPI:
                     return response.content
                     
             except RequestException as e:
-                logger.warning(f"Download failed (attempt {attempt + 1}/{self.max_retries}): {e}")
+                logger.warning(
+                    "Download failed (attempt %s/%s, type=%s)",
+                    attempt + 1,
+                    self.max_retries,
+                    type(e).__name__,
+                )
                 if attempt < self.max_retries - 1:
                     sleep(self.retry_delay)
         
+        return None
+
+    def download_to_file(self, url: str, destination: str, timeout: int = 180) -> Optional[int]:
+        """Stream a download to an atomic temporary file and return its size."""
+        target = Path(destination)
+        temporary = target.with_name(f"{target.name}.part")
+
+        for attempt in range(self.max_retries):
+            try:
+                with self.session.get(
+                    url,
+                    allow_redirects=True,
+                    timeout=timeout,
+                    stream=True,
+                ) as response:
+                    response.raise_for_status()
+                    expected = int(response.headers.get('content-length', 0) or 0)
+                    written = 0
+                    with temporary.open('wb') as output:
+                        for chunk in response.iter_content(chunk_size=64 * 1024):
+                            if not chunk:
+                                continue
+                            output.write(chunk)
+                            written += len(chunk)
+                    if expected and written != expected:
+                        raise OSError(
+                            f"Incomplete download: expected {expected} bytes, got {written}"
+                        )
+                os.replace(temporary, target)
+                return written
+            except (RequestException, OSError) as e:
+                if temporary.exists():
+                    try:
+                        temporary.unlink()
+                    except OSError:
+                        logger.warning("Could not remove incomplete .part file")
+                logger.warning(
+                    "Download failed (attempt %s/%s, type=%s)",
+                    attempt + 1,
+                    self.max_retries,
+                    type(e).__name__,
+                )
+                if attempt < self.max_retries - 1:
+                    sleep(self.retry_delay)
         return None

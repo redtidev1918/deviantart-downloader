@@ -298,7 +298,7 @@ if befCsrf not in page:
     quit()
 csrf = page[page.index(befCsrf) + len(befCsrf):]
 csrf = csrf[0:csrf.index(aftCsrf)]
-print(f'✓ CSRF token acquired')
+print('✓ CSRF token acquired')
 pattern = pattern.replace('<CSRF>', csrf)
 
 # Check login status

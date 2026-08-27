@@ -17,7 +17,6 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Optional, Tuple
-from urllib.parse import quote
 
 
 class FileOrganizer:

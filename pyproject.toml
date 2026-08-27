@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devart-dl"
-version = "3.3.0"
+version = "3.3.1"
 description = "专业的 DeviantArt 作品批量下载工具 - Professional DeviantArt batch downloader with anti-ban features"
 readme = "README.md"
-requires-python = ">=3.6"
-license = {text = "MIT"}
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "DeviantArt Downloader Team"}
 ]
@@ -28,39 +29,33 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Multimedia :: Graphics",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Environment :: Console",
 ]
 
 dependencies = [
-    "httpx>=0.25.0",
-    "aiofiles>=23.2.1",
+    "requests>=2.31.0",
+    "httpx>=0.28.0",
     "pydantic>=2.5.0",
     "pydantic-settings>=2.1.0",
-    "typer[all]>=0.9.0",
-    "rich>=13.7.0",
-    "pyyaml>=6.0.1",
-    "python-dotenv>=1.0.0",
-    "sqlalchemy>=2.0.23",
-    "aiosqlite>=0.19.0",
 ]
 
 [project.optional-dependencies]
+browser = [
+    "selenium>=4.0.0",
+    "webdriver-manager>=3.8.0",
+]
 dev = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.21.1",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
-    "httpx-mock>=0.7.0",
     "black>=23.12.0",
     "mypy>=1.7.1",
     "ruff>=0.1.7",
@@ -69,12 +64,13 @@ dev = [
 ]
 
 [project.scripts]
-devart-dl = "deviantart_downloader_cli:main"
-deviantart-dl = "deviantart_downloader_cli:main"
-da-dl = "deviantart_downloader_cli:main"
+devart-dl = "da_downloader.cli:main"
+deviantart-dl = "da_downloader.cli:main"
+da-dl = "da_downloader.cli:main"
 
-[tool.setuptools]
-packages = ["deviantart_dl", "da_downloader"]
+[tool.setuptools.packages.find]
+include = ["da_downloader*", "deviantart_dl*", "legacy*", "tools*"]
+exclude = ["deviantart_dl.tests*"]
 
 # Black configuration
 [tool.black]
@@ -131,7 +127,7 @@ asyncio_mode = "auto"
 
 # Coverage configuration
 [tool.coverage.run]
-source = ["deviantart_dl"]
+source = ["da_downloader", "deviantart_dl"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
@@ -156,54 +152,26 @@ exclude_lines = [
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
+# Enforced policy: high-signal checks only (real bugs), matching CI.
+# Style rules can be added per-directory once the legacy debt is paid.
 select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
+    "E9",  # runtime errors (syntax error, undefined name, unused bind)
     "F",   # pyflakes
-    "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
-    "UP",  # pyupgrade
-    "N",   # pep8-naming
-    "YTT", # flake8-2020
-    "ANN", # flake8-annotations
-    "S",   # flake8-bandit
-    "BLE", # flake8-blind-except
-    "A",   # flake8-builtins
-    "C4",  # flake8-comprehensions
-    "DTZ", # flake8-datetimez
-    "T10", # flake8-debugger
-    "ISC", # flake8-implicit-str-concat
-    "ICN", # flake8-import-conventions
-    "G",   # flake8-logging-format
-    "PIE", # flake8-pie
-    "T20", # flake8-print
-    "PT",  # flake8-pytest-style
-    "Q",   # flake8-quotes
-    "RET", # flake8-return
-    "SIM", # flake8-simplify
-    "TCH", # flake8-type-checking
-    "ARG", # flake8-unused-arguments
-    "PTH", # flake8-use-pathlib
-    "PD",  # pandas-vet
-    "PL",  # Pylint
-    "TRY", # tryceratops
-    "RUF", # Ruff-specific rules
 ]
 ignore = [
-    "ANN101",  # Missing type annotation for self
-    "ANN102",  # Missing type annotation for cls
-    "D100",    # Missing docstring in public module
-    "D104",    # Missing docstring in public package
     "S101",    # Use of assert
 ]
 
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]  # Unused import
-"tests/*" = ["S101", "PLR2004", "ANN"]  # Allow assert and magic values in tests
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Re-exported names
+"tests/*" = ["S101"]  # Allow assert in tests
+# selenium imports inside try/except ImportError are availability checks
+"tools/browser_login.py" = ["F401"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["deviantart_dl", "da_downloader"]

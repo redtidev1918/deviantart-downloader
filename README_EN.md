@@ -4,11 +4,14 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 
 [中文文档](README.md) | **English Documentation**
 
+[![CI](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![Python](https://img.shields.io/pypi/pyversions/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![Downloads](https://img.shields.io/pypi/dm/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#internationalization)
+
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
 
 ---
 
@@ -49,17 +52,17 @@ pip install devart-dl[browser]
 
 ```bash
 # Clone repository
-git clone https://github.com/zoidberg-xgd/deviantart-downloader.git
+git clone https://github.com/redtidev1918/deviantart-downloader.git
 cd deviantart-downloader
 
-# Install dependencies
-pip install -r requirements.txt
+# Install the package and command
+pip install .
 
-# Install command (optional)
-./bin/install.sh
-# Or add to PATH manually
-export PATH="$HOME/.local/bin:$PATH"
+# Include browser login support when needed
+pip install ".[browser]"
 ```
+
+Python 3.10 or newer is required.
 
 ### Basic Usage | 基本使用
 
@@ -140,6 +143,10 @@ devart-dl gallery username --delay=2 --limit=24
 
 # Download favorites
 devart-dl fav username folder_id
+
+# Gallery downloads cover ALL gallery folders (not just Featured).
+# Progress is saved to ~/.deviantart_dl/progress/ — rerun the same command
+# to resume; failed files retry automatically on the next run.
 ```
 
 ### Search Downloads | 搜索下载
@@ -483,21 +490,15 @@ python tools/file_organizer.py --mode=by_date --show-structure
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--quality=<o\|f\|p>` | Quality: o=original, f=full, p=preview | `f` |
-| `--dest=<path>` | Download directory | `./downloads` |
+| `--quality=<o\|f\|p>` | Quality: o=original (login required), f=full, p=preview | `f` |
+| `--dest=<path>` | Download directory | `./Downloads` |
 | `--delay=<seconds>` | Delay time (anti-ban) | `1` |
-| `--limit=<number>` | Batch quantity | `24` |
-| `--organize=<mode>` | File organization mode | `by_author` |
+| `--limit=<number>` | Page size (1–60) | `24` |
+| `--offset=<int>` | Start offset (for resuming) | `0` |
+| `--separate=<0\|1>` | One folder per author | `1` |
+| `--replace=<0\|1>` | Replace existing files | `0` (skip) |
 | `--cookies=<path>` | Cookie file path | `cookies.txt` |
-| `--proxy=<url>` | Proxy server | - |
-
-### Global Options | 全局选项
-
-| Option | Description |
-|--------|-------------|
-| `--debug, -d` | Debug mode with file logging |
-| `--verbose, -v` | Verbose output |
-| `--quiet, -q` | Quiet mode (errors only) |
+| `--proxy=<url>` | Proxy server | auto from environment |
 
 ### Examples | 示例
 
@@ -508,11 +509,11 @@ devart-dl gallery user --quality=o --delay=3
 # Use proxy
 devart-dl url <URL> --proxy=http://127.0.0.1:7890
 
-# Debug mode with file organization
-devart-dl --debug artist username --organize=mixed
+# Debug logging
+devart-dl gallery username --debug=1
 
-# Silent mode, by date organization
-devart-dl --quiet gallery username --organize=by_date
+# Resume a large gallery from a known offset
+devart-dl gallery username --offset=240
 ```
 
 ---
@@ -652,7 +653,7 @@ devart-dl url <URL> --proxy=http://127.0.0.1:7890
 ```bash
 # Download multiple artists
 for user in artist1 artist2 artist3; do
-    devart-dl artist $user --delay=3 --organize=by_author
+    devart-dl artist $user --delay=3
     sleep 60  # Wait 1 minute between artists
 done
 
@@ -665,6 +666,16 @@ done
 ---
 
 ## ❓ FAQ | 常见问题
+
+### Q: Downloads are incomplete / skip some artworks?
+**A:** Upgrade to **v3.3.1+**. Older versions fetched only the Featured
+folder, so works in other gallery folders were skipped. v3.3.1 walks all
+gallery folders, no longer mistakes a failed request for "end of gallery",
+and retries previously failed files on the next run.
+
+### Q: ModuleNotFoundError after pip install?
+**A:** Upgrade to **v3.3.1+** (`pip install -U devart-dl`); the console
+entry point is fixed.
 
 ### Q: Downloads are very slow?
 **A:** Try these solutions:
@@ -695,14 +706,14 @@ done
 ### Q: Does browser login work?
 **A:** May be blocked by anti-automation. Recommend manual cookie export.
 
-### Q: How to organize downloaded files?
-**A:** Use `--organize` option:
-- `by_author`: By artist (recommended)
-- `by_date`: By date
-- `mixed`: Author + date
+### Q: How are downloaded files organized?
+**A:** Gallery/favorite downloads create one folder per author by default
+(control with `--separate=<0|1>`). Single-URL downloads additionally
+support `--organize` modes.
 
-### Q: Where are metadata files saved?
-**A:** In `.metadata/` directory under download folder, JSON format.
+### Q: Where is the resume progress stored?
+**A:** In `~/.deviantart_dl/progress/<session>.json`. Delete the file and
+pass `--replace=1` to re-download everything.
 
 ---
 
@@ -729,8 +740,8 @@ MIT License - See [LICENSE](LICENSE) file
 
 ## 📮 Contact | 联系方式
 
-- Issues: [GitHub Issues](https://github.com/zoidberg-xgd/deviantart-downloader/issues)
-- Discussions: [GitHub Discussions](https://github.com/zoidberg-xgd/deviantart-downloader/discussions)
+- Issues: [GitHub Issues](https://github.com/redtidev1918/deviantart-downloader/issues)
+- Discussions: [GitHub Discussions](https://github.com/redtidev1918/deviantart-downloader/discussions)
 
 ---
 
