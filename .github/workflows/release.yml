@@ -16,9 +16,6 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  HAS_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN != '' }}
-
 jobs:
   build:
     name: Build distributions
@@ -83,18 +80,31 @@ jobs:
           fi
           gh release create "${ARGS[@]}" dist/*
 
+  # The env context is unavailable in job-level if conditions, so the
+  # token check runs as the first step instead of a job condition.
   pypi-publish:
     name: Publish to PyPI
     needs: build
     runs-on: ubuntu-latest
-    if: env.HAS_PYPI_TOKEN == 'true'
     environment: pypi
     steps:
+      - name: Check for PyPI token
+        id: guard
+        env:
+          HAS_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN != '' }}
+        run: |
+          if [ "${HAS_PYPI_TOKEN}" = "true" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PYPI_API_TOKEN not configured; skipping PyPI publish."
+          fi
       - uses: actions/download-artifact@v4
+        if: steps.guard.outputs.publish == 'true'
         with:
           name: dist
           path: dist/
       - name: Publish
+        if: steps.guard.outputs.publish == 'true'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
