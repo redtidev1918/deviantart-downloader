@@ -71,14 +71,13 @@ jobs:
             echo "generated=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ARGS=("create" "${GITHUB_REF_NAME}" --title "devart-dl ${GITHUB_REF_NAME}" --generate-notes)
-          if [ "${{ steps.notes.outputs.generated }}" != "true" ]; then
-            ARGS+=(--notes-file release_notes.md)
-          fi
-          gh release create "${ARGS[@]}" dist/*
+        uses: softprops/action-gh-release@v2
+        with:
+          name: devart-dl ${{ github.ref_name }}
+          body_path: release_notes.md
+          generate_release_notes: ${{ steps.notes.outputs.generated == 'true' }}
+          files: dist/*
+          fail_on_unmatched_files: true
 
   # The env context is unavailable in job-level if conditions, so the
   # token check runs as the first step instead of a job condition.
