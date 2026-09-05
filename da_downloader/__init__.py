@@ -4,7 +4,7 @@ DeviantArt Downloader - 模块化下载工具
 这是一个重构版本，采用面向对象设计和模块化架构。
 """
 
-__version__ = "3.3.1"
+__version__ = "3.4.0"
 __author__ = "DeviantArt Downloader Team"
 
 from .downloader import DeviantArtDownloader

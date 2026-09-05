@@ -1,20 +1,19 @@
 """
-DeviantArt Downloader
+DeviantArt Downloader (deprecated package).
 
-Modern, async, fully-tested DeviantArt media downloader.
+This package was an early async prototype and is now deprecated in favour of the
+canonical ``da_downloader`` package, which contains the maintained CLI, the
+``Downloader`` facade, and the provider/downloader layers. Please import from
+``da_downloader`` instead:
 
-Features:
-- Async downloads with httpx
-- Pydantic data validation
-- SQLite database for history
-- Rich CLI interface
-- Comprehensive test suite
-- Type-safe with mypy
+    from da_downloader import Downloader
+    from da_downloader.download import build_downloader
 
-Requires Python 3.10+
+This module is kept only as a compatibility shim and will be removed in a
+future major release.
 """
 
-__version__ = "3.3.1"
+__version__ = "3.4.0"
 __author__ = "DeviantArt Downloader Team"
 
 from .core.downloader import DeviantArtDownloader

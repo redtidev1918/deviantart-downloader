@@ -3,10 +3,8 @@
 import logging
 import json
 import html
-import os
 import re
 from time import sleep
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 
@@ -360,101 +358,3 @@ class DeviantArtAPI:
             url += f"{'&' if '?' in url else '?'}token={token}"
         
         return url
-    
-    def download_file(self, url: str, timeout: int = 180) -> Optional[bytes]:
-        """下载文件内容（带进度显示）"""
-        logger.debug("Downloading media")
-        
-        for attempt in range(self.max_retries):
-            try:
-                response = self.session.get(
-                    url,
-                    allow_redirects=True,
-                    timeout=timeout,
-                    stream=True  # 启用流式下载
-                )
-                response.raise_for_status()
-                
-                # 获取文件大小
-                total_size = int(response.headers.get('content-length', 0))
-                
-                # 流式下载并显示进度
-                if total_size > 0:
-                    downloaded = 0
-                    chunks = []
-                    chunk_size = 8192
-                    last_reported = 0  # 上次报告的百分比
-                    
-                    for chunk in response.iter_content(chunk_size=chunk_size):
-                        if chunk:
-                            chunks.append(chunk)
-                            downloaded += len(chunk)
-                            
-                            # 每10%显示一次进度，避免刷屏
-                            progress = (downloaded / total_size) * 100
-                            progress_10 = int(progress / 10) * 10  # 取整到10的倍数
-                            
-                            if progress_10 > last_reported and progress_10 % 10 == 0:
-                                logger.info(f"  下载中: {progress_10}% ({downloaded / 1024 / 1024:.1f} MB / {total_size / 1024 / 1024:.1f} MB)")
-                                last_reported = progress_10
-                    
-                    return b''.join(chunks)
-                else:
-                    # 大小未知，直接下载
-                    return response.content
-                    
-            except RequestException as e:
-                logger.warning(
-                    "Download failed (attempt %s/%s, type=%s)",
-                    attempt + 1,
-                    self.max_retries,
-                    type(e).__name__,
-                )
-                if attempt < self.max_retries - 1:
-                    sleep(self.retry_delay)
-        
-        return None
-
-    def download_to_file(self, url: str, destination: str, timeout: int = 180) -> Optional[int]:
-        """Stream a download to an atomic temporary file and return its size."""
-        target = Path(destination)
-        temporary = target.with_name(f"{target.name}.part")
-
-        for attempt in range(self.max_retries):
-            try:
-                with self.session.get(
-                    url,
-                    allow_redirects=True,
-                    timeout=timeout,
-                    stream=True,
-                ) as response:
-                    response.raise_for_status()
-                    expected = int(response.headers.get('content-length', 0) or 0)
-                    written = 0
-                    with temporary.open('wb') as output:
-                        for chunk in response.iter_content(chunk_size=64 * 1024):
-                            if not chunk:
-                                continue
-                            output.write(chunk)
-                            written += len(chunk)
-                    if expected and written != expected:
-                        raise OSError(
-                            f"Incomplete download: expected {expected} bytes, got {written}"
-                        )
-                os.replace(temporary, target)
-                return written
-            except (RequestException, OSError) as e:
-                if temporary.exists():
-                    try:
-                        temporary.unlink()
-                    except OSError:
-                        logger.warning("Could not remove incomplete .part file")
-                logger.warning(
-                    "Download failed (attempt %s/%s, type=%s)",
-                    attempt + 1,
-                    self.max_retries,
-                    type(e).__name__,
-                )
-                if attempt < self.max_retries - 1:
-                    sleep(self.retry_delay)
-        return None

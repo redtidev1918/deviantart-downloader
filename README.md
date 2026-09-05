@@ -123,25 +123,25 @@ devart-dl search all "digital art"
 
 ### 登录认证
 
-为访问成熟内容或下载原图，建议进行登录配置。
+为访问成熟内容或下载原图，建议进行登录配置。**官方 API（OAuth）优先**，Cookie 作为降级方案。
 
-1. **交互式登录（推荐）**
+1. **OAuth 登录（推荐）**
    
+   ```bash
+   devart-dl login oauth --client-id 你的_PUBLIC_CLIENT_ID
+   devart-dl whoami        # 验证登录状态
+   devart-dl logout        # 撤销令牌并清除本地会话
+   ```
+
+   在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录会在浏览器中完成，无需把密码或 `client_secret` 交给 CLI，令牌安全保存在 `~/.deviantart_dl/oauth.json`（0600）并自动续期。登录后下载命令自动走官方 API，无需 Cookie 与防封延时。
+
+2. **Cookie 登录（降级方案）**
+
    ```bash
    devart-dl login interactive
    ```
-   
-   按提示输入 Cookie 即可。登录信息会保存至本地会话文件中（`~/.deviantart_dl/session.json`），长期有效。
 
-2. **Cookie 文件**
-   
-   创建 `cookies.txt` 并填入浏览器导出的 Cookie，工具会自动读取。
-
-3. **环境变量**
-   
-   ```bash
-   export DEVIANTART_COOKIES="auth=xxx; auth_secure=xxx; ..."
-   ```
+   按提示输入 Cookie，保存至 `~/.deviantart_dl/session.json`；或创建 `cookies.txt`、设置 `DEVIANTART_COOKIES` 环境变量。
 
 > **获取 Cookie 提示**：在浏览器登录 DeviantArt 后，按 F12 打开开发者工具，在 Console 中输入 `document.cookie` 即可获取。
 
@@ -263,26 +263,26 @@ export ALL_PROXY=socks5://127.0.0.1:1080
 
 ### Python 脚本调用
 
-支持在 Python 代码中直接调用（异步核心库）：
+支持在 Python 代码中直接调用：
 
 ```python
-import asyncio
 from pathlib import Path
-from deviantart_dl import DeviantArtDownloader, AppConfig
+from da_downloader import Downloader
+from da_downloader.download import build_downloader
 
-config = AppConfig(
-    cookies_file=Path('cookies.txt'),
+downloader = build_downloader(
     destination=Path('downloads'),
-    quality='full',
-    ask_before_download=False,
+    archive=Path('archive.sqlite'),   # 可选：已下载自动跳过
+    quality='best',                   # original / best / preview
+    write_info_json=True,             # 每个作品旁写一份 metadata .json
 )
 
-async def main():
-    async with DeviantArtDownloader(config) as dl:
-        await dl.download_gallery('username')
-
-asyncio.run(main())
+results = downloader.download('https://www.deviantart.com/username/gallery')
+for r in results:
+    print(r.status, r.path)
 ```
+
+URL 优先：直接传 DeviantArt 链接、`fav.me` 短链或裸 artwork id 均可。已通过 `devart-dl login oauth` 登录时自动走官方 API，否则回退到 Cookie。
 
 ---
 

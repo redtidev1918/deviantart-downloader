@@ -2,12 +2,15 @@
 
 import os
 import logging
+from pathlib import Path
 from time import sleep
 from typing import Optional
 
 from .config import Config
 from .auth import AuthManager
 from .api import DeviantArtAPI
+from .errors import DeviantArtError
+from .http import HttpDownloader
 from .models import DownloadTask, DownloadResult, ActionType, Quality
 from .utils import ensure_directory, sanitize_filename
 from .progress import ProgressManager
@@ -44,6 +47,14 @@ class DeviantArtDownloader:
             proxies=proxies,
             retry_delay=config.retry_delay,
             max_retries=config.max_retries
+        )
+        
+        # 可靠的文件传输：流式下载 + .part + Range 续传 + 重试/429 + 响应校验。
+        self.http = HttpDownloader(
+            session=self.api.session,
+            max_retries=config.max_retries,
+            retry_backoff=float(config.retry_delay),
+            timeout=config.timeout,
         )
         
         # 状态变量
@@ -268,12 +279,13 @@ class DeviantArtDownloader:
             if 1 < len(ext) <= 10:
                 file_path = os.path.splitext(file_path)[0] + ext
 
-        file_size = self.api.download_to_file(
-            download_url, file_path, self.config.timeout
-        )
-        if file_size is None:
-            logger.error(f"[{task.index}] Failed to download: {deviation.title}")
-            return DownloadResult(task=task, success=False, error="Download failed")
+        try:
+            self.http.download(
+                download_url, Path(file_path), overwrite=self.config.replace_existing
+            )
+        except DeviantArtError as exc:
+            logger.error(f"[{task.index}] Failed to download: {deviation.title} ({exc})")
+            return DownloadResult(task=task, success=False, error=str(exc))
 
         logger.info(f"[{task.index}] ✓ Downloaded: {os.path.basename(file_path)}")
         return DownloadResult(task=task, success=True, file_path=file_path)

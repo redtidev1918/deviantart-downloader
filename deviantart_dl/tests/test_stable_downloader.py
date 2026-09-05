@@ -136,22 +136,6 @@ def test_request_failure_is_not_reported_as_normal_completion() -> None:
         api.fetch_deviations("https://example.test?offset=<OFFSET>")
 
 
-def test_download_streams_through_atomic_part_file(tmp_path: Path) -> None:
-    api = api_client()
-    response = Mock()
-    response.headers = {"content-length": "6"}
-    response.iter_content.return_value = [b"abc", b"def"]
-    response.raise_for_status.return_value = None
-    response.__enter__ = Mock(return_value=response)
-    response.__exit__ = Mock(return_value=False)
-    api.session.get = Mock(return_value=response)
-    target = tmp_path / "artwork.jpg"
-
-    assert api.download_to_file("https://example.test/art.jpg", str(target)) == 6
-    assert target.read_bytes() == b"abcdef"
-    assert not (tmp_path / "artwork.jpg.part").exists()
-
-
 def test_progress_requires_the_recorded_file_to_exist(tmp_path: Path) -> None:
     progress = ProgressManager("gallery_user_all", progress_dir=tmp_path)
     missing = tmp_path / "deleted.jpg"
@@ -218,7 +202,7 @@ def test_downloader_continues_after_an_empty_intermediate_page(tmp_path: Path) -
 
 def test_cli_version_is_importable(capsys: pytest.CaptureFixture[str]) -> None:
     assert cli_main(["--version"]) == 0
-    assert "devart-dl 3.3.1" in capsys.readouterr().out
+    assert "devart-dl 3.4.0" in capsys.readouterr().out
 
 
 def test_model_accepts_official_api_field_names() -> None:

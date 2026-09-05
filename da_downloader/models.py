@@ -1,7 +1,8 @@
 """数据模型模块"""
 
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Optional, Dict, Any, Mapping
 from enum import Enum
 
 
@@ -153,3 +154,21 @@ class DownloadResult:
             return f"⊘ Skipped: {self.task.deviation.title}"
         else:
             return f"✗ Failed: {self.task.deviation.title} - {self.error}"
+
+
+@dataclass(frozen=True)
+class DownloadItem:
+    """A single resolved media file, produced by a provider and consumed by the
+    downloader. This is the boundary between "understand DeviantArt" and
+    "write bytes to disk": the downloader never sees API DTOs, CSRF, or
+    ``_puppy`` endpoints — only this contract."""
+
+    artwork_id: str
+    url: str  # deviation page URL (for metadata / archive identity)
+    title: str
+    author: str
+    media_url: str  # the actual file to download
+    extension: Optional[str] = None  # without leading dot, e.g. "jpg"
+    published_at: Optional[datetime] = None
+    mature: bool = False
+    metadata: Mapping[str, Any] = field(default_factory=dict)

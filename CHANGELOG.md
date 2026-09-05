@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2026-09-05
+
+### Added
+- **官方 API（OAuth）登录**：`devart-dl login oauth --client-id …` 在浏览器中完成授权，无需导出 Cookie 或填写密码。登录后下载自动走官方 API，原图来自官方下载接口，也不再需要防封延时。
+- **URL 优先**：`devart-dl URL` 直接下载（作品 / 画廊 / 收藏夹 / 标签 / fav.me 短链），无需子命令。
+- **下载档案**：`--archive 文件` 用 SQLite 记住已下载内容，跨会话自动跳过。
+- **文件名 / 目录模板**：`--filename`、`--directory` 支持 `{id}` `{title}` `{author}` `{published}` `{filename}` `{ext}` 等字段。
+- **元数据 sidecar**：`--write-info-json` 在每个作品旁写一份 `*.json` 元数据。
+- **断点续传**：中断的下载从 `.part` 文件续传，不重新下载。
+- **`devart-dl whoami` / `devart-dl logout`**：查看登录状态、撤销令牌。
+- **下载校验**：HTML 错误页、空文件不再被当作图片保存；遇到 429 会自动退避重试。
+
+### Changed
+- 画质参数改为 `--quality original|best|preview`（旧的 `o|f|p` 仍可用）。
+- 下载改为边下边写盘，不再把整个文件读进内存。
+- 解析失败、网络失败现在会明确报错，而不是被当成「下载完毕」。
+
 ## [3.3.1] - 2026-04-24
 
 ### Fixed
@@ -96,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Video download support.
 
+[3.4.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.2.6...v3.3.0
 [3.2.6]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.2.5...v3.2.6
