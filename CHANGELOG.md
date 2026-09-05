@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-09-05
+
+### Added
+- Cookie 登录现在支持 `DEVIANTART_COOKIES` 环境变量。
+- 登录文档新增 OAuth、Cookie、环境变量、Cookie 文件的逐步教程，并说明各方式支持的下载类型。
+- 安装文档解释 GitHub Release 中 wheel、sdist、源码压缩包与 SHA256 的用途。
+
+### Changed
+- GitHub 发版后自动删除旧 Release，仅保留最新 Release；历史 git 标签继续保留。
+
 ## [4.0.0] - 2026-09-05
 
 ### Added
@@ -126,6 +136,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Video download support.
 
+[4.0.1]: https://github.com/redtidev1918/deviantart-downloader/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.0...v3.3.1

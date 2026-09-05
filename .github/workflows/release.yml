@@ -1,8 +1,7 @@
 name: Release
 
-# Tag-driven release: push a tag like v3.3.1 and this workflow builds the
-# distributions, creates the GitHub Release, and publishes to PyPI when the
-# PYPI_API_TOKEN secret is configured. See RELEASING.md.
+# Tag-driven release: push a tag like v4.0.1 and this workflow builds the
+# distributions, creates the GitHub Release, and publishes to PyPI via OIDC.
 
 on:
   push:
@@ -25,8 +24,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install build tools
-        run: pip install build twine
+      - name: Install package and release tools
+        run: pip install ".[dev]" build twine
+      - name: Ruff check
+        run: ruff check .
+      - name: Test
+        run: pytest -m "not integration" -q
       - name: Build sdist and wheel
         run: python -m build
       - name: Twine metadata check
@@ -101,3 +104,20 @@ jobs:
           path: dist/
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  cleanup-releases:
+    name: Keep only latest GitHub Release
+    needs: [github-release, pypi-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete older Release entries (keep tags)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq '.[] | [.id, .tag_name] | @tsv' |
+          while IFS=$'\t' read -r id tag; do
+            if [ "${tag}" != "${GITHUB_REF_NAME}" ]; then
+              gh api --method DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+            fi
+          done

@@ -16,7 +16,7 @@
 需要 Python 3.10 或更高版本。
 
 ```bash
-pip install devart-dl
+python -m pip install -U devart-dl
 
 # 单张作品（也支持 fav.me 短链、裸 artwork id）
 devart-dl https://www.deviantart.com/username/art/title-123456
@@ -28,6 +28,17 @@ devart-dl https://www.deviantart.com/username/gallery
 devart-dl https://www.deviantart.com/username/favourites
 devart-dl https://www.deviantart.com/tag/landscape
 ```
+
+首次下载前建议使用 OAuth 登录：
+
+```bash
+devart-dl login oauth --client-id 你的_PUBLIC_CLIENT_ID
+devart-dl whoami
+```
+
+不会注册 OAuth 应用也可以使用 Cookie。完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/#/LOGIN)**。
+
+> 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#/?id=github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
 
 ## 核心特性
 

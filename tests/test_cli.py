@@ -65,6 +65,11 @@ def test_oauth_login_requires_client_id(monkeypatch, capsys) -> None:
     assert "client-id" in capsys.readouterr().err
 
 
+def test_load_cookies_from_environment(monkeypatch) -> None:
+    monkeypatch.setenv("DEVIANTART_COOKIES", " auth=token; auth_secure=secret ")
+    assert cli._load_cookies(None) == "auth=token; auth_secure=secret"
+
+
 def test_oauth_whoami_without_session(monkeypatch, capsys) -> None:
     monkeypatch.setattr(cli.OAuthSession, "from_store", classmethod(lambda cls: None))
     assert cli._oauth_whoami([]) == 1

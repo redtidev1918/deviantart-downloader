@@ -33,8 +33,40 @@
 需要 Python 3.10 或更高版本。
 
 ```bash
-pip install devart-dl
+python -m pip install -U devart-dl
 ```
+
+### GitHub Release 里的文件是什么
+
+**普通用户不用手动下载这些文件**，运行 `python -m pip install -U devart-dl` 即可。`pip` 会自动选择正确的包。
+
+以 `devart_dl-4.0.1-py3-none-any.whl` 为例：
+
+- `devart_dl`：Python 包名；
+- `4.0.1`：版本号；
+- `py3`：适用于 Python 3；
+- `none-any`：不依赖特定 Python ABI 或操作系统。
+
+Release 页面中的文件用途如下：
+
+| 文件 | 是什么 | 谁需要它 |
+|------|--------|----------|
+| `devart_dl-X.Y.Z-py3-none-any.whl` | 已构建的 Python wheel，可用 `python -m pip install 文件名.whl` 安装 | 离线安装用户 |
+| `devart_dl-X.Y.Z.tar.gz` | 发布到 PyPI 的 Python 源码发行包（sdist） | 打包工具或需要从源码构建的用户 |
+| `Source code (zip)` / `Source code (tar.gz)` | GitHub 根据 git 标签自动生成的仓库快照 | 开发者阅读源码；不是普通安装包 |
+| `sha256:...` | 文件内容的校验指纹，不是密码或下载链接 | 需要确认文件完整、未被替换时使用 |
+
+校验下载文件：
+
+```bash
+# macOS / Linux
+shasum -a 256 devart_dl-X.Y.Z-py3-none-any.whl
+
+# Windows PowerShell
+Get-FileHash devart_dl-X.Y.Z-py3-none-any.whl -Algorithm SHA256
+```
+
+输出应与 Release 页面显示的 SHA256 完全一致。GitHub 自动附加的两个 Source code 压缩包无法从 Release 页面隐藏。
 
 ### 基本用法（URL 优先）
 
@@ -60,7 +92,7 @@ devart-dl whoami     # 验证登录状态
 devart-dl logout     # 撤销令牌
 ```
 
-在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录在浏览器中完成，无需把密码或 `client_secret` 交给 CLI。完整步骤见 [docs/LOGIN.md](LOGIN.md)。
+在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录在浏览器中完成，无需把密码或 `client_secret` 交给 CLI。不会注册应用、需要 Cookie 登录或遇到报错时，请按[登录与认证教程](LOGIN.md)逐步操作。
 
 ---
 
@@ -90,7 +122,7 @@ devart-dl fav username folder_id
 
 ### 登录认证
 
-**官方 API（OAuth）优先**，Cookie 作为降级方案。
+**官方 API（OAuth）优先**，Cookie 作为降级方案。OAuth 支持单张作品、画廊、收藏夹和标签；Cookie 支持作者/画廊、收藏夹和搜索。完整步骤及安全说明见[登录与认证教程](LOGIN.md)。
 
 1. **OAuth 登录（推荐）**
 
@@ -108,7 +140,7 @@ devart-dl fav username folder_id
    devart-dl login interactive   # 交互式输入 Cookie
    ```
 
-   或创建 `cookies.txt`、设置 `DEVIANTART_COOKIES` 环境变量。会话保存于 `~/.deviantart_dl/session.json`。
+   或创建 `cookies.txt`、设置 `DEVIANTART_COOKIES` 环境变量。会话保存于 `~/.deviantart_dl/session.json`。Cookie 模式不支持单张作品和标签。
 
 ### 下载档案与断点续传
 
@@ -151,7 +183,7 @@ devart-dl URL --write-info-json
 | `--archive` | SQLite 下载档案路径 | 无 |
 | `--write-info-json` | 写元数据 sidecar | 关 |
 | `--overwrite` | 覆盖已存在文件 | 关（跳过） |
-| `--cookies` | Cookie 文件路径 | 自动加载会话 |
+| `--cookies` | Cookie 文件路径 | 环境变量/会话/`cookies.txt` |
 | `--proxy` | 代理地址 | 自动读环境变量 |
 | `--timeout` | 请求超时（秒） | `60` |
 | `--retries` | 最大重试次数 | `3` |
@@ -244,7 +276,10 @@ A: 使用官方 API（OAuth 登录）通常不会触发；Cookie 路径下会自
 A: 建议配置代理（`--proxy`），或降低画质（`--quality preview`）。
 
 **Q: 如何导出 Cookie？**
-A: 推荐 Chrome/Edge 开发者工具 (F12) → Application → Cookies，复制 `auth` 和 `auth_secure` 字段；或 `devart-dl login interactive` 按提示粘贴。
+A: 推荐 Chrome/Edge 开发者工具 (F12) → Application → Cookies，复制 `auth` 和 `auth_secure` 字段；或 `devart-dl login interactive` 按提示粘贴。详见[登录与认证教程](LOGIN.md)。
+
+**Q: Release 里的 `.whl`、`.tar.gz` 和 SHA256 是什么？**
+A: 普通用户直接运行 `python -m pip install -U devart-dl`，无需下载。区别和校验方法见上面的[GitHub Release 文件说明](#github-release-里的文件是什么)。
 
 ---
 

@@ -50,7 +50,7 @@ Options (URL-first and subcommands):
   --filename TEMPLATE     filename template (default "{id}_{title}.{ext}")
   --quality NAME          original|best|preview (default best)
   --archive PATH          SQLite archive to skip already-downloaded
-  --cookies PATH          cookies file (falls back to saved session)
+  --cookies PATH          cookie file (otherwise env/session/cookies.txt)
   --write-info-json       write a metadata .json next to each file
   --overwrite             replace existing files
   --proxy URL --timeout S --retries N --limit N
@@ -72,7 +72,7 @@ def _version() -> str:
     try:
         return version("devart-dl")
     except PackageNotFoundError:
-        return "4.0.0"
+        return "4.0.1"
 
 
 def _looks_like_target(value: str) -> bool:
@@ -93,7 +93,9 @@ def _load_cookies(cookies_path: Optional[str]) -> str:
             return path.read_text(encoding="utf-8").strip()
         print(f"warning: cookies file not found: {cookies_path}", file=sys.stderr)
         return ""
-    return str(AuthManager().load_cookies() or "")
+    return os.environ.get("DEVIANTART_COOKIES", "").strip() or str(
+        AuthManager().load_cookies() or ""
+    )
 
 
 def _execute(
