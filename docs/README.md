@@ -288,3 +288,16 @@ A: 普通用户直接运行 `python -m pip install -U devart-dl`，无需下载�
 本项目基于 [MIT License](https://github.com/redtidev1918/deviantart-downloader/blob/main/LICENSE) 开源。
 
 **注意**：本工具仅供个人学习和研究使用。使用者应遵守 DeviantArt 服务条款及版权规定，请勿用于商业用途或大规模抓取导致服务器过载。作者不对任何滥用后果负责。
+
+---
+
+## 网络 / 出口要求（重要）
+
+DeviantArt 会对「数据中心出口 IP」实施封锁（WAF 按 ASN/IP 段放行名单）：
+
+- **实测被拦**：Cloudflare Workers（网页 403、官方 API 数据面 500）、Fly.io（网页 403）及多数云主机的网页路径；部分机场/机房 IP 访问媒体变体（`/v1/fit|fill`）也会 400/404。
+- **可用的出口**：住宅网络实测全部正常；部分小型 VPS/机场（海外住宅类出口）也可用。
+- **建议**：在本机/住宅网络运行；云服务器上请经 clash/mihomo 等代理走放行出口，或使用官方 OAuth API（部分数据面相对放行，但同样受限时请加代理）。
+
+症状通常是：请求 `www.deviantart.com` 返回 403、官方 API 数据端点 500、或媒体下载 400/404 且换 UA/加 Referer 无效——先换出口排查，而不是改代码。
+

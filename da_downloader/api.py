@@ -324,14 +324,24 @@ class DeviantArtAPI:
             None,
         )
         
-        if not full_view:
-            logger.warning("Full view not found, using base URI")
+        # 现代 DA 的 baseUri 本身就是原始文件（以图片/视频扩展名结尾）：
+        # 直接 baseUri + token 取原图即可。别拿它拼 fullview 的 /v1/fit|fill
+        # 变体模板——那些 URL 即使带 token 也可能返回 400/404（2026-09 实测）。
+        def _is_file_url(u: str) -> bool:
+            path = str(u).split('?', 1)[0].rstrip('/')
+            return bool(re.search(r'\.(?:png|jpe?g|gif|webp|mp4|m4v)$', path, re.I))
+
+        if _is_file_url(base_uri):
             url = base_uri
-        elif full_view.get('b'):
+        elif full_view and full_view.get('b'):
             url = str(full_view['b'])
-        elif 'c' in full_view:
+        elif full_view and 'c' in full_view:
             url = base_uri + str(full_view['c']).replace('<prettyName>', pretty_name)
+        elif full_view:
+            logger.warning("Full view has no usable URL, falling back to base URI")
+            url = base_uri
         else:
+            logger.warning("Full view not found, using base URI")
             url = base_uri
         
         if token:

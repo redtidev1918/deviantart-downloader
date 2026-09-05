@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - 修复 DA 改版后「数字 id → UUID」解析失效：网页解析接口自 2026 年起把 `type` 列为必填参数，缺失会返回 400，已补上该参数（gallery-dl/DeviantDrop 同款修复）。
+- 网页路径取全图改为「baseUri 原文件优先」：现代 DA 的 `baseUri` 本身就是带扩展名的原始文件，直接加 token 下载即可；此前拿它拼 `/v1/fit|fill` 变体模板（DA 2026 改版后实测 400/404）会导致下载失败。
+
+### Docs
+- 新增网络出口说明：DeviantArt 会按出口 IP 封锁数据中心（Cloudflare Workers、Fly 及多数云主机实测网页与部分接口被拦），详见 docs/README.md「网络 / 出口要求」。
 
 ## [4.0.1] - 2026-09-05
 
