@@ -72,7 +72,7 @@ def _version() -> str:
     try:
         return version("devart-dl")
     except PackageNotFoundError:
-        return "3.4.0"
+        return "4.0.0"
 
 
 def _looks_like_target(value: str) -> bool:
@@ -386,7 +386,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _oauth_logout(rest)
     if command in _REMOVED_COMMANDS:
         print(
-            f"`devart-dl {command}` was removed in v3.4.0 — use `devart-dl URL` instead.",
+            f"`devart-dl {command}` was removed in v4.0.0 — use `devart-dl URL` instead.",
             file=sys.stderr,
         )
         return 64

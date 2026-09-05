@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2026-09-05
+
+### Added
+- `fav.me` 短链现在可直接下载（自动跟随跳转解析作品）。
+
+### Changed
+- 显式子命令（`url` / `artist` / `gallery` / `search` / `fav`）现在走同一套可靠下载管线（Range 续传、下载档案、响应校验）。
+- 依赖更精简：只保留 `requests`，不再安装浏览器自动化等额外组件。
+
+### Removed
+- 移除旧的 `devart-dl anti-ban`、`devart-dl test`、`devart-dl login browser`、`devart-dl login validate` 命令（改用 `devart-dl URL` 与 `login oauth` / `whoami`）。
+- 移除旧的 `deviantart_dl` Python 包（改用 `da_downloader`）。
+
 ## [3.4.0] - 2026-09-05
 
 ### Added
@@ -113,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Video download support.
 
+[4.0.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/redtidev1918/deviantart-downloader/compare/v3.2.6...v3.3.0
