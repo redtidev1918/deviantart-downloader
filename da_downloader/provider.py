@@ -66,6 +66,7 @@ class WebProvider:
             action, query, folder = ActionType.FAVORITE, None, target.identifier
         elif kind == TargetKind.SEARCH:
             action, query, folder = ActionType.SEARCH, target.query or "", None
+            username = username or "all"  # empty → global search
         else:
             raise MediaUnavailableError(f"unsupported target kind: {kind}")
 

@@ -28,7 +28,7 @@ class AuthManager:
             try:
                 with open(session_file, 'r', encoding='utf-8') as f:
                     session_data = json.load(f)
-                    cookies = session_data.get('cookies', '')
+                    cookies = str(session_data.get('cookies', ''))
                     if cookies:
                         logger.info(f"✓ Loaded cookies from session file: {session_file}")
                         self.cookies = cookies
@@ -99,6 +99,7 @@ class AuthManager:
                     logger.info("! Not logged in (public access only)")
                     self.is_logged_in = False
                     return False
+            return False
         except Exception as e:
             logger.warning(f"Could not verify login status: {e}")
             return False
@@ -109,7 +110,7 @@ class AuthManager:
         return self.load_cookies()
     
     @staticmethod
-    def show_login_guide():
+    def show_login_guide() -> None:
         """显示登录指南"""
         guide = '''
 ╔══════════════════════════════════════════════════════════════════════╗

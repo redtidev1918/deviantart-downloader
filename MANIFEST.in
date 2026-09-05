@@ -8,8 +8,4 @@ include .env.example
 include requirements.txt
 
 # Include non-Python support files and source-tree scripts
-recursive-include tools *.md
 recursive-include bin *
-
-# Tests remain in the repository and are not installed with the user package.
-prune deviantart_dl/tests

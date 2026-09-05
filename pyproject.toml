@@ -41,19 +41,11 @@ classifiers = [
 
 dependencies = [
     "requests>=2.31.0",
-    "httpx>=0.28.0",
-    "pydantic>=2.5.0",
-    "pydantic-settings>=2.1.0",
 ]
 
 [project.optional-dependencies]
-browser = [
-    "selenium>=4.0.0",
-    "webdriver-manager>=3.8.0",
-]
 dev = [
     "pytest>=7.4.3",
-    "pytest-asyncio>=0.21.1",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
     "black>=23.12.0",
@@ -69,8 +61,7 @@ deviantart-dl = "da_downloader.cli:main"
 da-dl = "da_downloader.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["da_downloader*", "deviantart_dl*", "legacy*", "tools*"]
-exclude = ["deviantart_dl.tests*"]
+include = ["da_downloader*"]
 
 # Black configuration
 [tool.black]
@@ -108,7 +99,7 @@ disallow_untyped_defs = false
 
 # Pytest configuration
 [tool.pytest.ini_options]
-testpaths = ["deviantart_dl/tests"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -123,11 +114,10 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
 ]
-asyncio_mode = "auto"
 
 # Coverage configuration
 [tool.coverage.run]
-source = ["da_downloader", "deviantart_dl"]
+source = ["da_downloader"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
@@ -167,11 +157,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # Re-exported names
 "tests/*" = ["S101"]  # Allow assert in tests
-# selenium imports inside try/except ImportError are availability checks
-"tools/browser_login.py" = ["F401"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.ruff.lint.isort]
-known-first-party = ["deviantart_dl", "da_downloader"]
+known-first-party = ["da_downloader"]

@@ -164,6 +164,33 @@ def _as_int(value: Any) -> Optional[int]:
         return None
 
 
+def _resolve_short_id(code: str, http: requests.Session, timeout: float) -> str:
+    """Follow a fav.me short link to its numeric artwork id."""
+    try:
+        response = http.get(
+            f"https://fav.me/{code}",
+            allow_redirects=True,
+            timeout=timeout,
+            stream=True,
+        )
+    except requests.RequestException as error:
+        raise NetworkError(f"could not reach fav.me: {error}") from error
+    final_url = response.url
+    response.close()
+    numeric_id = _extract_numeric_id(final_url)
+    if numeric_id is None:
+        raise MediaUnavailableError(f"could not resolve fav.me/{code} to an artwork id")
+    return numeric_id
+
+
+def _extract_numeric_id(url: str) -> Optional[str]:
+    leaf = url.split("?")[0].rstrip("/").rsplit("/", 1)[-1]
+    if leaf.isdigit():
+        return leaf
+    match = re.search(r"-(\d+)$", leaf)
+    return match.group(1) if match else None
+
+
 def resolve_uuid(
     identifier: str,
     username: Optional[str] = None,
@@ -178,6 +205,9 @@ def resolve_uuid(
         return identifier
 
     http = session or requests.Session()
+    if not identifier.isdigit():
+        # A fav.me (or similar short) code: follow the redirect to the numeric id.
+        identifier = _resolve_short_id(identifier, http, timeout)
     try:
         home = http.get(
             WEB_BASE,

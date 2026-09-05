@@ -8,7 +8,11 @@ import pytest
 
 import da_downloader.provider as provider_mod
 from da_downloader.errors import MediaUnavailableError
-from da_downloader.official_api import OriginalDownload
+from da_downloader.official_api import (
+    OriginalDownload,
+    _extract_numeric_id,
+    _resolve_short_id,
+)
 from da_downloader.provider import OfficialProvider
 from da_downloader.targets import TargetParser
 
@@ -133,3 +137,23 @@ def test_tag_target() -> None:
 
     assert [i.artwork_id for i in items] == ["uuid-1"]
     assert items[0].media_url == "https://images.test/full.jpg"
+
+
+def test_extract_numeric_id() -> None:
+    assert _extract_numeric_id("https://www.deviantart.com/u/art/title-123456") == "123456"
+    assert _extract_numeric_id("https://www.deviantart.com/u/art/123456") == "123456"
+    assert _extract_numeric_id("https://www.deviantart.com/u/gallery") is None
+
+
+def test_resolve_short_id_follows_redirect() -> None:
+    class FakeResponse:
+        url = "https://www.deviantart.com/alice/art/title-123456"
+
+        def close(self) -> None:
+            pass
+
+    class FakeHttp:
+        def get(self, url, allow_redirects=True, timeout=30, stream=True):
+            return FakeResponse()
+
+    assert _resolve_short_id("abc123", FakeHttp(), 30) == "123456"

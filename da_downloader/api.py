@@ -68,6 +68,8 @@ class DeviantArtAPI:
                     raise APIError(
                         f"Request failed after {self.max_retries} attempts"
                     ) from e
+        raise APIError("request failed (no attempts made)")
+
     
     def get_csrf_token(self, username: str) -> Optional[str]:
         """获取 CSRF Token"""
@@ -225,6 +227,8 @@ class DeviantArtAPI:
         if raw_next_offset is None and not has_more:
             next_offset = offset + len(deviations_data)
         else:
+            if raw_next_offset is None:
+                raise APIError("DeviantArt returned an invalid next offset")
             try:
                 next_offset = int(raw_next_offset)
             except (TypeError, ValueError) as e:
@@ -310,7 +314,7 @@ class DeviantArtAPI:
             
             # 视频URL在 'b' 字段中（完整URL）
             if 'b' in best_video:
-                url = best_video['b']
+                url = str(best_video['b'])
                 logger.info("Selected video quality: %s", quality)
                 return url
         
@@ -324,9 +328,9 @@ class DeviantArtAPI:
             logger.warning("Full view not found, using base URI")
             url = base_uri
         elif full_view.get('b'):
-            url = full_view['b']
+            url = str(full_view['b'])
         elif 'c' in full_view:
-            url = base_uri + full_view['c'].replace('<prettyName>', pretty_name)
+            url = base_uri + str(full_view['c']).replace('<prettyName>', pretty_name)
         else:
             url = base_uri
         
@@ -352,7 +356,7 @@ class DeviantArtAPI:
             logger.warning("Preview path not found, using full view")
             return self._get_full_view_url(media, base_uri, token, pretty_name)
         
-        url = base_uri + preview['c'].replace('<prettyName>', pretty_name)
+        url = base_uri + str(preview['c']).replace('<prettyName>', pretty_name)
         
         if token:
             url += f"{'&' if '?' in url else '?'}token={token}"

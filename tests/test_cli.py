@@ -22,11 +22,16 @@ def test_url_first_routes_to_download(monkeypatch) -> None:
     assert calls == [["https://www.deviantart.com/alice/gallery"]]
 
 
-def test_known_command_still_dispatches(monkeypatch) -> None:
+def test_known_command_routes_to_subcommand(monkeypatch) -> None:
     calls: list = []
-    monkeypatch.setattr(cli, "_run_module", lambda m, a: calls.append((m, list(a))) or 0)
+    monkeypatch.setattr(cli, "_run_subcommand", lambda cmd, args: calls.append((cmd, list(args))) or 0)
     assert cli.main(["gallery", "alice"]) == 0
-    assert calls == [("legacy.main", ["gallery", "alice"])]
+    assert calls == [("gallery", ["alice"])]
+
+
+def test_cli_version_is_importable(capsys) -> None:
+    assert cli.main(["--version"]) == 0
+    assert "devart-dl" in capsys.readouterr().out
 
 
 def test_run_download_summary_and_flags(monkeypatch, capsys, tmp_path) -> None:
