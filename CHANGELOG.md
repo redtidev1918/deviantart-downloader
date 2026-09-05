@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.0.2] - 2026-09-06
 
 ### Fixed
 - 修复 DA 改版后「数字 id → UUID」解析失效：网页解析接口自 2026 年起把 `type` 列为必填参数，缺失会返回 400，已补上该参数（gallery-dl/DeviantDrop 同款修复）。
