@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.4] - 2026-09-06
+
+### Chores
+- 补测试工具链与用例：`pytest` 全量 89 个用例通过（含新增「多文件作品逐个下载」回归测试）；`ruff check` 通过；CI 各 Python 版本矩阵验证通过。
+
 ## [4.0.3] - 2026-09-06
 
 ### Fixed
