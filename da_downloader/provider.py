@@ -158,7 +158,7 @@ class OfficialProvider:
     def resolve(self, target: DownloadTarget) -> Iterator[DownloadItem]:
         kind = target.kind
         if kind == TargetKind.ARTWORK:
-            yield self._artwork(target)
+            yield from self._artwork_items(target)
             return
         if kind == TargetKind.SEARCH:
             raise MediaUnavailableError(
@@ -191,8 +191,48 @@ class OfficialProvider:
         yield from self._paginate(fetch)
 
     def _artwork(self, target: DownloadTarget) -> DownloadItem:
+        # 兼容旧的单返回值调用（resolve 里已改用 _artwork_items）
+        return next(self._artwork_items(target))
+
+    def _artwork_items(self, target: DownloadTarget) -> Iterator[DownloadItem]:
+        """单作品下载；多文件作品（additionalMedia/files）会一并产出全部画面。"""
         uuid = resolve_uuid(target.identifier or "", target.username)
-        return self._item(self.client.deviation(uuid))
+        deviation = self.client.deviation(uuid)
+        yield self._item(deviation)
+        # DA 多文件作品的附加画面若在官方响应里带出来（字段名不固定），逐个产出；
+        # 找不到就只下主图（行为与以前一致）。
+        extras = (
+            deviation.get("additionalMedia")
+            or deviation.get("additional_media")
+            or deviation.get("files")
+            or []
+        )
+        for index, entry in enumerate(extras or [], start=1):
+            if not isinstance(entry, dict):
+                continue
+            item = self._item(deviation)
+            item.artwork_id = f"{deviation.get('deviationid', uuid)}-{index}"
+            item.media_url = self._extra_media_url(entry) or item.media_url
+            item.extension = _ext_from_url(item.media_url)
+            item.metadata = {**item.metadata, "index": index}
+            if item.media_url:
+                yield item
+
+    def _extra_media_url(self, entry: dict) -> Optional[str]:
+        """附加画面的媒体地址：entry 里可能是 content/preview/thumbs 或嵌套 media/baseUri。"""
+        content = entry.get("content") or {}
+        if content.get("src"):
+            return str(content["src"])
+        preview = entry.get("preview") or {}
+        if preview.get("src"):
+            return str(preview["src"])
+        media = entry.get("media") or {}
+        if media.get("baseUri"):
+            return str(media["baseUri"])
+        thumbs = entry.get("thumbs") or []
+        if thumbs and isinstance(thumbs[0], dict) and thumbs[0].get("src"):
+            return str(thumbs[0]["src"])
+        return None
 
     def _paginate(self, fetch: Callable[[int], dict]) -> Iterator[DownloadItem]:
         offset = 0
