@@ -183,6 +183,12 @@ devart-dl login clear
 
 ---
 
+## 成熟 / NSFW 内容与免费额度
+
+- 匿名访问成熟作品只能拿到**打码预览**（Wix 的 `blur_*` 变体）；要未打码原图必须**登录**（Cookie 或 OAuth 均可）。
+- 原图走官方 `deviation/download/{uuid}`，受 **免费账号每日下载额度**限制；超限会被拒（daviewer/dakit 里表现为 `Free download limit reached`）。额度用尽时先用「预览/展示图」降级，或开通 Core。
+- 判别「登录态是否失效」：请求 init 返回的 `preview`/`fullview` 变体带 `blur_` 即视为匿名；`isDownloadable=false` 也常伴随匿名/未开成熟设置。
+
 ## 安全提醒
 
 - OAuth 只在 `deviantart.com` 官方页面输入密码。
