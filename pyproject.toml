@@ -145,7 +145,6 @@ target-version = "py310"
 
 [tool.ruff.lint]
 # Enforced policy: high-signal checks only (real bugs), matching CI.
-# Style rules can be added per-directory once the legacy debt is paid.
 select = [
     "E9",  # runtime errors (syntax error, undefined name, unused bind)
     "F",   # pyflakes

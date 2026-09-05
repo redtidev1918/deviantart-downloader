@@ -21,10 +21,8 @@ jobs:
           python-version: "3.12"
       - name: Install ruff
         run: pip install ruff
-      - name: Ruff check (import order, pyflakes)
-        # The legacy/tools modules predate the full rule set; enforce the
-        # high-signal subset everywhere instead of failing on style debt.
-        run: ruff check --select F,E9 da_downloader deviantart_dl tools legacy
+      - name: Ruff check
+        run: ruff check .
 
   test:
     name: Test py${{ matrix.python-version }} on ${{ matrix.os }}
