@@ -1,6 +1,6 @@
 # DeviantArt Downloader
 
-A powerful, feature-rich DeviantArt artwork downloader with intelligent file organization, multiple authentication methods, and anti-ban protection.
+A reliable, focused DeviantArt downloader and archival CLI.
 
 [中文文档](README.md) | **English Documentation**
 
@@ -9,746 +9,254 @@ A powerful, feature-rich DeviantArt artwork downloader with intelligent file org
 [![Python](https://img.shields.io/pypi/pyversions/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![Downloads](https://img.shields.io/pypi/dm/devart-dl.svg)](https://pypi.org/project/devart-dl/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![i18n](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange.svg)](#internationalization)
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes.
 
 ---
 
-## ✨ Core Features | 核心特性
+## Core Features
 
--  **Unified CLI** - Single `devart-dl` command for all features
--  **5 Login Methods** - Cookie file, interactive, session save, env var, browser
--  **Smart Anti-Ban** - 4 preset modes, auto delay, rate limiting
--  **Flexible Download** - Single URL, author gallery, batch, search filter
--  **Resume Support** - Auto-resume after interruption, skip downloaded
--  **Auto Retry** - Network errors auto-retry 3 times
--  **1080p Videos** - Auto-select highest quality videos
--  **Auto Proxy** - Auto-load proxy from environment variables
--  **Enhanced Logging** - Colored output, file logging, login status display
--  **Internationalization** - Chinese/English bilingual support
--  **High Performance** - Async download, fast skip existing files
--  **Zero Config** - Works out of box, progressive enhancement
--  **Modular** - Clean project structure, easy to maintain
-
+- **Official API first (OAuth)** — log in once to download originals; no cookie export, no anti-ban delays.
+- **URL-first** — `devart-dl URL` downloads artworks / galleries / favourites / tags / fav.me links directly.
+- **Reliable downloads** — HTTP Range resume, automatic retry, 429 backoff, HTML/empty-file validation, atomic finalize.
+- **Download archive** — `--archive` remembers what you've downloaded in SQLite, skipping it across sessions.
+- **Path templates** — `--directory` / `--filename` support `{id}` `{title}` `{author}` `{published}` `{ext}` and more, with safe sanitization.
+- **Metadata sidecars** — `--write-info-json` writes a `.json` next to each file.
+- **Proxy & fallback** — `--proxy` or proxy environment variables; falls back to cookies when not logged in via OAuth.
 
 ---
 
-## 🚀 Quick Start | 快速开始
+## Quick Start
 
-### Installation | 安装
+### Installation
 
-**Method 1: Install from PyPI (Recommended) ⭐**
+Requires Python 3.10 or newer.
 
 ```bash
-# Basic installation
 pip install devart-dl
-
-# Or with browser login support
-pip install devart-dl[browser]
 ```
 
-**Method 2: Install from source**
+### Basic Usage (URL-first)
 
 ```bash
-# Clone repository
-git clone https://github.com/redtidev1918/deviantart-downloader.git
-cd deviantart-downloader
+# Single artwork (also fav.me links and bare artwork ids)
+devart-dl https://www.deviantart.com/username/art/title-123456
 
-# Install the package and command
-pip install .
+# Gallery / all works by an artist
+devart-dl https://www.deviantart.com/username/gallery
 
-# Include browser login support when needed
-pip install ".[browser]"
+# Favourites
+devart-dl https://www.deviantart.com/username/favourites
+
+# Tag
+devart-dl https://www.deviantart.com/tag/landscape
 ```
 
-Python 3.10 or newer is required.
-
-### Basic Usage | 基本使用
+### Login (OAuth recommended)
 
 ```bash
-# Download single artwork
+devart-dl login oauth --client-id YOUR_PUBLIC_CLIENT_ID
+devart-dl whoami     # verify login
+devart-dl logout     # revoke the token
+```
+
+Register a **Public** OAuth app at [deviantart.com/developers](https://www.deviantart.com/developers/) and whitelist `http://127.0.0.1:8765/callback`. Login happens in the browser — no password or `client_secret` is ever given to the CLI.
+
+---
+
+## Main Features
+
+### Download Modes
+
+URL-first is the simplest entry; explicit subcommands are also kept:
+
+```bash
+# URL-first
+devart-dl https://www.deviantart.com/username/art/title-123456
+devart-dl https://www.deviantart.com/username/gallery
+devart-dl https://www.deviantart.com/username/gallery/12345   # specific folder
+devart-dl https://www.deviantart.com/username/favourites
+devart-dl https://www.deviantart.com/tag/landscape
+
+# Explicit subcommands
 devart-dl url https://www.deviantart.com/username/art/title-123456
-
-# Download all from artist
 devart-dl artist username
-
-# Download gallery
-devart-dl gallery username
-
-# Search and download
-devart-dl search username "keyword"
-```
-
-### ⭐ v3.2.4 New Features Quick Start | 新功能快速开始
-
-```bash
-# 1. Auto Proxy + Auto Login (Recommended Setup)
-export ALL_PROXY=http://127.0.0.1:7890  # Set proxy
-devart-dl login interactive              # One-time login
-devart-dl artist username                # Auto-loads proxy & cookies
-
-# 2. Resume Support (Continue after interruption)
-devart-dl artist username --ask=0        # Start download
-# Press Ctrl+C to interrupt
-devart-dl artist username --ask=0        # Re-run, auto-skips downloaded
-
-# 3. 1080p HD Video Downloads
-devart-dl artist username --ask=0        # Auto-downloads 1080p videos
-
-# 4. Login Status Display
-# Automatically shows at start:
-# 🔓 Login Status: ✅ LOGGED IN
-#    You can download original quality and mature content
-
-# 5. High-Performance Batch Downloads
-devart-dl artist username --ask=0 --proxy=http://127.0.0.1:7890
-# ✓ Auto-skip existing files
-# ✓ Auto-retry failures 3 times
-# ✓ Real-time progress display
-# ✓ 1080p video quality
-```
-
----
-
-## 📥 Main Features | 主要功能
-
-### Single URL Download | 单个URL下载
-
-```bash
-# Download with full quality (default)
-devart-dl url <artwork_url>
-
-# Download original quality (requires login)
-devart-dl url <artwork_url> --quality=o
-
-# Custom filename
-devart-dl url <artwork_url> --filename=my_artwork
-
-# Organize by author
-devart-dl url <artwork_url> --organize=by_author
-```
-
-### Batch Downloads | 批量下载
-
-```bash
-# Download all artworks from artist
-devart-dl artist username
-
-# Download specific gallery
-devart-dl gallery username gallery_id
-
-# Download with anti-ban protection
-devart-dl gallery username --delay=2 --limit=24
-
-# Download favorites
-devart-dl fav username folder_id
-
-# Gallery downloads cover ALL gallery folders (not just Featured).
-# Progress is saved to ~/.deviantart_dl/progress/ — rerun the same command
-# to resume; failed files retry automatically on the next run.
-```
-
-### Search Downloads | 搜索下载
-
-```bash
-# Search user's artworks
-devart-dl search username "landscape"
-
-# Global search
+devart-dl gallery username [gallery_id]
 devart-dl search all "digital art"
+devart-dl fav username folder_id
+```
+
+> Note: explicit subcommands keep the old usage for compatibility. The official API has no search endpoint, so `search` uses the cookie fallback.
+
+### Authentication
+
+**Official API (OAuth) first**, cookies as the fallback.
+
+1. **OAuth login (recommended)**
+
+   ```bash
+   devart-dl login oauth --client-id YOUR_PUBLIC_CLIENT_ID
+   ```
+
+   - Register a **Public** OAuth app and whitelist `http://127.0.0.1:8765/callback` exactly.
+   - Login completes in the browser; tokens are stored at `~/.deviantart_dl/oauth.json` (0600) and auto-refresh.
+   - Download commands then use the official API automatically; originals come from the official download endpoint.
+
+2. **Cookie login (fallback)**
+
+   ```bash
+   devart-dl login interactive   # paste a cookie interactively
+   ```
+
+   Or create a `cookies.txt`, or set the `DEVIANTART_COOKIES` environment variable. The session is saved at `~/.deviantart_dl/session.json`.
+
+### Download Archive & Resume
+
+```bash
+# SQLite archive: skip already-downloaded items across sessions and directories
+devart-dl https://www.deviantart.com/username/gallery --archive ~/.devart-dl/archive.sqlite
+
+# Interrupted downloads resume from the .part file — no full re-download
+```
+
+### Filename / Directory Templates
+
+```bash
+devart-dl URL \
+  --directory "{author}/{published:%Y-%m}" \
+  --filename "{id}_{title}.{ext}"
+```
+
+Fields: `{id}` `{title}` `{author}` `{username}` `{published}` `{filename}` `{ext}` `{index}`. Paths are sanitized (illegal characters, Windows reserved names, `..` traversal, overly long names) so results always stay inside the download root.
+
+### Metadata Sidecar
+
+```bash
+devart-dl URL --write-info-json
+# produces artwork.jpg plus artwork.json (title, author, URL, published, mature, media URL, …)
 ```
 
 ---
 
-## 🔐 Authentication Methods | 身份验证方式
+## Configuration Options
 
-5 flexible authentication methods supported:
-
-| Method | Difficulty | Recommended | Use Case |
-|--------|-----------|-------------|----------|
-| **Cookie File** | Easy | ✅ Recommended | Daily use |
-| **Interactive Input** | Easy | ✅ Recommended | First setup |
-| **Session Save** | Easiest | ✅ | Long-term use |
-| **Environment Variable** | Medium | - | CI/CD, scripts |
-| **Browser Auto** | Easiest | ⚠️ Unstable | Try only |
-
-### Method 1: Browser Auto-Login (May be blocked)
-
-**Note:** DeviantArt has anti-automation detection, this method may be blocked. Recommend Method 2 or Method 4.
-
-```bash
-# Install dependencies (first time)
-pip install selenium webdriver-manager
-
-# Try browser login
-devart-dl login browser
-
-# Specify browser
-devart-dl login browser --browser=firefox
-```
-
-**Known Issues:**
-- ⚠️ May encounter "Access Denied" error (anti-automation)
-- ⚠️ First run needs to download driver (1-2 minutes)
-- ⚠️ Requires browser to be installed
-
-**If you encounter problems, use Method 2 (Cookie file) or Method 4 (Interactive input).**
-
-### Method 2: Cookie File
-
-```bash
-# 1. Create cookies.txt
-# 2. Paste cookie obtained from browser
-# 3. Start downloading
-devart-dl gallery username
-```
-
-### Method 3: Environment Variable
-
-```bash
-# Set environment variable
-export DEVIANTART_COOKIES="auth=xxx; auth_secure=xxx; ..."
-
-# Or in .env file
-echo 'DEVIANTART_COOKIES=...' > .env
-```
-
-### Method 4: Interactive Input (Recommended ⭐)
-
-```bash
-# Run interactive login
-devart-dl login interactive
-
-# Paste cookie when prompted
-# Choose to save as session file (y)
-```
-
-**Auto-load mechanism:**
-- ✅ After saving, all commands **automatically** load cookies from session file
-- ✅ No need to manually create `cookies.txt`
-- ✅ No need to specify cookie path each time
-- ✅ 30-day validity
-
-### Method 5: Session Management
-
-```bash
-# Check session status
-devart-dl login validate
-
-# Clear session
-devart-dl login clear
-
-# Session file location
-~/.deviantart_dl/session.json
-```
-
-### Validate Cookie
-
-```bash
-# Validate current cookie
-devart-dl login validate
-
-# Validate specific cookie
-devart-dl login validate --cookies="auth=xxx; ..."
-
-# JSON format output (for scripts)
-devart-dl login check --json
-```
-
-**Validation includes:**
-- ✓ Cookie existence check
-- ✓ Login status verification
-- ✓ User info retrieval
-- ✓ Download permission test
-- ✓ Cookie expiry detection
-
-### Cookie Loading Priority
-
-The system searches for cookies in the following order:
-
-**For download commands (gallery, artist, url, etc.):**
-1. 📁 Session file `~/.deviantart_dl/session.json` ⭐ **Priority**
-2. 📄 Cookie file `cookies.txt`
-3. 🌍 Environment variable `DEVIANTART_COOKIES`
-4. 📋 .env file
-
-**Recommended workflow:**
-```bash
-# One-time setup
-devart-dl login interactive  # Save to session file
-
-# All future commands auto-load
-devart-dl artist username    # ✅ Auto-loads session
-devart-dl gallery username   # ✅ Auto-loads session
-devart-dl url <URL>          # ✅ Auto-loads session
-```
-
-### Quick Cookie Export
-
-**Method 1: Console Script (Recommended ⭐)**
-
-```javascript
-// 1. Press F12 on DeviantArt logged-in page
-// 2. Switch to Console tab
-// 3. Paste the following code and press Enter:
-(function(){let c=document.cookie;navigator.clipboard.writeText(c).then(()=>alert('✓ Cookie copied!')).catch(()=>{let t=document.createElement('textarea');t.value=c;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('✓ Cookie copied!')})})();
-// 4. Cookie automatically copied to clipboard!
-```
-
-**Method 2: Bookmarklet (Most convenient)**
-- Create bookmark, name: `Export DA Cookie`
-- URL: `javascript:(function(){...})()`
-- Click bookmark on DeviantArt page to export
-
-**Method 3: Manual copy (Traditional)**
-- Chrome/Edge: `F12` → `Application` → `Cookies`
-- Firefox: `F12` → `Storage` → `Cookie`
-- Only need key cookies: `auth`, `auth_secure`, `userinfo`
-
-**📖 Complete export guide:**
-```bash
-# View all export methods (recommended reading)
-cat tools/COOKIE_EXPORT_GUIDE.md
-```
-
----
-
-## 🛡️ Anti-Ban Protection | 防封IP保护
-
-**Important: Must-read for batch downloads**
-
-### Recommended Config | 推荐配置
-
-```bash
-# Safe mode (recommended for beginners)
-devart-dl gallery username --delay=3 --limit=10
-
-# Balanced mode (daily use)
-devart-dl gallery username --delay=2 --limit=24
-
-# Fast mode (use cautiously)
-devart-dl gallery username --delay=1 --limit=50
-```
-
-### Core Principles | 核心原则
-
-✅ **Must do:**
-- Delay ≥ 2 seconds (`--delay=2`)
-- Limit batch size (`--limit=24`)
-- Stop immediately on 429 error
-- Spread large downloads over multiple days
-
-❌ **Never do:**
-- No delay or very short delay
-- Download hundreds at once
-- Ignore rate limit errors
-- Continue downloading after IP ban
-
-### Complete Guide | 完整指南
-
-```bash
-devart-dl anti-ban
-```
-
----
-
-## 🌍 Internationalization | 国际化
-
-Supports Chinese and English bilingual
-
-### Set Language | 设置语言
-
-```bash
-# Method 1: Environment variable
-export DEVART_LANG=zh_CN  # Chinese
-export DEVART_LANG=en_US  # English
-
-# Method 2: Auto-detect (based on system LANG)
-# Chinese system auto Chinese, English system auto English
-
-# Test
-python i18n.py --lang=zh_CN --test
-python i18n.py --lang=en_US --test
-```
-
----
-
-## 📝 Logging System | 日志系统
-
-Enhanced colored logging system with debug and file recording support
-
-### Log Options | 日志选项
-
-```bash
-# Debug mode (enable file logging)
-devart-dl --debug gallery username
-devart-dl -d url <URL>
-
-# Verbose mode (show all info)
-devart-dl --verbose artist username
-devart-dl -v gallery username
-
-# Quiet mode (errors only)
-devart-dl --quiet gallery username
-devart-dl -q url <URL>
-```
-
-### Log File Location | 日志文件位置
-
-```bash
-# In debug mode, logs auto-saved to:
-~/.deviantart_dl/logs/devart-dl_YYYYMMDD.log
-
-# View logs
-tail -f ~/.deviantart_dl/logs/devart-dl_*.log
-
-# Clean old logs
-rm ~/.deviantart_dl/logs/*.log
-```
-
-### Log Levels | 日志级别
-
-| Level | Color | Purpose |
-|-------|-------|---------|
-| DEBUG | Cyan | Debug info (only in --debug mode) |
-| INFO | Green | General information |
-| WARNING | Yellow | Warning info |
-| ERROR | Red | Error info |
-| CRITICAL | Purple | Critical errors |
-
-### Examples | 示例
-
-```bash
-# Debug download issues
-devart-dl --debug url <URL>
-
-# View detailed download progress
-devart-dl --verbose gallery username --delay=2
-
-# Silent background run
-devart-dl --quiet artist username > /dev/null 2>&1 &
-```
-
----
-
-## 📁 File Organization | 文件组织
-
-Smart file management with automatic categorization:
-
-### Organization Modes | 组织模式
-
-| Mode | Description | Directory Structure |
-|------|-------------|---------------------|
-| `by_author` | By artist (recommended) | `downloads/artist_name/artwork.jpg` |
-| `by_date` | By date | `downloads/2025/01/15/artwork.jpg` |
-| `by_type` | By file type | `downloads/images/artwork.jpg` |
-| `by_gallery` | By gallery | `downloads/artist/gallery_name/artwork.jpg` |
-| `mixed` | Hybrid (artist+date) | `downloads/artist/2025-01/artwork.jpg` |
-| `flat` | Flat (no organization) | `downloads/artwork.jpg` |
-
-### Usage Examples | 使用示例
-
-```bash
-# By artist (default)
-devart-dl url <URL>
-devart-dl url <URL> --organize=by_author
-
-# By date
-devart-dl gallery username --organize=by_date
-
-# By type
-devart-dl artist username --organize=by_type
-
-# Mixed mode (author+date)
-devart-dl gallery username --organize=mixed
-
-# Flat structure
-devart-dl url <URL> --organize=flat
-```
-
-### Metadata Saving | 元数据保存
-
-Each downloaded file saves metadata to `.metadata/` directory:
-- Artwork title, author, URL
-- Download time, file size
-- Quality setting, deviation ID
-- JSON format, easy to query and manage
-
-### View Directory Structure | 查看目录结构
-
-```bash
-python tools/file_organizer.py --mode=by_author --show-structure
-python tools/file_organizer.py --mode=by_date --show-structure
-```
-
----
-
-## ⚙️ Configuration Options | 配置选项
-
-### Common Options | 通用选项
+### Common Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--quality=<o\|f\|p>` | Quality: o=original (login required), f=full, p=preview | `f` |
-| `--dest=<path>` | Download directory | `./Downloads` |
-| `--delay=<seconds>` | Delay time (anti-ban) | `1` |
-| `--limit=<number>` | Page size (1–60) | `24` |
-| `--offset=<int>` | Start offset (for resuming) | `0` |
-| `--separate=<0\|1>` | One folder per author | `1` |
-| `--replace=<0\|1>` | Replace existing files | `0` (skip) |
-| `--cookies=<path>` | Cookie file path | `cookies.txt` |
-| `--proxy=<url>` | Proxy server | auto from environment |
+| `-d, --dest` | Download root directory | `./Downloads` |
+| `--directory` | Directory template (e.g. `{author}/{published:%Y}`) | `{author}` |
+| `--filename` | Filename template (e.g. `{id}_{title}.{ext}`) | `{id}_{title}.{ext}` |
+| `--quality` | `original` (login) / `best` (default) / `preview`; legacy `o/f/p` still accepted | `best` |
+| `--archive` | SQLite download archive path | none |
+| `--write-info-json` | Write a metadata sidecar | off |
+| `--overwrite` | Replace existing files | off (skip) |
+| `--cookies` | Cookie file path | auto-load session |
+| `--proxy` | Proxy URL | auto from environment |
+| `--timeout` | Request timeout (seconds) | `60` |
+| `--retries` | Max retries | `3` |
+| `--limit` | Items per page | `24` |
 
-### Examples | 示例
+### Output Options
 
-```bash
-# Download original, delay 3 seconds
-devart-dl gallery user --quality=o --delay=3
-
-# Use proxy
-devart-dl url <URL> --proxy=http://127.0.0.1:7890
-
-# Debug logging
-devart-dl gallery username --debug=1
-
-# Resume a large gallery from a known offset
-devart-dl gallery username --offset=240
-```
+- `-v, --verbose`: show details (including skip reasons).
+- `-q, --quiet`: only the summary and errors.
 
 ---
 
-## 📚 Command Reference | 命令参考
-
-### Download Commands | 下载命令
+## Command Reference
 
 ```bash
-# Single artwork download
-devart-dl url <artwork_url> [options]
+# URL-first (recommended)
+devart-dl <URL>
 
-# Artist all artworks
-devart-dl artist <username> [options]
+# Explicit subcommands
+devart-dl url <artwork_url>
+devart-dl artist <username>
+devart-dl gallery <username> [gallery_id]
+devart-dl search <username|all> <query>
+devart-dl fav <username> <folder_id>
 
-# Gallery download
-devart-dl gallery <username> [gallery_id] [options]
+# Login / session
+devart-dl login oauth --client-id <ID>   # OAuth login (recommended)
+devart-dl login interactive             # Cookie login (fallback)
+devart-dl whoami                        # show login status
+devart-dl logout                        # revoke token and clear local session
 
-# Search download
-devart-dl search <username|all> <query> [options]
-
-# Favorites download
-devart-dl fav <username> <folder_id> [options]
-```
-
-### Tool Commands | 工具命令
-
-```bash
-# Login management
-devart-dl login interactive    # Interactive login
-devart-dl login browser        # Browser login
-devart-dl login validate       # Validate cookie
-devart-dl login clear          # Clear session
-
-# Anti-ban guide
-devart-dl anti-ban
-
-# Test download
-devart-dl test <username>
-
-# Configuration
-devart-dl config
-```
-
-### Info Commands | 信息命令
-
-```bash
-# Help
-devart-dl help                 # Main help
-devart-dl help <command>       # Command-specific help
-
-# Version
+# Other
 devart-dl version
-
-# Documentation
-devart-dl docs
 ```
 
 ---
 
-## 🏗️ Project Structure | 项目结构
+## Advanced Usage
 
-```
-deviantart_downloader/
-├── bin/
-│   ├── devart-dl              # Unified CLI entry
-│   └── install.sh             # Installation script
-├── deviantart_dl/             # Async core (Python 3.10+)
-│   ├── __init__.py
-│   ├── downloader.py          # Async downloader
-│   └── api.py                 # API wrapper
-├── da_downloader/             # Stable legacy version
-│   ├── main.py
-│   └── auth.py
-├── tools/                     # Utility tools
-│   ├── download_url.py        # URL downloader
-│   ├── download_artist.py     # Artist downloader
-│   ├── browser_login.py       # Browser auto-login
-│   ├── cookie_loader.py       # Universal cookie loader
-│   ├── validate_cookies.py    # Cookie validator
-│   ├── file_organizer.py      # File organizer
-│   ├── export_cookies.js      # Cookie export script
-│   ├── logger.py              # Logging system
-│   └── i18n.py                # Internationalization
-├── docs/                      # Documentation
-│   ├── PROJECT_STATUS.md
-│   ├── QUICK_START.md
-│   └── COOKIE_EXPORT_GUIDE.md
-├── README.md                  # Chinese documentation
-├── README_EN.md               # English documentation (this file)
-├── requirements.txt           # Dependencies
-├── .env.example               # Environment variable template
-└── .gitignore                 # Git ignore rules
-```
-
----
-
-## 🔧 Advanced Usage | 高级用法
-
-### Custom Download Script | 自定义下载脚本
-
-```python
-from deviantart_dl import DeviantArtDownloader
-
-# Create downloader instance
-dl = DeviantArtDownloader(
-    cookies_file='cookies.txt',
-    quality='f',
-    delay=2
-)
-
-# Download single artwork
-dl.download_url('https://www.deviantart.com/...')
-
-# Batch download
-artworks = dl.search_user('username', 'keyword')
-for art in artworks:
-    dl.download(art)
-```
-
-### Using Proxy | 使用代理
+### Proxy
 
 ```bash
-# HTTP proxy
+# Command-line
+devart-dl URL --proxy http://127.0.0.1:7890
+
+# Environment variables (HTTP/HTTPS)
 export HTTP_PROXY=http://127.0.0.1:7890
 export HTTPS_PROXY=http://127.0.0.1:7890
-
-# SOCKS proxy
-export ALL_PROXY=socks5://127.0.0.1:1080
-
-# Command line proxy
-devart-dl url <URL> --proxy=http://127.0.0.1:7890
+export ALL_PROXY=http://127.0.0.1:7890
 ```
 
-### Batch Processing | 批处理
+### Python API
 
-```bash
-# Download multiple artists
-for user in artist1 artist2 artist3; do
-    devart-dl artist $user --delay=3
-    sleep 60  # Wait 1 minute between artists
-done
+```python
+from pathlib import Path
+from da_downloader import Downloader
+from da_downloader.download import build_downloader
 
-# Download from URL list
-cat urls.txt | while read url; do
-    devart-dl url "$url" --delay=2
-done
+downloader = build_downloader(
+    destination=Path('downloads'),
+    archive=Path('archive.sqlite'),   # optional: skip already-downloaded
+    quality='best',                   # original / best / preview
+    write_info_json=True,             # write a metadata .json next to each file
+)
+
+results = downloader.download('https://www.deviantart.com/username/gallery')
+for r in results:
+    print(r.status, r.path)
 ```
 
----
-
-## ❓ FAQ | 常见问题
-
-### Q: Downloads are incomplete / skip some artworks?
-**A:** Upgrade to **v3.3.1+**. Older versions fetched only the Featured
-folder, so works in other gallery folders were skipped. v3.3.1 walks all
-gallery folders, no longer mistakes a failed request for "end of gallery",
-and retries previously failed files on the next run.
-
-### Q: ModuleNotFoundError after pip install?
-**A:** Upgrade to **v3.3.1+** (`pip install -U devart-dl`); the console
-entry point is fixed.
-
-### Q: Downloads are very slow?
-**A:** Try these solutions:
-1. Use proxy: `--proxy=http://...`
-2. Reduce quality: `--quality=p`
-3. Check network connection
-4. Increase delay: `--delay=3`
-
-### Q: Got 403 Forbidden error?
-**A:** Login required:
-1. Run `devart-dl login interactive`
-2. Or provide cookie file
-3. Check if cookie is expired
-
-### Q: Got 429 Too Many Requests?
-**A:** IP rate limited:
-1. Stop downloading immediately
-2. Wait a few hours
-3. Use longer delay: `--delay=5`
-4. Reduce batch size: `--limit=10`
-
-### Q: How long do cookies last?
-**A:** Usually a few days to weeks. Re-export if expired.
-
-### Q: Can I use multiple cookies on different computers?
-**A:** Yes, but DeviantArt may detect abnormal logins.
-
-### Q: Does browser login work?
-**A:** May be blocked by anti-automation. Recommend manual cookie export.
-
-### Q: How are downloaded files organized?
-**A:** Gallery/favorite downloads create one folder per author by default
-(control with `--separate=<0|1>`). Single-URL downloads additionally
-support `--organize` modes.
-
-### Q: Where is the resume progress stored?
-**A:** In `~/.deviantart_dl/progress/<session>.json`. Delete the file and
-pass `--replace=1` to re-download everything.
+When logged in via `devart-dl login oauth`, the official API is used automatically; otherwise it falls back to cookies.
 
 ---
 
-## 📄 License | 许可证
+## FAQ
 
-MIT License - See [LICENSE](LICENSE) file
+**Q: Downloads are incomplete / skip some artworks?**
+**A:** Upgrade to **v3.4.0+**. Older versions fetched only the Featured folder;
+v3.3.1 walks all gallery folders, and v3.4.0 reports parsing/network failures
+loudly and resumes interrupted downloads via Range.
 
-**Important Disclaimer:**
-- This tool is for personal learning and research only
-- Respect copyright and terms of service
-- Do not use for commercial purposes
-- Do not abuse or overload servers
-- Author is not responsible for any consequences of misuse
+**Q: ModuleNotFoundError after pip install?**
+**A:** Upgrade to **v3.4.0+** (`pip install -U devart-dl`); the console entry point is fixed.
 
----
+**Q: Got a 403 Forbidden error?**
+**A:** Usually not logged in or an expired cookie. Prefer `devart-dl login oauth`
+(official API); otherwise `devart-dl login interactive` to refresh the cookie.
 
-## 🙏 Acknowledgments | 致谢
+**Q: Got a 429 Too Many Requests?**
+**A:** The official API (OAuth) usually avoids this; the cookie path retries with
+backoff. If it persists, pause for a while.
 
-- DeviantArt for providing the platform
-- All contributors and users
-- Open source community
+**Q: Downloads are slow?**
+**A:** Use a proxy (`--proxy`), or lower the quality (`--quality preview`).
 
----
-
-## 📮 Contact | 联系方式
-
-- Issues: [GitHub Issues](https://github.com/redtidev1918/deviantart-downloader/issues)
-- Discussions: [GitHub Discussions](https://github.com/redtidev1918/deviantart-downloader/discussions)
-
----
-
-## 🌟 Star History | 星标历史
-
-If you find this project helpful, please give it a star! ⭐
+**Q: How do I export a cookie?**
+**A:** Chrome/Edge DevTools (F12) → Application → Cookies, copy the `auth` and
+`auth_secure` fields; or paste it via `devart-dl login interactive`.
 
 ---
 
-**Happy Downloading! 🎨**
+## License
+
+MIT License — see [LICENSE](LICENSE).
+
+**Important disclaimer:** this tool is for personal learning and research only.
+Respect DeviantArt's terms of service and copyright. Do not use it commercially
+or to overload their servers. The author is not responsible for any misuse.

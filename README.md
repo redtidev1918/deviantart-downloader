@@ -1,6 +1,6 @@
 # DeviantArt Downloader
 
-DeviantArt 作品批量下载工具。支持智能文件分类、多账号登录及防封控机制。
+一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。
 
 [English Documentation](README_EN.md)
 
@@ -16,16 +16,13 @@ DeviantArt 作品批量下载工具。支持智能文件分类、多账号登录
 
 ## 核心特性
 
-- **统一命令行**：使用 `devart-dl` 即可调用所有功能。
-- **多种登录支持**：支持 Cookie 文件、交互式输入、环境变量等多种方式。
-- **防封控机制**：内置多种预设模式，自动控制请求频率。
-- **灵活下载**：支持单图、画廊、作者全集、收藏夹及搜索结果下载。
-- **断点续传**：自动记录下载进度，中断后可无缝继续。
-- **高清画质**：自动优先下载最高质量（包括 1080p 视频）。
-- **自动代理**：支持从环境变量自动读取代理设置。
-- **文件管理**：支持按作者、日期、类型等方式自动归档文件。
-
-
+- **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
+- **URL 优先**：`devart-dl URL` 直接下载作品 / 画廊 / 收藏夹 / 标签 / fav.me 短链。
+- **下载可靠**：HTTP Range 断点续传、自动重试、429 退避、HTML/空文件校验、原子落盘。
+- **下载档案**：`--archive` 用 SQLite 记住已下载内容，跨会话自动跳过。
+- **路径模板**：`--directory` / `--filename` 支持 `{id}` `{title}` `{author}` `{published}` `{ext}` 等字段，并做路径安全清洗。
+- **元数据**：`--write-info-json` 在每个作品旁写一份 `.json` 元数据。
+- **代理与降级**：支持 `--proxy` 与代理环境变量；未登录 OAuth 时自动回退 Cookie。
 
 ---
 
@@ -33,71 +30,37 @@ DeviantArt 作品批量下载工具。支持智能文件分类、多账号登录
 
 ### 安装
 
-推荐使用 `pip` 安装：
+需要 Python 3.10 或更高版本。
 
 ```bash
 pip install devart-dl
-
-# 如需浏览器登录支持（可选）
-pip install "devart-dl[browser]"
 ```
 
-也可以从源码安装：
+### 基本用法（URL 优先）
 
 ```bash
-git clone https://github.com/redtidev1918/deviantart-downloader.git
-cd deviantart-downloader
-pip install .
+# 单张作品（也支持 fav.me 短链、裸 artwork id）
+devart-dl https://www.deviantart.com/username/art/title-123456
+
+# 画廊 / 作者全集
+devart-dl https://www.deviantart.com/username/gallery
+
+# 收藏夹
+devart-dl https://www.deviantart.com/username/favourites
+
+# 标签
+devart-dl https://www.deviantart.com/tag/landscape
 ```
 
-需要 Python 3.10 或更高版本。
-
-### 基本用法
+### 登录（推荐 OAuth）
 
 ```bash
-# 下载单张作品
-devart-dl url https://www.deviantart.com/username/art/title-123456
-
-# 下载画师所有作品
-devart-dl artist username
-
-# 下载画廊
-devart-dl gallery username
-
-# 搜索并下载
-devart-dl search username "keyword"
+devart-dl login oauth --client-id 你的_PUBLIC_CLIENT_ID
+devart-dl whoami     # 验证登录状态
+devart-dl logout     # 撤销令牌
 ```
 
-### 常用功能
-
-**配置代理与登录**
-
-```bash
-# 设置代理（可选）
-export ALL_PROXY=http://127.0.0.1:7890
-
-# 交互式登录（推荐）
-devart-dl login interactive
-# 按提示输入 Cookie 后，会自动保存会话，后续命令无需再次登录
-
-# 下载画师作品（自动使用已保存的登录信息）
-devart-dl artist username
-```
-
-**断点续传与批量下载**
-
-```bash
-# 下载画师作品，若中断重新运行即可（自动跳过已下载文件）
-devart-dl artist username --ask=0
-
-# 下载 1080p 视频
-# 工具会自动选择最高画质，无需额外配置
-```
-
-> **提示**：画廊下载会遍历**所有**画廊文件夹（包括非 Featured 文件夹）。
-> 下载进度保存在 `~/.deviantart_dl/progress/`，中断后重新运行同一命令即可
-> 续传；上次失败的文件会自动重试。如需完全重新下载，删除对应的进度
-> `.json` 文件并加 `--replace=1`。
+在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录在浏览器中完成，无需把密码或 `client_secret` 交给 CLI。
 
 ---
 
@@ -105,102 +68,73 @@ devart-dl artist username --ask=0
 
 ### 下载模式
 
-```bash
-# 单张下载
-devart-dl url <artwork_url>
-# 下载原图（需登录）
-devart-dl url <artwork_url> --quality=o
+URL 优先是最简单的方式；也保留显式子命令：
 
-# 批量下载（画师、画廊、收藏夹）
+```bash
+# URL 优先
+devart-dl https://www.deviantart.com/username/art/title-123456
+devart-dl https://www.deviantart.com/username/gallery
+devart-dl https://www.deviantart.com/username/gallery/12345   # 指定文件夹
+devart-dl https://www.deviantart.com/username/favourites
+devart-dl https://www.deviantart.com/tag/landscape
+
+# 显式子命令
+devart-dl url https://www.deviantart.com/username/art/title-123456
 devart-dl artist username
 devart-dl gallery username [gallery_id]
-devart-dl fav username [folder_id]
-
-# 搜索下载
-devart-dl search username "keyword"
 devart-dl search all "digital art"
+devart-dl fav username folder_id
 ```
+
+> 说明：显式子命令沿用旧用法、保持兼容；官方 API 暂不提供搜索端点，`search` 走 Cookie 回退路径。
 
 ### 登录认证
 
-为访问成熟内容或下载原图，建议进行登录配置。**官方 API（OAuth）优先**，Cookie 作为降级方案。
+**官方 API（OAuth）优先**，Cookie 作为降级方案。
 
 1. **OAuth 登录（推荐）**
-   
+
    ```bash
    devart-dl login oauth --client-id 你的_PUBLIC_CLIENT_ID
-   devart-dl whoami        # 验证登录状态
-   devart-dl logout        # 撤销令牌并清除本地会话
    ```
 
-   在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录会在浏览器中完成，无需把密码或 `client_secret` 交给 CLI，令牌安全保存在 `~/.deviantart_dl/oauth.json`（0600）并自动续期。登录后下载命令自动走官方 API，无需 Cookie 与防封延时。
+   - 注册 **Public** OAuth 应用，白名单精确加入 `http://127.0.0.1:8765/callback`。
+   - 登录会在浏览器中完成，令牌保存到 `~/.deviantart_dl/oauth.json`（0600），自动续期。
+   - 登录后下载命令自动走官方 API，原图来自官方下载接口。
 
 2. **Cookie 登录（降级方案）**
 
    ```bash
-   devart-dl login interactive
+   devart-dl login interactive   # 交互式输入 Cookie
    ```
 
-   按提示输入 Cookie，保存至 `~/.deviantart_dl/session.json`；或创建 `cookies.txt`、设置 `DEVIANTART_COOKIES` 环境变量。
+   或创建 `cookies.txt`、设置 `DEVIANTART_COOKIES` 环境变量。会话保存于 `~/.deviantart_dl/session.json`。
 
-> **获取 Cookie 提示**：在浏览器登录 DeviantArt 后，按 F12 打开开发者工具，在 Console 中输入 `document.cookie` 即可获取。
-
-### 防封控机制
-
-批量下载时建议开启延迟限制，以避免触发反爬虫策略。
+### 下载档案与断点续传
 
 ```bash
-# 推荐配置
-devart-dl gallery username --delay=2 --limit=24
+# 用 SQLite 记住已下载内容，下次运行自动跳过（跨会话、跨目录都有效）
+devart-dl https://www.deviantart.com/username/gallery --archive ~/.devart-dl/archive.sqlite
+
+# 中断的下载从 .part 文件续传，无需重新下载整个文件
 ```
 
-- `--delay`：请求间隔秒数（建议 ≥ 2秒）
-- `--limit`：单次批处理数量
-
-
----
-
-## 国际化
-
-工具支持中英双语，会自动根据系统语言设置（`LANG`）切换。也可以手动强制设置：
+### 文件名 / 目录模板
 
 ```bash
-export DEVART_LANG=zh_CN  # 强制中文
-export DEVART_LANG=en_US  # 强制英文
+devart-dl URL \
+  --directory "{author}/{published:%Y-%m}" \
+  --filename "{id}_{title}.{ext}"
 ```
 
----
+可用字段：`{id}` `{title}` `{author}` `{username}` `{published}` `{filename}` `{ext}` `{index}`。路径会自动清洗（去除非法字符、Windows 保留名、`..` 穿越、超长名），确保结果在下载目录之内。
 
-## 日志系统
-
-支持多级日志输出，便于调试和监控。
+### 元数据 sidecar
 
 ```bash
-# 调试模式（详细日志并保存到文件）
-devart-dl gallery username --debug=1
-
-# 下载目录默认为 ./Downloads，可用 --dest 调整
-devart-dl gallery username --dest=./my_downloads
+devart-dl URL --write-info-json
+# 生成 artwork.jpg 与 artwork.json（标题、作者、URL、发布时间、mature、媒体地址等）
 ```
-
----
-
-## 文件管理
-
-画廊/收藏夹下载默认**按作者分文件夹**保存，可用 `--separate` 控制：
-
-```bash
-devart-dl gallery username --separate=1   # 每位作者一个文件夹（默认）
-devart-dl gallery username --separate=0   # 全部保存到同一目录
-```
-
-`devart-dl url` 单图下载额外支持 `--organize=<模式>` 分类归档：
-
-| 模式 | 说明 | 示例路径 |
-|------|------|-------------|
-| `by_author` | 按作者分类（默认） | `downloads/artist_name/artwork.jpg` |
-| `flat` | 不分类 | `downloads/artwork.jpg` |
-
 
 ---
 
@@ -210,39 +144,47 @@ devart-dl gallery username --separate=0   # 全部保存到同一目录
 
 | 选项 | 说明 | 默认值 |
 |------|------|--------|
-| `--quality` | 图片质量：`o` (原图, 需登录), `f` (全图), `p` (预览) | `f` |
-| `--dest` | 下载目录 | `./Downloads` |
-| `--delay` | 下载间隔（秒），用于防封 | `1` |
-| `--limit` | 每页加载数量（1–60） | `24` |
-| `--offset` | 起始偏移（配合续传使用） | `0` |
-| `--separate` | 是否按作者分文件夹 `0\|1` | `1` |
-| `--replace` | 是否覆盖已存在文件 `0\|1` | `0`（跳过） |
-| `--cookies` | Cookie 文件路径 | `./cookies.txt` |
-| `--proxy` | 代理地址 (HTTP/SOCKS) | 自动读取环境变量 |
+| `-d, --dest` | 下载根目录 | `./Downloads` |
+| `--directory` | 目录模板（如 `{author}/{published:%Y}`） | `{author}` |
+| `--filename` | 文件名模板（如 `{id}_{title}.{ext}`） | `{id}_{title}.{ext}` |
+| `--quality` | `original`（原图，需登录）/ `best`（默认）/ `preview`；旧 `o/f/p` 仍可用 | `best` |
+| `--archive` | SQLite 下载档案路径 | 无 |
+| `--write-info-json` | 写元数据 sidecar | 关 |
+| `--overwrite` | 覆盖已存在文件 | 关（跳过） |
+| `--cookies` | Cookie 文件路径 | 自动加载会话 |
+| `--proxy` | 代理地址 | 自动读环境变量 |
+| `--timeout` | 请求超时（秒） | `60` |
+| `--retries` | 最大重试次数 | `3` |
+| `--limit` | 每页数量 | `24` |
 
-### 调试选项
+### 输出选项
 
-- `--debug, -d`：开启调试模式（输出详细日志并保存到文件）。
-- `--verbose, -v`：显示详细运行信息。
-- `--quiet, -q`：静默模式，仅显示错误信息。
+- `-v, --verbose`：显示详细运行信息（含跳过原因）。
+- `-q, --quiet`：静默模式，仅显示汇总与错误。
 
 ---
 
 ## 常用命令速查
 
 ```bash
-# 基础下载
+# URL 优先（推荐）
+devart-dl <URL>
+
+# 显式子命令
 devart-dl url <artwork_url>
 devart-dl artist <username>
 devart-dl gallery <username> [gallery_id]
 devart-dl search <username|all> <query>
 devart-dl fav <username> <folder_id>
 
-# 工具命令
-devart-dl login interactive    # 交互式登录
-devart-dl login validate       # 验证 Cookie 有效性
-devart-dl anti-ban             # 查看防封指南
-devart-dl version              # 查看版本
+# 登录 / 会话
+devart-dl login oauth --client-id <ID>   # OAuth 登录（推荐）
+devart-dl login interactive             # Cookie 登录（降级）
+devart-dl whoami                        # 查看登录状态
+devart-dl logout                        # 撤销令牌并清除本地会话
+
+# 其他
+devart-dl version
 ```
 
 ---
@@ -251,19 +193,17 @@ devart-dl version              # 查看版本
 
 ### 代理设置
 
-除了命令行参数 `--proxy`，也支持环境变量：
-
 ```bash
-# HTTP/HTTPS 代理
-export ALL_PROXY=http://127.0.0.1:7890
+# 命令行参数
+devart-dl URL --proxy http://127.0.0.1:7890
 
-# SOCKS5 代理
-export ALL_PROXY=socks5://127.0.0.1:1080
+# 环境变量（HTTP/HTTPS 代理）
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
+export ALL_PROXY=http://127.0.0.1:7890
 ```
 
 ### Python 脚本调用
-
-支持在 Python 代码中直接调用：
 
 ```python
 from pathlib import Path
@@ -282,31 +222,29 @@ for r in results:
     print(r.status, r.path)
 ```
 
-URL 优先：直接传 DeviantArt 链接、`fav.me` 短链或裸 artwork id 均可。已通过 `devart-dl login oauth` 登录时自动走官方 API，否则回退到 Cookie。
+已通过 `devart-dl login oauth` 登录时自动走官方 API，否则回退到 Cookie。
 
 ---
 
 ## 常见问题
 
 **Q: 下载不完整 / 只下了一部分 / 像是跳着下？**
-A: 请升级到 **v3.3.1+**。旧版本只下载 Featured（精选）文件夹，其他画廊
-文件夹里的作品会被跳过；v3.3.1 起会遍历全部画廊文件夹。同时网络请求失败
-不再被误判为"下载完毕"，会明确报错并在下次运行时自动重试。
+A: 请升级到 **v3.4.0+**。旧版本只下载 Featured（精选）文件夹；v3.3.1 起遍历全部画廊文件夹，v3.4.0 起解析失败与网络失败会明确报错，且中断可 Range 续传。
 
 **Q: pip 安装后运行 `devart-dl` 报 ModuleNotFoundError？**
-A: 请升级到 **v3.3.1+**（`pip install -U devart-dl`），安装入口已修复。
-
-**Q: 下载速度慢？**
-A: 建议配置代理（`--proxy`），或适当降低图片质量（`--quality=p`）。
+A: 请升级到 **v3.4.0+**（`pip install -U devart-dl`），安装入口已修复。
 
 **Q: 出现 403 Forbidden？**
-A: 通常是因为未登录或 Cookie 过期。请运行 `devart-dl login interactive` 重新登录。
+A: 通常是未登录或 Cookie 过期。优先 `devart-dl login oauth`（官方 API）；或 `devart-dl login interactive` 更新 Cookie。
 
 **Q: 出现 429 Too Many Requests？**
-A: 请求过于频繁导致 IP 被限制。请停止下载数小时，并在后续使用时增加延迟（`--delay`）。
+A: 使用官方 API（OAuth 登录）通常不会触发；Cookie 路径下会自动退避重试，若仍频繁 429，请暂停一段时间再试。
+
+**Q: 下载速度慢？**
+A: 建议配置代理（`--proxy`），或降低画质（`--quality preview`）。
 
 **Q: 如何导出 Cookie？**
-A: 推荐使用 Chrome/Edge 开发者工具 (F12) -> Application -> Cookies，复制 `auth` 和 `auth_secure` 字段。或参考 `devart-dl login interactive` 的提示。
+A: 推荐 Chrome/Edge 开发者工具 (F12) → Application → Cookies，复制 `auth` 和 `auth_secure` 字段；或 `devart-dl login interactive` 按提示粘贴。
 
 ---
 
