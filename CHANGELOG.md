@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- 单作品下载支持**多文件作品**：若官方响应带出附加画面（additionalMedia/files），会逐个产出下载项，不再只下第一张图。
+- 单作品下载支持**多文件作品**：附加画面来自网页 init 响应（deviation.extended.additionalMedia，官方 API 不再返回），会逐个产出下载项，不再只下第一张图。
 
 ## [4.0.2] - 2026-09-06
 

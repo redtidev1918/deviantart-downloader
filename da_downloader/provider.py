@@ -14,7 +14,13 @@ from typing import Any, Callable, Iterator, Optional, Protocol
 from .api import ActionType, DeviantArtAPI
 from .errors import MediaUnavailableError, ParseError
 from .models import Deviation, DownloadItem
-from .official_api import OfficialApiClient, resolve_uuid
+from .official_api import (
+    OfficialApiClient,
+    additional_media_urls,
+    deviation_init,
+    deviation_uuid,
+    resolve_uuid,
+)
 from .targets import DownloadTarget, TargetKind
 
 logger = logging.getLogger(__name__)
@@ -195,44 +201,27 @@ class OfficialProvider:
         return next(self._artwork_items(target))
 
     def _artwork_items(self, target: DownloadTarget) -> Iterator[DownloadItem]:
-        """单作品下载；多文件作品（additionalMedia/files）会一并产出全部画面。"""
-        uuid = resolve_uuid(target.identifier or "", target.username)
-        deviation = self.client.deviation(uuid)
-        yield self._item(deviation)
-        # DA 多文件作品的附加画面若在官方响应里带出来（字段名不固定），逐个产出；
-        # 找不到就只下主图（行为与以前一致）。
-        extras = (
-            deviation.get("additionalMedia")
-            or deviation.get("additional_media")
-            or deviation.get("files")
-            or []
-        )
-        for index, entry in enumerate(extras or [], start=1):
-            if not isinstance(entry, dict):
-                continue
-            item = self._item(deviation)
-            item.artwork_id = f"{deviation.get('deviationid', uuid)}-{index}"
-            item.media_url = self._extra_media_url(entry) or item.media_url
-            item.extension = _ext_from_url(item.media_url)
-            item.metadata = {**item.metadata, "index": index}
-            if item.media_url:
-                yield item
-
-    def _extra_media_url(self, entry: dict) -> Optional[str]:
-        """附加画面的媒体地址：entry 里可能是 content/preview/thumbs 或嵌套 media/baseUri。"""
-        content = entry.get("content") or {}
-        if content.get("src"):
-            return str(content["src"])
-        preview = entry.get("preview") or {}
-        if preview.get("src"):
-            return str(preview["src"])
-        media = entry.get("media") or {}
-        if media.get("baseUri"):
-            return str(media["baseUri"])
-        thumbs = entry.get("thumbs") or []
-        if thumbs and isinstance(thumbs[0], dict) and thumbs[0].get("src"):
-            return str(thumbs[0]["src"])
-        return None
+        """单作品下载。多文件作品的附加画面来自网页 init 响应
+        （deviation.extended.additionalMedia，官方 API 不再返回），逐个产出下载项；
+        没有附加画面时只下主图（行为与以前一致）。"""
+        identifier = target.identifier or ""
+        init_data = deviation_init(identifier, target.username)
+        uuid = deviation_uuid(init_data)
+        main = self._item(self.client.deviation(uuid))
+        yield main
+        for index, url in enumerate(additional_media_urls(init_data), start=1):
+            item = DownloadItem(
+                artwork_id=f"{main.artwork_id}-{index}",
+                url=main.url,
+                title=main.title,
+                author=main.author,
+                media_url=url,
+                extension=_ext_from_url(url),
+                published_at=main.published_at,
+                mature=main.mature,
+                metadata={**main.metadata, "index": index},
+            )
+            yield item
 
     def _paginate(self, fetch: Callable[[int], dict]) -> Iterator[DownloadItem]:
         offset = 0

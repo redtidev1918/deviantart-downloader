@@ -251,4 +251,95 @@ def resolve_uuid(
     return uuid
 
 
-__all__ = ["OfficialApiClient", "OriginalDownload", "resolve_uuid"]
+
+def deviation_init(
+    identifier: str,
+    username: Optional[str] = None,
+    timeout: int = 30,
+    session: Optional[requests.Session] = None,
+) -> dict:
+    """Fetch the full public ``_puppy/dadeviation/init`` payload (numeric or
+    fav.me ids). Mirrors DAKit/DAViewer: multimedia pages surface under
+    ``deviation.extended.additionalMedia`` here, which the official API no
+    longer returns.
+    """
+    identifier = identifier.strip()
+    if not identifier:
+        raise ParseError("the URL does not contain an artwork id")
+    http = session or requests.Session()
+    if not identifier.isdigit():
+        identifier = _resolve_short_id(identifier, http, timeout)
+    try:
+        home = http.get(
+            WEB_BASE,
+            headers={"User-Agent": USER_AGENT, "Accept": "text/html"},
+            timeout=timeout,
+        )
+        home.raise_for_status()
+        match = re.search(r"window\.__CSRF_TOKEN__ = '([^']*)'", home.text)
+        if not match or not match.group(1):
+            raise ParseError("could not read the DeviantArt CSRF token")
+        csrf = match.group(1)
+        query = {
+            "deviationid": identifier,
+            # 该接口自 2026 年起把 type 列为必填枚举（art/journal），缺失返回 400。
+            "type": "art",
+            "include_session": "false",
+            "csrf_token": csrf,
+            "mature_content": True,
+        }
+        if username:
+            query["username"] = username
+        response = http.get(
+            f"{WEB_BASE}/_puppy/dadeviation/init",
+            params=query,
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException as error:
+        raise NetworkError(f"could not reach the resolution endpoint: {error}") from error
+    except ValueError as error:
+        raise ParseError("the resolution endpoint returned invalid JSON") from error
+    if not isinstance(data, dict) or not isinstance(data.get("deviation"), dict):
+        raise ParseError("the resolution endpoint returned an unexpected payload")
+    return data
+
+
+def deviation_uuid(init_data: dict) -> str:
+    """Read the UUID out of an init payload."""
+    extended = init_data.get("deviation", {}).get("extended") or {}
+    uuid = extended.get("deviationUuid")
+    if not isinstance(uuid, str) or not uuid:
+        raise MediaUnavailableError("could not resolve the artwork to a UUID")
+    return uuid
+
+
+def additional_media_urls(init_data: dict) -> list:
+    """Original-file URLs of a multimedia deviation's extra pages
+    (``deviation.extended.additionalMedia``, each entry nests its Wix
+    descriptor under ``media``). Prefers the raw ``baseUri`` file + token.
+    """
+    extended = init_data.get("deviation", {}).get("extended") or {}
+    entries = extended.get("additionalMedia") or []
+    urls: list = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        media = entry.get("media")
+        if not isinstance(media, dict):
+            continue
+        base = media.get("baseUri")
+        if not isinstance(base, str) or not base:
+            continue
+        raw_token = media.get("token")
+        token = raw_token[0] if isinstance(raw_token, list) and raw_token else raw_token
+        if token:
+            urls.append(f"{base}{'&' if '?' in base else '?'}token={token}")
+        else:
+            urls.append(base)
+    return urls
+
+
+__all__ = ["OfficialApiClient", "OriginalDownload", "resolve_uuid", "deviation_init", "deviation_uuid", "additional_media_urls"]
