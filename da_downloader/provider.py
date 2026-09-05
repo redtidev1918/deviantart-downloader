@@ -19,7 +19,6 @@ from .official_api import (
     additional_media_urls,
     deviation_init,
     deviation_uuid,
-    resolve_uuid,
 )
 from .targets import DownloadTarget, TargetKind
 
