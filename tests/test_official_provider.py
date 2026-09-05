@@ -58,7 +58,7 @@ class FakeClient:
 
 
 def test_artwork_original(monkeypatch) -> None:
-    monkeypatch.setattr(provider_mod, "resolve_uuid", lambda identifier, username=None: "uuid-1")
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
     client = FakeClient()
     client.deviations["uuid-1"] = make_deviation()
     client.originals["uuid-1"] = OriginalDownload(
@@ -77,8 +77,35 @@ def test_artwork_original(monkeypatch) -> None:
     assert items[0].published_at == datetime(2015, 3, 30, 21, 21, 4, tzinfo=timezone.utc)
 
 
+def test_artwork_multimedia_yields_every_file(monkeypatch) -> None:
+    init = {
+        "deviation": {
+            "extended": {
+                "deviationUuid": "uuid-1",
+                "additionalMedia": [
+                    {"fileId": 2, "media": {"baseUri": "https://media.test/p2.jpg", "token": ["t2"]}},
+                    {"fileId": 3, "media": {"baseUri": "https://media.test/p3.png", "token": ["t3"]}},
+                ],
+            }
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation()
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("https://www.deviantart.com/alice/art/x-123456")))
+
+    assert len(items) == 3  # 主图 + 两张附加
+    assert items[0].media_url == "https://images.test/full.jpg"
+    assert items[1].media_url == "https://media.test/p2.jpg?token=t2"
+    assert items[1].artwork_id == "uuid-1-1"
+    assert items[2].media_url == "https://media.test/p3.png?token=t3"
+    assert items[2].extension == "png"
+
+
 def test_artwork_best_uses_content(monkeypatch) -> None:
-    monkeypatch.setattr(provider_mod, "resolve_uuid", lambda identifier, username=None: "uuid-1")
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
     client = FakeClient()
     client.deviations["uuid-1"] = make_deviation()
     provider = OfficialProvider(client, quality="f")
@@ -111,7 +138,7 @@ def test_gallery_paginates(monkeypatch) -> None:
 
 
 def test_no_media_raises(monkeypatch) -> None:
-    monkeypatch.setattr(provider_mod, "resolve_uuid", lambda identifier, username=None: "uuid-1")
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
     client = FakeClient()
     client.deviations["uuid-1"] = {
         "deviationid": "uuid-1",
