@@ -60,7 +60,7 @@ devart-dl whoami     # 验证登录状态
 devart-dl logout     # 撤销令牌
 ```
 
-在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录在浏览器中完成，无需把密码或 `client_secret` 交给 CLI。
+在 [deviantart.com/developers](https://www.deviantart.com/developers/) 注册一个 **Public** OAuth 应用，把 `http://127.0.0.1:8765/callback` 加入白名单。登录在浏览器中完成，无需把密码或 `client_secret` 交给 CLI。完整步骤见 [docs/LOGIN.md](docs/LOGIN.md)。
 
 ---
 
