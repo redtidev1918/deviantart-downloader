@@ -102,7 +102,22 @@ devart-dl fav username folder_id
    - Login completes in the browser; tokens are stored at `~/.deviantart_dl/oauth.json` (0600) and auto-refresh.
    - Download commands then use the official API automatically; originals come from the official download endpoint.
 
-2. **Cookie login (fallback)**
+2. **Cookie login — one-click browser (recommended for cookies)**
+
+   ```bash
+   devart-dl login browser
+   ```
+
+   A Chrome window opens to the DeviantArt login page; just log in there. The
+   helper drives your **real** Chrome via the DevTools Protocol and captures the
+   web cookies (`auth` / `auth_secure` / `userinfo`) automatically — no F12 copy.
+   It needs Node.js (>= 22) and Chrome, and saves the session to
+   `~/.deviantart_dl/session.json` (0600). Logging in on the real domain is
+   required because the DeviantArt login page is behind an AWS WAF bot check that
+   blocks headless/proxied browsers; this is also the only way to capture the
+   HttpOnly `auth_secure` cookie.
+
+3. **Cookie login — manual paste (fallback)**
 
    ```bash
    devart-dl login interactive   # paste a cookie interactively
@@ -179,7 +194,8 @@ devart-dl fav <username> <folder_id>
 
 # Login / session
 devart-dl login oauth --client-id <ID>   # OAuth login (recommended)
-devart-dl login interactive             # Cookie login (fallback)
+devart-dl login browser                 # one-click cookie via your Chrome
+devart-dl login interactive             # cookie login (manual paste)
 devart-dl whoami                        # show login status
 devart-dl logout                        # revoke token and clear local session
 
@@ -238,7 +254,8 @@ loudly and resumes interrupted downloads via Range.
 
 **Q: Got a 403 Forbidden error?**
 **A:** Usually not logged in or an expired cookie. Prefer `devart-dl login oauth`
-(official API); otherwise `devart-dl login interactive` to refresh the cookie.
+(official API); otherwise `devart-dl login browser` for a one-click cookie
+(`devart-dl login interactive` to paste one manually).
 
 **Q: Got a 429 Too Many Requests?**
 **A:** The official API (OAuth) usually avoids this; the cookie path retries with
@@ -248,8 +265,10 @@ backoff. If it persists, pause for a while.
 **A:** Use a proxy (`--proxy`), or lower the quality (`--quality preview`).
 
 **Q: How do I export a cookie?**
-**A:** Chrome/Edge DevTools (F12) → Application → Cookies, copy the `auth` and
-`auth_secure` fields; or paste it via `devart-dl login interactive`.
+**A:** Easiest is `devart-dl login browser` — it opens your own Chrome and
+captures the cookie automatically. Otherwise open Chrome/Edge DevTools (F12) →
+Application → Cookies, copy the `auth` and `auth_secure` fields, and paste them
+via `devart-dl login interactive`.
 
 ---
 

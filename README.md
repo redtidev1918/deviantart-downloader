@@ -36,7 +36,13 @@ devart-dl login oauth --client-id 你的_PUBLIC_CLIENT_ID
 devart-dl whoami
 ```
 
-不会注册 OAuth 应用也可以使用 Cookie。完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/#/LOGIN)**。
+不会注册 OAuth 应用也可以使用 Cookie。最简单的是一键浏览器登录（本机装 Chrome + Node ≥ 22）：
+
+```bash
+devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，无需 F12 复制
+```
+
+完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/#/LOGIN)**。
 
 > 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#/?id=github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
 
