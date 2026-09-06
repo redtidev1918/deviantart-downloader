@@ -14,6 +14,8 @@
 
 ---
 
+> 📥 下载：`pip install -U devart-dl`，或见 [下载页](download.md)（自动指向最新 Release）。
+
 ## 核心特性
 
 - **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
