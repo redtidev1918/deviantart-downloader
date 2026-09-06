@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0](https://github.com/redtidev1918/deviantart-downloader/compare/v4.0.4...v4.1.0) (2026-09-06)
+
+
+### Features
+
+* **login:** 一键浏览器登录（CDP 自动抓 cookie），免 F12 手动复制 ([94f86ff](https://github.com/redtidev1918/deviantart-downloader/commit/94f86ffd90c6dda9a7414063c72021332a9c53d1))
+
+
+### Documentation
+
+* mature content blur/quota and login-liveness notes ([85d9a38](https://github.com/redtidev1918/deviantart-downloader/commit/85d9a3848d2c41b110921172bc7ec34b2b141112))
+* **site:** 新增自动化下载页（pip wheel + 发版自动更新） ([29ee11d](https://github.com/redtidev1918/deviantart-downloader/commit/29ee11dccbd50737d06d31810530351f97ba9460))
+
 ## [4.0.4] - 2026-09-06
 
 ### Chores
