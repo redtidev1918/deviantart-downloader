@@ -62,7 +62,6 @@ def main() -> int:
         return 1
 
     tag = rel.get("tag_name", "")
-    name = rel.get("name") or tag
     published = (rel.get("published_at") or "")[:10]
     assets = rel.get("assets", [])
     project = REPO.split("/")[1]
