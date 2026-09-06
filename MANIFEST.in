@@ -9,3 +9,4 @@ include requirements.txt
 
 # Include non-Python support files and source-tree scripts
 recursive-include bin *
+include da_downloader/*.mjs

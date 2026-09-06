@@ -63,6 +63,9 @@ da-dl = "da_downloader.cli:main"
 [tool.setuptools.packages.find]
 include = ["da_downloader*"]
 
+[tool.setuptools.package-data]
+da_downloader = ["*.mjs"]
+
 # Black configuration
 [tool.black]
 line-length = 100

@@ -11,6 +11,8 @@ import argparse
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
@@ -40,7 +42,7 @@ Usage:
   devart-dl gallery USERNAME [GALLERY_ID] [options]
   devart-dl search USERNAME_OR_ALL QUERY [options]
   devart-dl fav USERNAME [FOLDER_ID] [options]
-  devart-dl login oauth|interactive
+  devart-dl login oauth|browser|interactive
   devart-dl whoami | logout
   devart-dl version
 
@@ -281,6 +283,33 @@ def _oauth_login(arguments: Sequence[str]) -> int:
     return 0
 
 
+def _login_browser(arguments: Sequence[str]) -> int:
+    """One-click cookie login: drive the user's real Chrome via CDP.
+
+    Avoids the manual F12 cookie copy and, importantly, runs the login on the
+    real DeviantArt domain so the AWS WAF challenge passes (a server-side or
+    proxied headless browser is blocked). Requires Node >= 22 and Chrome.
+    Falls back with instructions if they are unavailable.
+    """
+    if not shutil.which("node"):
+        print(
+            "browser login needs Node.js (>= 22) to drive Chrome.\n"
+            "Install Node, or use `devart-dl login interactive` to paste a cookie instead.",
+            file=sys.stderr,
+        )
+        return 1
+    script = Path(__file__).resolve().parent / "da_cookie_login.mjs"
+    if not script.exists():
+        print(f"login helper not found: {script}", file=sys.stderr)
+        return 1
+    print("Opening Chrome — log in to DeviantArt in the window that appears…")
+    try:
+        return subprocess.call(["node", str(script)])
+    except KeyboardInterrupt:
+        print("\ncancelled", file=sys.stderr)
+        return 130
+
+
 def _login_interactive(arguments: Sequence[str]) -> int:
     print("Paste your DeviantArt cookie (F12 → Application → Cookies → copy auth & auth_secure):")
     cookies = input().strip()
@@ -368,14 +397,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _run_subcommand(command, rest)
     if command == "login":
         if not rest or rest[0] in {"-h", "--help", "help"}:
-            print("Usage: devart-dl login oauth|interactive|clear")
+            print("Usage: devart-dl login oauth|browser|interactive|clear")
             print("  oauth        log in via the official API (recommended)")
+            print("  browser      one-click: log in with your own Chrome, cookie auto-saved")
             print("  interactive  paste a cookie (fallback)")
             print("  clear        clear saved login sessions")
             return 0
         login_command, *login_args = rest
         if login_command == "oauth":
             return _oauth_login(login_args)
+        if login_command == "browser":
+            return _login_browser(login_args)
         if login_command == "interactive":
             return _login_interactive(login_args)
         if login_command == "clear":

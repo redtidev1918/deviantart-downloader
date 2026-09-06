@@ -99,7 +99,26 @@ devart-dl 作品链接 --quality original
 
 Cookie 登录走 DeviantArt 网页接口。它适合作者/画廊、收藏夹和搜索；单张作品与标签仍需 OAuth。
 
-### 第一步：从浏览器复制 Cookie
+### 方式 A（推荐）：一键浏览器登录，免手动复制
+
+需要本机装有 Google Chrome / Edge，以及 Node.js（≥ 22）。
+
+```bash
+devart-dl login browser
+```
+
+命令会自动打开一个 Chrome 窗口进入 DeviantArt 登录页，你**在窗口里正常登录**即可；
+脚本通过 Chrome DevTools Protocol 在网络层自动读取登录后的网页 Cookie（`auth` /
+`auth_secure` / `userinfo`），保存到 `~/.deviantart_dl/session.json`（权限 `0600`），
+无需打开开发者工具、无需复制粘贴。
+
+> 为什么必须在你自己的浏览器里登录：DeviantArt 登录页有 AWS WAF 人机校验，
+> 服务器端或代理的无头浏览器会被拦截；在真实域上用真实浏览器登录天然通过。
+> 这也是获取 `auth_secure`（HttpOnly，`document.cookie` 拿不到）最省事的方式。
+
+没有 Node 或在无图形界面的服务器上时，用下面的手动方式。
+
+### 方式 B：手动从浏览器复制 Cookie
 
 先在浏览器正常登录 <https://www.deviantart.com/>，然后：
 
@@ -124,7 +143,7 @@ auth=第一个值; auth_secure=第二个值
 
 不要把这行内容发给任何人，也不要提交到 Git 仓库。`auth_secure` 通常是 HttpOnly Cookie，不能依赖 `document.cookie` 获取。
 
-### 方式 A：交互式保存（最简单）
+### B-1：交互式保存（最简单）
 
 ```bash
 devart-dl login interactive
@@ -132,7 +151,7 @@ devart-dl login interactive
 
 看到提示后粘贴上面的完整一行并按回车。Cookie 会保存到 `~/.deviantart_dl/session.json`，权限为 `0600`。
 
-### 方式 B：临时环境变量
+### B-2：临时环境变量
 
 只在当前终端会话中使用，不写入配置文件：
 
@@ -148,7 +167,7 @@ devart-dl https://www.deviantart.com/用户名/gallery
 
 关闭终端后环境变量通常会消失。不要把真实 Cookie 写进仓库里的 `.env` 文件。
 
-### 方式 C：Cookie 文件
+### B-3：Cookie 文件
 
 创建一个文本文件，例如 `cookies.txt`，内容只有一行：
 
