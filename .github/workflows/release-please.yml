@@ -17,3 +17,5 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          # PAT 推送的 tag 才能触发 release 工作流；内置 GITHUB_TOKEN 推 tag 不会触发
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
