@@ -1,0 +1,34 @@
+{
+  "kind": "python-library",
+  "versioning": {
+    "mode": "release-please"
+  },
+  "build": {
+    "test": "pip install \".[dev]\" build twine && ruff check . && pytest -m \"not integration\" -q",
+    "command": "scripts/build-release",
+    "version_check": "python -c \"import pathlib,os; wheels=list(pathlib.Path('dist/pypi').glob('*.whl')); assert wheels and os.environ['RELEASE_VERSION'] in wheels[0].name\""
+  },
+  "assets": {
+    "required": [
+      "*.whl",
+      "*.tar.gz"
+    ],
+    "optional": []
+  },
+  "registries": {
+    "github": {
+      "required": true
+    },
+    "pypi": {
+      "required": true,
+      "packages_dir": "dist/pypi"
+    }
+  },
+  "retention": {
+    "stable": 1,
+    "prerelease": 1,
+    "failed_draft": 2
+  },
+  "checksums": true,
+  "sbom": false
+}

@@ -5,7 +5,8 @@
       "release-type": "python",
       "package-name": "deviantart-downloader",
       "include-v-in-tag": true,
-      "include-component-in-tag": false
+      "include-component-in-tag": false,
+      "skip-github-release": true
     }
   }
 }
