@@ -8,4 +8,5 @@
 - English
   - [Documentation](/en/)
   - [📥 Download](/en/download.md)
+  - [Login and authentication](/en/LOGIN.md)
   - [README (English)](https://github.com/redtidev1918/deviantart-downloader/blob/main/README.en.md)
