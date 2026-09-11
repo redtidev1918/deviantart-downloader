@@ -1,6 +1,6 @@
 # Include documentation
 include README.md
-include README_EN.md
+include README.en.md
 include LICENSE
 
 # Include configuration examples

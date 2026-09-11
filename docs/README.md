@@ -2,7 +2,7 @@
 
 一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。
 
-[English Documentation](https://github.com/redtidev1918/deviantart-downloader/blob/main/README_EN.md)
+**语言 / Language:** 中文 · [English](https://github.com/redtidev1918/deviantart-downloader/blob/main/README.en.md)
 
 [![CI](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)
