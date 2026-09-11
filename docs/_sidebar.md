@@ -1,12 +1,7 @@
 - 开始使用
-  - [文档中心](/)
+  - [概览](/)
   - [📥 下载](/download.md)
   - [登录与认证](/LOGIN.md)
 - 项目
-  - [更新日志](https://github.com/redtidev1918/deviantart-downloader/blob/main/CHANGELOG.md)
-  - [发布流程](https://github.com/redtidev1918/deviantart-downloader/blob/main/RELEASING.md)
-- English
-  - [Documentation](/en/)
-  - [📥 Download](/en/download.md)
-  - [Login and authentication](/en/LOGIN.md)
-  - [README (English)](https://github.com/redtidev1918/deviantart-downloader/blob/main/README.en.md)
+  - [更新日志（GitHub）](https://github.com/redtidev1918/deviantart-downloader/blob/main/CHANGELOG.md)
+  - [发布流程（GitHub）](https://github.com/redtidev1918/deviantart-downloader/blob/main/RELEASING.md)
