@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.2](https://github.com/redtidev1918/deviantart-downloader/compare/v4.1.1...v4.1.2) (2026-09-12)
+
+
+### Documentation
+
+* 侧边栏按信息架构规约收敛，拆分语言侧边栏 ([#20](https://github.com/redtidev1918/deviantart-downloader/issues/20)) ([07e2bcf](https://github.com/redtidev1918/deviantart-downloader/commit/07e2bcfa2787b6d5c62ac69a490c9952a2be41b6))
+* 发版说明对齐 releasegraph 流水线，去 emoji ([fcde413](https://github.com/redtidev1918/deviantart-downloader/commit/fcde4134a50274e62d4a6502af00138e00a2ab84))
+* 统一双语命名与侧边栏，接入托管下载页生成链路，清理一次性报告 ([#18](https://github.com/redtidev1918/deviantart-downloader/issues/18)) ([9b4c751](https://github.com/redtidev1918/deviantart-downloader/commit/9b4c7519981ad4a7db26275265af20fc18f6d5fe))
+
 ## [4.1.1](https://github.com/redtidev1918/deviantart-downloader/compare/v4.1.0...v4.1.1) (2026-09-07)
 
 
