@@ -1,4 +1,4 @@
 - Getting Started
   - [Overview](/en/)
-  - [📥 Download](/en/download.md)
+  - [Download](/en/download.md)
   - [Login and Authentication](/en/LOGIN.md)

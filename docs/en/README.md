@@ -9,7 +9,7 @@
 
 | Document | Content |
 | :-- | :-- |
-| [📥 Download](download.md) | PyPI install and release artifacts, auto-updated on every release |
+| [Download](download.md) | PyPI install and release artifacts, auto-updated on every release |
 | [README (English)](https://github.com/redtidev1918/deviantart-downloader/blob/main/README.en.md) | Overview, install and usage |
 | [Login and authentication](LOGIN.md) | OAuth and cookie sign-in flows, mature-content handling, security notes |
 

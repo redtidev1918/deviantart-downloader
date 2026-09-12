@@ -2,7 +2,7 @@
 
 A reliable, focused DeviantArt downloader and archival CLI.
 
-**Language / 语言:** [中文](README.md) · English · [📖 Full documentation](https://redtidev1918.github.io/deviantart-downloader/) · [Changelog](CHANGELOG.md)
+**Language / 语言:** [中文](README.md) · English · [Full documentation](https://redtidev1918.github.io/deviantart-downloader/) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)

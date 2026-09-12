@@ -14,7 +14,7 @@
 
 ---
 
-> 📥 下载：`pip install -U devart-dl`，或见 [下载页](download.md)（自动指向最新 Release）。
+下载：`pip install -U devart-dl`，或见 [下载页](download.md)（自动指向最新 Release）。
 
 ## 核心特性
 
@@ -42,10 +42,10 @@ python -m pip install -U devart-dl
 
 **普通用户不用手动下载这些文件**，运行 `python -m pip install -U devart-dl` 即可。`pip` 会自动选择正确的包。
 
-以 `devart_dl-4.0.1-py3-none-any.whl` 为例：
+以 `devart_dl-4.1.1-py3-none-any.whl` 为例：
 
 - `devart_dl`：Python 包名；
-- `4.0.1`：版本号；
+- `4.1.1`：版本号；
 - `py3`：适用于 Python 3；
 - `none-any`：不依赖特定 Python ABI 或操作系统。
 

@@ -1,6 +1,6 @@
 - 开始使用
   - [概览](/)
-  - [📥 下载](/download.md)
+  - [下载](/download.md)
   - [登录与认证](/LOGIN.md)
 - 项目
   - [更新日志（GitHub）](https://github.com/redtidev1918/deviantart-downloader/blob/main/CHANGELOG.md)
