@@ -74,3 +74,26 @@ def test_oauth_whoami_without_session(monkeypatch, capsys) -> None:
     monkeypatch.setattr(cli.OAuthSession, "from_store", classmethod(lambda cls: None))
     assert cli._oauth_whoami([]) == 1
     assert "not logged in" in capsys.readouterr().err
+
+
+def test_run_download_dry_run_summary(monkeypatch, capsys, tmp_path) -> None:
+    from da_downloader.manager import DownloadOutcome
+
+    class FakeDryDownloader:
+        def download(self, target):
+            return [
+                DownloadOutcome("1", "planned", path=tmp_path / "x.jpg"),
+                DownloadOutcome("2", "skipped", reason="exists"),
+            ]
+
+    built: dict = {}
+    monkeypatch.setattr(cli, "build_downloader", lambda **kw: built.update(kw) or FakeDryDownloader())
+    monkeypatch.setattr(cli, "_load_cookies", lambda p: "")
+
+    rc = cli._run_download(
+        ["https://www.deviantart.com/alice/gallery", "--dest", str(tmp_path), "--dry-run"]
+    )
+
+    assert rc == 0
+    assert "dry-run: would download 1, skip 1, fail 0" in capsys.readouterr().out
+    assert built["dry_run"] is True

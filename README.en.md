@@ -165,6 +165,7 @@ devart-dl URL --write-info-json
 | `--quality` | `original` (login) / `best` (default) / `preview`; legacy `o/f/p` still accepted | `best` |
 | `--archive` | SQLite download archive path | none |
 | `--write-info-json` | Write a metadata sidecar | off |
+| `--dry-run` | Plan only: resolve and report what would be downloaded, write nothing | off |
 | `--overwrite` | Replace existing files | off (skip) |
 | `--cookies` | Cookie file path | auto-load session |
 | `--proxy` | Proxy URL | auto from environment |
