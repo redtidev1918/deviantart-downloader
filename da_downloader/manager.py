@@ -44,12 +44,14 @@ class DownloadManager:
         archive: Optional[DownloadArchive] = None,
         overwrite: bool = False,
         write_info_json: bool = False,
+        dry_run: bool = False,
     ) -> None:
         self.downloader = downloader
         self.formatter = formatter
         self.archive = archive
         self.overwrite = overwrite
         self.write_info_json = write_info_json
+        self.dry_run = dry_run
 
     def run(self, item: DownloadItem) -> DownloadOutcome:
         key = artwork_key(item.artwork_id)
@@ -66,6 +68,9 @@ class DownloadManager:
 
         if path.exists() and not self.overwrite:
             return DownloadOutcome(item.artwork_id, "skipped", path=path, reason="exists")
+
+        if self.dry_run:
+            return DownloadOutcome(item.artwork_id, "planned", path=path)
 
         try:
             result: TransferResult = self.downloader.download(

@@ -59,6 +59,7 @@ def build_downloader(
     quality: str = "best",
     overwrite: bool = False,
     write_info_json: bool = False,
+    dry_run: bool = False,
     directory: str = "{author}",
     filename: str = "{id}_{title}.{ext}",
     proxy: Optional[str] = None,
@@ -115,6 +116,7 @@ def build_downloader(
         archive=archive_obj,
         overwrite=overwrite,
         write_info_json=write_info_json,
+        dry_run=dry_run,
     )
     return Downloader(provider, manager)
 

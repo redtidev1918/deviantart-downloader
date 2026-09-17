@@ -54,6 +54,7 @@ Options (URL-first and subcommands):
   --archive PATH          SQLite archive to skip already-downloaded
   --cookies PATH          cookie file (otherwise env/session/cookies.txt)
   --write-info-json       write a metadata .json next to each file
+  --dry-run               plan only: report what would be downloaded, write nothing
   --overwrite             replace existing files
   --proxy URL --timeout S --retries N --limit N
 
@@ -109,6 +110,7 @@ def _execute(
     quality: str = "best",
     overwrite: bool = False,
     write_info_json: bool = False,
+    dry_run: bool = False,
     directory: str = "{author}",
     filename: str = "{id}_{title}.{ext}",
     proxy: Optional[str] = None,
@@ -126,6 +128,7 @@ def _execute(
             quality=quality,
             overwrite=overwrite,
             write_info_json=write_info_json,
+            dry_run=dry_run,
             directory=directory,
             filename=filename,
             proxy=proxy,
@@ -139,12 +142,16 @@ def _execute(
         return 1
 
     downloaded = sum(1 for o in outcomes if o.status == "downloaded")
+    planned = sum(1 for o in outcomes if o.status == "planned")
     skipped = sum(1 for o in outcomes if o.status == "skipped")
     failed = sum(1 for o in outcomes if o.status == "failed")
     if not quiet:
-        print(f"downloaded: {downloaded}, skipped: {skipped}, failed: {failed}")
+        if dry_run:
+            print(f"dry-run: would download {planned}, skip {skipped}, fail {failed}")
+        else:
+            print(f"downloaded: {downloaded}, skipped: {skipped}, failed: {failed}")
         for outcome in outcomes:
-            if outcome.status == "downloaded" and outcome.path:
+            if outcome.status in ("downloaded", "planned") and outcome.path:
                 print(f"  {outcome.path}")
             elif outcome.status == "skipped" and verbose:
                 print(f"  - {outcome.item_id} ({outcome.reason})")
@@ -167,6 +174,7 @@ def _run_download(arguments: Sequence[str]) -> int:
     parser.add_argument("--retries", type=int, default=3)
     parser.add_argument("--limit", type=int, default=24)
     parser.add_argument("--write-info-json", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-q", "--quiet", action="store_true")
@@ -179,6 +187,7 @@ def _run_download(arguments: Sequence[str]) -> int:
         quality=args.quality,
         overwrite=args.overwrite,
         write_info_json=args.write_info_json,
+        dry_run=args.dry_run,
         directory=args.directory,
         filename=args.filename,
         proxy=args.proxy,
@@ -232,6 +241,7 @@ def _run_subcommand(command: str, rest: Sequence[str]) -> int:
 
     separate = options.get("--separate", "1") not in ("0", "false", "no")
     overwrite = options.get("--replace") in ("1", "true", "yes")
+    dry_run = options.get("--dry-run") in ("1", "true", "yes")
     try:
         return _execute(
             target,
@@ -241,6 +251,7 @@ def _run_subcommand(command: str, rest: Sequence[str]) -> int:
             quality=options.get("--quality", "best"),
             overwrite=overwrite,
             write_info_json=options.get("--write-info-json") == "1",
+            dry_run=dry_run,
             directory="{author}" if separate else "",
             filename=options.get("--filename", "{id}_{title}.{ext}"),
             proxy=options.get("--proxy"),

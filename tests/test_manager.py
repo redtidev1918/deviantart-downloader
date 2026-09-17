@@ -46,13 +46,14 @@ def make_item(**overrides) -> DownloadItem:
     return DownloadItem(**kwargs)
 
 
-def make_manager(tmp_path, *, downloader=None, archive=None, overwrite=False, write_info_json=False) -> DownloadManager:
+def make_manager(tmp_path, *, downloader=None, archive=None, overwrite=False, write_info_json=False, dry_run=False) -> DownloadManager:
     return DownloadManager(
         downloader=downloader or FakeDownloader(),
         formatter=PathFormatter(tmp_path),
         archive=archive,
         overwrite=overwrite,
         write_info_json=write_info_json,
+        dry_run=dry_run,
     )
 
 
@@ -143,3 +144,15 @@ def test_path_stays_inside_root_for_evil_title(tmp_path: Path) -> None:
 
     assert outcome.status == "downloaded"
     assert outcome.path is not None and outcome.path.is_relative_to(tmp_path)
+
+def test_dry_run_plans_without_writing(tmp_path: Path) -> None:
+    downloader = FakeDownloader()
+    manager = make_manager(tmp_path, downloader=downloader, dry_run=True)
+
+    outcome = manager.run(make_item())
+
+    assert outcome.status == "planned"
+    assert outcome.path is not None
+    assert not outcome.path.exists()
+    assert downloader.calls == []  # never touched the network or disk
+
