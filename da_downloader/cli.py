@@ -37,6 +37,7 @@ _HELP = """DeviantArt Downloader
 
 Usage:
   devart-dl URL [options]             # URL-first: artwork/gallery/favourites/tag
+  devart-dl resolve URL [options]     # resolve to work/media JSON, download nothing
   devart-dl url URL [options]
   devart-dl artist USERNAME [options]
   devart-dl gallery USERNAME [GALLERY_ID] [options]
@@ -62,7 +63,7 @@ Run `devart-dl login oauth --help` for OAuth details.
 """
 
 _KNOWN_COMMANDS = frozenset(
-    {"help", "url", "artist", "gallery", "search", "fav", "login", "whoami", "logout"}
+    {"help", "url", "artist", "gallery", "search", "fav", "resolve", "login", "whoami", "logout"}
 )
 _REMOVED_COMMANDS = frozenset({"anti-ban", "test"})
 _UUID_RE = re.compile(
@@ -197,6 +198,39 @@ def _run_download(arguments: Sequence[str]) -> int:
         quiet=args.quiet,
         verbose=args.verbose,
     )
+
+
+
+def _run_resolve(arguments: Sequence[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="devart-dl resolve",
+        description="Resolve a DeviantArt target to work/media JSON (download nothing)",
+    )
+    parser.add_argument("target", help="DeviantArt URL or artwork id")
+    parser.add_argument("--cookies", default=None)
+    parser.add_argument("--quality", default="best")
+    parser.add_argument("--proxy", default=None)
+    parser.add_argument("--timeout", type=float, default=60.0)
+    parser.add_argument("--retries", type=int, default=3)
+    parser.add_argument("--limit", type=int, default=24)
+    args = parser.parse_args(list(arguments))
+    try:
+        downloader = build_downloader(
+            destination=Path("."),
+            cookies=_load_cookies(args.cookies),
+            quality=args.quality,
+            proxy=args.proxy,
+            timeout=args.timeout,
+            retries=args.retries,
+            limit=args.limit,
+        )
+        works = downloader.resolve(args.target)
+    except (ValueError, DeviantArtError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    payload = works[0].to_dict() if len(works) == 1 else {"works": [w.to_dict() for w in works]}
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0
 
 
 def _run_subcommand(command: str, rest: Sequence[str]) -> int:
@@ -406,6 +440,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     if command in {"url", "artist", "gallery", "search", "fav"}:
         return _run_subcommand(command, rest)
+    if command == "resolve":
+        return _run_resolve(rest)
     if command == "login":
         if not rest or rest[0] in {"-h", "--help", "help"}:
             print("Usage: devart-dl login oauth|browser|interactive|clear")
