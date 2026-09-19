@@ -97,3 +97,29 @@ def test_run_download_dry_run_summary(monkeypatch, capsys, tmp_path) -> None:
     assert rc == 0
     assert "dry-run: would download 1, skip 1, fail 0" in capsys.readouterr().out
     assert built["dry_run"] is True
+
+
+def test_resolve_command_outputs_single_work_json(monkeypatch, capsys) -> None:
+    from da_downloader.models import MediaAsset, ResolvedDeviation
+
+    class FakeResolver:
+        def resolve(self, target):
+            return [
+                ResolvedDeviation(
+                    id="u1",
+                    title="Art",
+                    author="alice",
+                    mature=False,
+                    url="https://da.test/x-1",
+                    media=(MediaAsset("deviantart:u1:p0", "u1", 0, "image", "https://img.test/1.jpg"),),
+                )
+            ]
+
+    monkeypatch.setattr(cli, "build_downloader", lambda **kw: FakeResolver())
+    monkeypatch.setattr(cli, "_load_cookies", lambda p: "")
+
+    assert cli.main(["resolve", "https://www.deviantart.com/alice/art/x-123"]) == 0
+    out = capsys.readouterr().out
+    assert '"work"' in out
+    assert '"media"' in out
+    assert "deviantart:u1:p0" in out

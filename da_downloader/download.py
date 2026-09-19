@@ -15,6 +15,7 @@ from .api import DeviantArtAPI
 from .archive import DownloadArchive
 from .http import HttpDownloader
 from .manager import DownloadManager, DownloadOutcome
+from .models import ResolvedDeviation, make_media_asset
 from .oauth import OAuthSession
 from .official_api import OfficialApiClient
 from .path import PathFormatter
@@ -54,6 +55,50 @@ class Downloader:
     def download(self, target: str | DownloadTarget) -> list[DownloadOutcome]:
         parsed = TargetParser.parse(target) if isinstance(target, str) else target
         return [self.manager.run(item) for item in self.provider.resolve(parsed)]
+
+    def resolve(self, target: str | DownloadTarget) -> list[ResolvedDeviation]:
+        """Resolve a target to DeviantArt works and media assets (no download)."""
+        parsed = TargetParser.parse(target) if isinstance(target, str) else target
+        groups: dict[str, dict] = {}
+        order: list[str] = []
+        for item in self.provider.resolve(parsed):
+            extra = item.metadata.get("index") if item.metadata else None
+            base = str(item.artwork_id)
+            if extra is not None:
+                suffix = f"-{extra}"
+                if base.endswith(suffix):
+                    base = base[: -len(suffix)]
+            if base not in groups:
+                groups[base] = {
+                    "title": item.title,
+                    "author": item.author,
+                    "mature": item.mature,
+                    "url": item.url,
+                    "assets": [],
+                }
+                order.append(base)
+            index = int(extra) if extra is not None else len(groups[base]["assets"])
+            groups[base]["assets"].append(
+                make_media_asset(
+                    base,
+                    index,
+                    item.media_url,
+                    extension=item.extension,
+                    mature=item.mature,
+                )
+            )
+        return [
+            ResolvedDeviation(
+                id=key,
+                title=groups[key]["title"],
+                author=groups[key]["author"],
+                mature=groups[key]["mature"],
+                url=groups[key]["url"],
+                media=tuple(groups[key]["assets"]),
+            )
+            for key in order
+        ]
+
 
 
 def build_downloader(
