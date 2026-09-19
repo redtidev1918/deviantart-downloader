@@ -1,6 +1,6 @@
 """DeviantArt Downloader — a reliable, focused downloader and archival CLI."""
 
-__version__ = "4.0.1"
+__version__ = "4.3.0"
 __author__ = "DeviantArt Downloader Team"
 
 from .download import Downloader, build_downloader, normalize_quality
