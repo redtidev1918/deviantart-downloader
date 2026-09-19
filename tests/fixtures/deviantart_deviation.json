@@ -1,0 +1,26 @@
+{
+  "deviationId": "913624585",
+  "deviationid": "913624585",
+  "title": "Conformance Sample",
+  "author": { "username": "conformance" },
+  "url": "https://www.deviantart.com/conformance/art/x-913624585",
+  "isMature": false,
+  "isMultiMedia": true,
+  "media": {
+    "baseUri": "https://images.wixmp.test/main",
+    "prettyName": "sample",
+    "token": "tok-main",
+    "types": [{ "t": "fullview", "b": "https://images.wixmp.test/main.jpg" }]
+  },
+  "extended": {
+    "deviationUuid": "11111111-2222-3333-4444-555555555555",
+    "additionalMedia": [
+      { "media": {
+        "baseUri": "https://images.wixmp.test/p1",
+        "token": "tok-p1",
+        "types": [{ "t": "fullview", "b": "https://images.wixmp.test/p1.jpg" }]
+      } }
+    ]
+  },
+  "isDownloadable": false
+}
