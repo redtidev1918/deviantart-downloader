@@ -9,7 +9,7 @@
 | OAuth（推荐） | 单张作品、画廊、收藏夹、标签、原图 | 除搜索外的下载 | 需注册一个免费的 Public 应用 |
 | Cookie | 不方便注册应用，或需要搜索 | 作者/画廊、收藏夹、搜索 | 不支持单张作品和标签；Cookie 会过期 |
 
-> 当前官方 API 没有搜索端点。使用搜索时请先运行 `devart-dl login clear` 清除 OAuth 会话，再使用 Cookie。
+> 官方 API 没有搜索端点，搜索始终走 Web/Cookie。OAuth 和 Cookie 可以同时启用：OAuth 负责单张作品／画廊／收藏／标签，Cookie 补上搜索等网页能力；两种认证不再互斥，也无需 `devart-dl login clear`。
 
 ---
 

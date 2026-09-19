@@ -86,7 +86,7 @@ devart-dl search all "digital art"
 devart-dl fav username folder_id
 ```
 
-> Note: explicit subcommands keep the old usage for compatibility. The official API has no search endpoint, so `search` uses the cookie fallback.
+> Note: explicit subcommands keep the old usage for compatibility. The official API has no search endpoint, so `search` always uses the web/cookie path. OAuth and cookies are capabilities that compose — OAuth gives the official API and cookie gives search — instead of one global "login mode".
 
 ### Authentication
 
