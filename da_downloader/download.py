@@ -18,7 +18,12 @@ from .manager import DownloadManager, DownloadOutcome
 from .oauth import OAuthSession
 from .official_api import OfficialApiClient
 from .path import PathFormatter
-from .provider import DeviantArtProvider, OfficialProvider, WebProvider
+from .provider import (
+    CompositeProvider,
+    DeviantArtProvider,
+    OfficialProvider,
+    WebProvider,
+)
 from .targets import DownloadTarget, TargetParser
 
 # User-facing quality names (new) and the legacy o/f/p shorthand.
@@ -70,23 +75,20 @@ def build_downloader(
 ) -> Downloader:
     """Assemble a wired ``Downloader`` from plain configuration values.
 
-    When an OAuth session exists it is preferred (official API); otherwise the
-    cookie-based web provider is used as the fallback.
+    OAuth and cookies are capabilities, not a global provider mode: the
+    official API is preferred where it works and the web session fills the
+    capabilities it cannot cover (notably search).
     """
     normalized_quality = normalize_quality(quality)
     proxies = {"http": proxy, "https": proxy} if proxy else {}
 
     oauth_session = OAuthSession.from_store()
+    official = web = None
+    api = None
     if oauth_session is not None:
         client = OfficialApiClient(oauth_session, timeout=timeout)
-        provider: DeviantArtProvider = OfficialProvider(
-            client, quality=normalized_quality, limit=limit
-        )
-        # Official media URLs are signed CDN links and need no cookies.
-        http_session = requests.Session()
-        if proxies:
-            http_session.proxies.update(proxies)
-    else:
+        official = OfficialProvider(client, quality=normalized_quality, limit=limit)
+    if cookies or oauth_session is None:
         headers = {
             "accept": "application/json, text/plain, */*",
             "user-agent": (
@@ -99,8 +101,17 @@ def build_downloader(
         api = DeviantArtAPI(
             headers, proxies, retry_delay=int(retry_delay), max_retries=retries
         )
-        provider = WebProvider(api, quality=normalized_quality, limit=limit)
+        web = WebProvider(api, quality=normalized_quality, limit=limit)
+
+    provider: DeviantArtProvider = CompositeProvider(official, web)
+    # The web session's cookies are harmless on signed official CDN links and
+    # required for web-sourced media (search/gallery fallback), so prefer it.
+    if api is not None:
         http_session = api.session
+    else:
+        http_session = requests.Session()
+        if proxies:
+            http_session.proxies.update(proxies)
 
     http = HttpDownloader(
         session=http_session,

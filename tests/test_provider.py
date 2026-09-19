@@ -6,8 +6,8 @@ import pytest
 
 from da_downloader.api import ActionType
 from da_downloader.errors import MediaUnavailableError
-from da_downloader.models import Deviation
-from da_downloader.provider import WebProvider
+from da_downloader.models import Deviation, DownloadItem
+from da_downloader.provider import CompositeProvider, WebProvider
 from da_downloader.targets import TargetParser
 
 
@@ -124,3 +124,89 @@ def test_search_target_builds_search_action() -> None:
     action, username, query, folder = provider.api.build_calls[0]
     assert action == ActionType.SEARCH
     assert query == "digital art"
+
+
+class RecordingProvider:
+    def __init__(self, items=None, error=None):
+        self.items = list(items or [])
+        self.error = error
+        self.calls = []
+
+    def resolve(self, target):
+        self.calls.append(target)
+        if self.error:
+            raise self.error
+        yield from self.items
+
+
+def test_composite_search_routes_to_web_even_with_official() -> None:
+    web = make_provider(
+        pages=[([make_deviation()], False, 1, "")],
+        media_urls={"123": "https://images.test/123.jpg"},
+    )
+    official = RecordingProvider(items=[])
+    router = CompositeProvider(official=official, web=web)
+
+    items = list(router.resolve(TargetParser.parse("https://www.deviantart.com/search?q=cat")))
+
+    assert len(items) == 1
+    assert items[0].artwork_id == "123"
+    assert official.calls == []
+    assert len(web.api.build_calls) == 1
+
+
+def test_composite_artwork_routes_to_official() -> None:
+    official = RecordingProvider(items=[DownloadItem("u1", "https://da.test/x-1", "A", "alice", "https://img.test/1.jpg")])
+    web = RecordingProvider(items=[])
+    router = CompositeProvider(official=official, web=web)
+
+    list(router.resolve(TargetParser.parse("https://www.deviantart.com/alice/art/x-123456")))
+
+    assert len(official.calls) == 1
+    assert web.calls == []
+
+
+def test_composite_gallery_prefers_official() -> None:
+    official = RecordingProvider(items=[DownloadItem("u1", "https://da.test/1", "A", "alice", "https://img.test/1.jpg")])
+    web = RecordingProvider(items=[])
+    router = CompositeProvider(official=official, web=web)
+
+    items = list(router.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert len(items) == 1
+    assert len(official.calls) == 1
+    assert web.calls == []
+
+
+def test_composite_gallery_falls_back_to_web_when_official_unavailable() -> None:
+    web = make_provider(
+        pages=[([make_deviation()], False, 1, "")],
+        media_urls={"123": "https://images.test/123.jpg"},
+    )
+    official = RecordingProvider(error=MediaUnavailableError("nope"))
+    router = CompositeProvider(official=official, web=web)
+
+    items = list(router.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items[0].artwork_id == "123"
+    assert len(official.calls) == 1
+    assert len(web.api.build_calls) == 1
+
+
+def test_composite_gallery_with_only_web_uses_web() -> None:
+    web = make_provider(
+        pages=[([make_deviation()], False, 1, "")],
+        media_urls={"123": "https://images.test/123.jpg"},
+    )
+    router = CompositeProvider(official=None, web=web)
+
+    items = list(router.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items[0].artwork_id == "123"
+
+
+def test_composite_tag_without_official_requires_official() -> None:
+    web = RecordingProvider(items=[])
+    router = CompositeProvider(official=None, web=web)
+    with pytest.raises(MediaUnavailableError):
+        list(router.resolve(TargetParser.parse("https://www.deviantart.com/tag/landscape")))

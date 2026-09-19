@@ -297,4 +297,55 @@ def _parse_published(value: Any) -> Optional[datetime]:
     return datetime.fromtimestamp(timestamp, tz=timezone.utc)
 
 
-__all__ = ["DeviantArtProvider", "OfficialProvider", "WebProvider"]
+class CompositeProvider:
+    """Routes each target to the provider that can actually serve it.
+
+    OAuth and cookies are capabilities, not global provider modes: search
+    always uses the web session, artwork/tag use the official API, and
+    gallery/favorites prefer the official API with the web session as a
+    fallback when the official path is unavailable.
+    """
+
+    def __init__(
+        self,
+        official: DeviantArtProvider | None = None,
+        web: DeviantArtProvider | None = None,
+    ) -> None:
+        if official is None and web is None:
+            raise ValueError("at least one provider is required")
+        self.official = official
+        self.web = web
+
+    def resolve(self, target: DownloadTarget) -> Iterator[DownloadItem]:
+        kind = target.kind
+        if kind == TargetKind.SEARCH:
+            if self.web is None:
+                raise MediaUnavailableError(
+                    "search requires a web/cookie session "
+                    "(`devart-dl login browser`/`interactive` or --cookies)"
+                )
+            yield from self.web.resolve(target)
+            return
+        if kind in (TargetKind.ARTWORK, TargetKind.TAG):
+            if self.official is None:
+                raise MediaUnavailableError(
+                    "this target requires the official API "
+                    "(`devart-dl login oauth`)"
+                )
+            yield from self.official.resolve(target)
+            return
+        if self.official is not None:
+            try:
+                yield from self.official.resolve(target)
+            except MediaUnavailableError:
+                if self.web is not None:
+                    yield from self.web.resolve(target)
+                    return
+                raise
+        elif self.web is not None:
+            yield from self.web.resolve(target)
+        else:
+            raise MediaUnavailableError("no provider can resolve this target")
+
+
+__all__ = ["CompositeProvider", "DeviantArtProvider", "OfficialProvider", "WebProvider"]

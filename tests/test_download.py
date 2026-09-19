@@ -91,3 +91,45 @@ def test_downloader_parses_target(tmp_path: Path) -> None:
 
     assert provider.targets[0].kind == TargetKind.GALLERY
     assert provider.targets[0].username == "alice"
+
+
+def test_build_downloader_wires_capability_router_with_oauth_and_cookies(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from da_downloader.download import build_downloader
+    from da_downloader.provider import CompositeProvider, OfficialProvider, WebProvider
+
+    class FakeSession:
+        def authorization_header(self, force=False):
+            return "Bearer x"
+
+    monkeypatch.setattr(
+        "da_downloader.download.OAuthSession.from_store", classmethod(lambda cls: FakeSession())
+    )
+
+    downloader = build_downloader(
+        destination=tmp_path, cookies="auth=token; auth_secure=secret"
+    )
+
+    router = downloader.provider
+    assert isinstance(router, CompositeProvider)
+    assert router.official is not None and isinstance(router.official, OfficialProvider)
+    assert router.web is not None and isinstance(router.web, WebProvider)
+
+
+def test_build_downloader_without_oauth_uses_composite_web_only(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from da_downloader.download import build_downloader
+    from da_downloader.provider import CompositeProvider, WebProvider
+
+    monkeypatch.setattr(
+        "da_downloader.download.OAuthSession.from_store", classmethod(lambda cls: None)
+    )
+
+    downloader = build_downloader(destination=tmp_path)
+
+    router = downloader.provider
+    assert isinstance(router, CompositeProvider)
+    assert router.official is None
+    assert isinstance(router.web, WebProvider)
