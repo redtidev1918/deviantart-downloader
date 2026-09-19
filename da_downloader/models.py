@@ -113,3 +113,100 @@ class DownloadItem:
     published_at: Optional[datetime] = None
     mature: bool = False
     metadata: Mapping[str, Any] = field(default_factory=dict)
+
+
+_MIME_BY_EXT = {
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png": "image/png",
+    "gif": "image/gif",
+    "webp": "image/webp",
+    "bmp": "image/bmp",
+    "svg": "image/svg+xml",
+    "mp4": "video/mp4",
+    "webm": "video/webm",
+    "mov": "video/quicktime",
+}
+
+_VIDEO_EXTS = frozenset({"mp4", "webm", "mov", "m4v"})
+
+_DEFAULT_MIME = {"image": "image/jpeg", "video": "video/mp4"}
+
+
+@dataclass(frozen=True)
+class MediaAsset:
+    """One resolute media file of a DeviantArt work (``deviantart:<uuid>:p<n>``)."""
+
+    id: str
+    deviation_id: str
+    index: int
+    kind: str  # "image" | "video"
+    source_url: str
+    extension: str | None = None
+    mime_type: str | None = None
+    width: int | None = None
+    height: int | None = None
+    mature: bool = False
+
+    def to_dict(self) -> dict:
+        data: dict = {
+            "id": self.id,
+            "kind": self.kind,
+            "sourceUrl": self.source_url,
+        }
+        for key, value in (
+            ("extension", self.extension),
+            ("mimeType", self.mime_type),
+            ("width", self.width),
+            ("height", self.height),
+            ("mature", self.mature),
+        ):
+            if value is not None:
+                data[key] = value
+        return data
+
+
+@dataclass(frozen=True)
+class ResolvedDeviation:
+    """A DeviantArt work plus its media assets, independent of downloading."""
+
+    id: str
+    title: str
+    author: str
+    mature: bool
+    media: tuple[MediaAsset, ...] = ()
+    url: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "work": {
+                "id": self.id,
+                "title": self.title,
+                "author": self.author,
+                "url": self.url,
+                "mature": self.mature,
+            },
+            "media": [asset.to_dict() for asset in self.media],
+        }
+
+
+def make_media_asset(
+    deviation_id: str,
+    index: int,
+    source_url: str,
+    *,
+    extension: str | None = None,
+    mature: bool = False,
+) -> MediaAsset:
+    ext = (extension or "").lstrip(".").lower() or None
+    kind = "video" if ext in _VIDEO_EXTS else "image"
+    return MediaAsset(
+        id=f"deviantart:{deviation_id}:p{index}",
+        deviation_id=deviation_id,
+        index=index,
+        kind=kind,
+        source_url=source_url,
+        extension=ext,
+        mime_type=_MIME_BY_EXT.get(ext) or _DEFAULT_MIME[kind],
+        mature=mature,
+    )

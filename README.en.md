@@ -50,6 +50,9 @@ devart-dl https://www.deviantart.com/username/favourites
 
 # Tag
 devart-dl https://www.deviantart.com/tag/landscape
+
+# Resolve to JSON descriptors (download nothing)
+devart-dl resolve https://www.deviantart.com/username/art/title-123456
 ```
 
 ### Login (OAuth recommended)
@@ -65,6 +68,10 @@ Register a **Public** OAuth app at [deviantart.com/developers](https://www.devia
 ---
 
 ## Main Features
+
+### Resolve Mode
+
+`devart-dl resolve URL` emits a machine-consumable `ResolvedDeviation` + `MediaAsset[]` JSON contract without writing any file.
 
 ### Download Modes
 

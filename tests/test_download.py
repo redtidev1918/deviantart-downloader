@@ -133,3 +133,37 @@ def test_build_downloader_without_oauth_uses_composite_web_only(
     assert isinstance(router, CompositeProvider)
     assert router.official is None
     assert isinstance(router.web, WebProvider)
+
+
+def test_resolve_groups_additional_media_into_one_work() -> None:
+    main = DownloadItem(
+        artwork_id="uuid-1",
+        url="https://www.deviantart.com/alice/art/x-1",
+        title="Art",
+        author="alice",
+        media_url="https://images.test/1.jpg",
+        extension="jpg",
+        mature=True,
+    )
+    extra = DownloadItem(
+        artwork_id="uuid-1-1",
+        url=main.url,
+        title=main.title,
+        author=main.author,
+        media_url="https://images.test/2.png",
+        extension="png",
+        metadata={"index": 1},
+    )
+    downloader = Downloader(FakeProvider([main, extra]), manager=None)
+
+    works = downloader.resolve("https://www.deviantart.com/alice/art/x-123")
+
+    assert len(works) == 1
+    work = works[0]
+    assert work.id == "uuid-1"
+    assert work.mature is True
+    assert [a.id for a in work.media] == ["deviantart:uuid-1:p0", "deviantart:uuid-1:p1"]
+    data = work.to_dict()
+    assert data["work"]["title"] == "Art"
+    assert data["media"][1]["sourceUrl"] == "https://images.test/2.png"
+    assert data["media"][1]["mimeType"] == "image/png"

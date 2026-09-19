@@ -27,6 +27,9 @@ devart-dl https://www.deviantart.com/username/gallery
 # 收藏夹 / 标签
 devart-dl https://www.deviantart.com/username/favourites
 devart-dl https://www.deviantart.com/tag/landscape
+
+# 解析为 JSON 描述（不下载文件）
+devart-dl resolve https://www.deviantart.com/username/art/title-123456
 ```
 
 首次下载前建议使用 OAuth 登录：
@@ -54,6 +57,7 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 - **下载档案**：`--archive` 用 SQLite 记住已下载，跨会话自动跳过。
 - **路径模板 + 元数据 sidecar**：`--directory`/`--filename` 模板与 `--write-info-json`。
 - **代理与降级**：支持 `--proxy`；未登录 OAuth 时自动回退 Cookie。
+- **Resolve 模式**：`devart-dl resolve URL` 输出 `ResolvedDeviation`/`MediaAsset` 的 JSON 契约，不写文件。
 
 完整的安装、登录认证、下载模式、配置参数、命令速查、Python 调用与常见问题，请看**文档站点**：
 
