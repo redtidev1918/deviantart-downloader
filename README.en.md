@@ -1,8 +1,8 @@
 # DeviantArt Downloader
 
-A reliable, focused DeviantArt downloader and archival CLI.
-
 **Language / 语言:** [中文](README.md) · English
+
+**A reliable, focused DeviantArt downloader and archival CLI.**
 
 📖 Full documentation: <https://redtidev1918.github.io/deviantart-downloader/> · [Changelog](CHANGELOG.md)
 

@@ -1,8 +1,8 @@
 # DeviantArt Downloader
 
-一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。
-
 **语言 / Language:** 中文 · [English](README.en.md)
+
+**一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。**
 
 📖 完整文档：<https://redtidev1918.github.io/deviantart-downloader/> · [更新日志](CHANGELOG.md)
 
@@ -60,10 +60,6 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 - **路径模板 + 元数据 sidecar**：`--directory`/`--filename` 模板与 `--write-info-json`。
 - **代理与降级**：支持 `--proxy`；未登录 OAuth 时自动回退 Cookie。
 - **Resolve 模式**：`devart-dl resolve URL` 输出 `ResolvedDeviation`/`MediaAsset` 的 JSON 契约，不写文件。
-
-完整的安装、登录认证、下载模式、配置参数、命令速查、Python 调用与常见问题，请看**文档站点**：
-
-https://redtidev1918.github.io/deviantart-downloader/
 
 ## 文档
 
