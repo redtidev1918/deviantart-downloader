@@ -65,6 +65,19 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 
 https://redtidev1918.github.io/deviantart-downloader/
 
+## 文档
+
+| 你想做什么 | 文档 |
+| --- | --- |
+| 下载安装包 | [下载页](https://redtidev1918.github.io/deviantart-downloader/download.md) |
+| 登录与认证 | [登录与认证](docs/LOGIN.md) |
+| 命令、配置与 Python 调用 | [文档站](https://redtidev1918.github.io/deviantart-downloader/) |
+
+## 致谢
+
+- [requests](https://github.com/psf/requests)：HTTP 客户端。
+- 登录与归档目录的实现与 [gallery-dl](https://github.com/mikf/gallery-dl) 交叉核对过。
+
 ## 许可证与免责声明
 
 本项目基于 [MIT License](LICENSE) 开源。
