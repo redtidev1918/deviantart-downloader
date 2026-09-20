@@ -5,3 +5,5 @@
 - 项目
   - [更新日志（GitHub）](https://github.com/redtidev1918/deviantart-downloader/blob/main/CHANGELOG.md)
   - [发布流程（GitHub）](https://github.com/redtidev1918/deviantart-downloader/blob/main/RELEASING.md)
+- English
+  - [English index](/en/)
