@@ -104,6 +104,31 @@ def test_artwork_multimedia_yields_every_file(monkeypatch) -> None:
     assert items[2].extension == "png"
 
 
+def test_mature_blurred_extra_pages_are_skipped(monkeypatch) -> None:
+    init = {
+        "deviation": {
+            "extended": {
+                "deviationUuid": "uuid-1",
+                "additionalMedia": [
+                    {"media": {"baseUri": "https://media.test/blur_page2.jpg", "token": "t"}},
+                    {"media": {"baseUri": "https://media.test/page3.png", "token": "t"}},
+                ],
+            }
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation()
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert [item.media_url for item in items] == [
+        "https://images.test/full.jpg",
+        "https://media.test/page3.png?token=t",
+    ]
+
+
 def test_artwork_best_uses_content(monkeypatch) -> None:
     monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
     client = FakeClient()
@@ -114,6 +139,21 @@ def test_artwork_best_uses_content(monkeypatch) -> None:
 
     assert items[0].media_url == "https://images.test/full.jpg"
     assert client.originals == {}  # never called the download endpoint
+
+
+def test_artwork_video_uses_playable_source_not_poster(monkeypatch) -> None:
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
+    client = FakeClient()
+    client.deviations["uuid-1"] = {
+        **make_deviation(content_src="https://images.test/poster.jpg"),
+        "videos": [{"src": "https://videos.test/full.mp4"}],
+    }
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert items[0].media_url == "https://videos.test/full.mp4"
+    assert items[0].extension == "mp4"
 
 
 def test_gallery_paginates(monkeypatch) -> None:

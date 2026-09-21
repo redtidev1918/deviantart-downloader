@@ -13,6 +13,7 @@ from typing import Any, Callable, Iterator, Optional, Protocol
 
 from .api import ActionType, DeviantArtAPI
 from .errors import MediaUnavailableError, ParseError
+from .errors import AuthenticationError, NetworkError
 from .models import Deviation, DownloadItem
 from .official_api import (
     OfficialApiClient,
@@ -262,6 +263,13 @@ class OfficialProvider:
             ext = _ext_from_url(original.filename)
             return original.url, ext
         content = deviation.get("content") or {}
+        # `content.src` is a poster for video works; only videos[].src is playable.
+        videos = deviation.get("videos") or []
+        if isinstance(videos, list):
+            for video in videos:
+                src = video.get("src") if isinstance(video, dict) else None
+                if src:
+                    return str(src), _ext_from_url(str(src))
         if content.get("src"):
             return str(content["src"]), _ext_from_url(str(content["src"]))
         preview = deviation.get("preview") or {}
@@ -337,7 +345,7 @@ class CompositeProvider:
         if self.official is not None:
             try:
                 yield from self.official.resolve(target)
-            except MediaUnavailableError:
+            except (MediaUnavailableError, NetworkError, AuthenticationError):
                 if self.web is not None:
                     yield from self.web.resolve(target)
                     return

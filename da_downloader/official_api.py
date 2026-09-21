@@ -320,6 +320,9 @@ def additional_media_urls(init_data: dict) -> list:
     """Original-file URLs of a multimedia deviation's extra pages
     (``deviation.extended.additionalMedia``, each entry nests its Wix
     descriptor under ``media``). Prefers the raw ``baseUri`` file + token.
+
+    Mature pages the server still returns with a ``blur_`` censored image are
+    skipped individually; one blocked page does not discard the others.
     """
     extended = init_data.get("deviation", {}).get("extended") or {}
     entries = extended.get("additionalMedia") or []
@@ -332,6 +335,8 @@ def additional_media_urls(init_data: dict) -> list:
             continue
         base = media.get("baseUri")
         if not isinstance(base, str) or not base:
+            continue
+        if "blur_" in base:
             continue
         raw_token = media.get("token")
         token = raw_token[0] if isinstance(raw_token, list) and raw_token else raw_token

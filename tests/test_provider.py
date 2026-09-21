@@ -6,6 +6,7 @@ import pytest
 
 from da_downloader.api import ActionType
 from da_downloader.errors import MediaUnavailableError
+from da_downloader.errors import NetworkError
 from da_downloader.models import Deviation, DownloadItem
 from da_downloader.provider import CompositeProvider, WebProvider
 from da_downloader.targets import TargetParser
@@ -191,6 +192,19 @@ def test_composite_gallery_falls_back_to_web_when_official_unavailable() -> None
     assert items[0].artwork_id == "123"
     assert len(official.calls) == 1
     assert len(web.api.build_calls) == 1
+
+
+def test_composite_gallery_falls_back_to_web_when_official_network_fails() -> None:
+    web = make_provider(
+        pages=[([make_deviation()], False, 1, "")],
+        media_urls={"123": "https://images.test/123.jpg"},
+    )
+    official = RecordingProvider(error=NetworkError("API down"))
+    router = CompositeProvider(official=official, web=web)
+
+    items = list(router.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items[0].artwork_id == "123"
 
 
 def test_composite_gallery_with_only_web_uses_web() -> None:
