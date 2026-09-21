@@ -110,6 +110,63 @@ jobs:
         with:
           packages-dir: dist
 
+  # ReleaseGraph's finalize ACKs right after the GitHub Release transaction,
+  # which runs before this caller's independent publish-pypi job. The registry
+  # health gate then correctly refuses to acknowledge an incomplete version.
+  # This job repeats the same idempotent reconcile only after PyPI publication,
+  # so the release PR reaches "autorelease: tagged" in the same run.
+  acknowledge:
+    needs: [release, publish-pypi]
+    if: >-
+      needs.release.result == 'success'
+      && needs.release.outputs.run_release == '1'
+      && (needs.publish-pypi.result == 'success' || needs.publish-pypi.result == 'skipped')
+      && github.event_name != 'pull_request'
+      && !(github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+      GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+      RELEASE_VERSION: ${{ needs.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: redtidev1918/releasegraph
+          ref: 20ac922821e2c11d1a6f8360b3ceafb434a7c9d6 # same pin as the release job
+          path: .releasegraph
+      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
+        with:
+          go-version-file: .releasegraph/go.mod
+          cache: false
+      - name: Acknowledge provider after registry publication
+        run: |
+          set -euo pipefail
+          (cd .releasegraph && go build -o "$RUNNER_TEMP/releasegraph" ./cmd/releasegraph)
+          ack="$RUNNER_TEMP/provider-ack.json"
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            if "$RUNNER_TEMP/releasegraph" provider reconcile \
+                --repo "$GITHUB_REPOSITORY" \
+                --version "$RELEASE_VERSION" \
+                --apply --output json > "$ack" &&
+               jq -e --arg repo "$GITHUB_REPOSITORY" --arg version "$RELEASE_VERSION" '
+                 (.data.errors | length) == 0 and (
+                   ([.data.acknowledged[] | select(.context.repository == $repo and .context.version == $version)] | length) > 0 or
+                   ([.data.reports[] | select(.context.repository == $repo and .context.version == $version and .observed.providerState == "TAGGED" and .verdict.health == "HEALTHY")] | length) > 0
+                 )' "$ack" >/dev/null; then
+              echo "provider acknowledged $RELEASE_VERSION"
+              exit 0
+            fi
+            echo "release $RELEASE_VERSION is not yet acknowledgeable (attempt $attempt/12); waiting for registry propagation"
+            sleep 30
+          done
+          echo "provider ACK did not converge for $RELEASE_VERSION after 12 attempts"
+          cat "$ack"
+          exit 1
+
   repair-pypi:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.repair == 'true' && github.event.inputs.stage == 'pypi'
     runs-on: ubuntu-latest
