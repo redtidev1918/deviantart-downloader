@@ -129,6 +129,88 @@ def test_mature_blurred_extra_pages_are_skipped(monkeypatch) -> None:
     ]
 
 
+def test_extra_video_page_uses_playable_source_not_poster(monkeypatch) -> None:
+    init = {
+        "deviation": {
+            "extended": {
+                "deviationUuid": "uuid-1",
+                "additionalMedia": [
+                    {"media": {
+                        "baseUri": "https://media.test/page2.jpg",
+                        "types": [
+                            {"t": "video", "q": "480p", "b": "https://videos.test/p2-480.mp4"},
+                            {"t": "video", "q": "1080p", "b": "https://videos.test/p2-1080.mp4"},
+                        ],
+                        "token": "t",
+                    }},
+                ],
+            }
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation()
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert items[1].media_url == "https://videos.test/p2-1080.mp4?token=t"
+    assert items[1].extension == "mp4"
+
+
+def test_extra_page_uses_fullview_template_when_baseuri_is_not_a_file(monkeypatch) -> None:
+    init = {
+        "deviation": {
+            "extended": {
+                "deviationUuid": "uuid-1",
+                "additionalMedia": [
+                    {"media": {
+                        "baseUri": "https://wixmp.test/hashed",
+                        "fullview": True,
+                        "types": [{"t": "fullview", "c": "/f/<prettyName>.jpg"}],
+                        "prettyName": "page2",
+                        "token": "t",
+                    }},
+                ],
+            }
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation()
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert items[1].media_url == "https://wixmp.test/hashed/f/page2.jpg?token=t"
+
+
+def test_preview_only_extra_page_is_skipped_not_downgraded(monkeypatch) -> None:
+    init = {
+        "deviation": {
+            "extended": {
+                "deviationUuid": "uuid-1",
+                "additionalMedia": [
+                    {"media": {
+                        "baseUri": "https://wixmp.test/hashed",
+                        "types": [{"t": "preview", "c": "/f/<prettyName>.jpg"}],
+                        "prettyName": "page2",
+                        "token": "t",
+                    }},
+                ],
+            }
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation()
+    provider = OfficialProvider(client, quality="f")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert [item.media_url for item in items] == ["https://images.test/full.jpg"]
+
+
 def test_artwork_best_uses_content(monkeypatch) -> None:
     monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
     client = FakeClient()

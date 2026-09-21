@@ -319,32 +319,67 @@ def deviation_uuid(init_data: dict) -> str:
 def additional_media_urls(init_data: dict) -> list:
     """Original-file URLs of a multimedia deviation's extra pages
     (``deviation.extended.additionalMedia``, each entry nests its Wix
-    descriptor under ``media``). Prefers the raw ``baseUri`` file + token.
+    descriptor under ``media``). Mirrors DeviantDrop's pick order: a playable
+    video ``types[].b`` (best quality) wins over ``baseUri`` — a video page's
+    baseUri is its poster — then the ``baseUri`` file itself, then a
+    fullview template. A page whose only representation is a small preview is
+    skipped rather than saved as a fake original.
 
     Mature pages the server still returns with a ``blur_`` censored image are
     skipped individually; one blocked page does not discard the others.
     """
-    extended = init_data.get("deviation", {}).get("extended") or {}
-    entries = extended.get("additionalMedia") or []
     urls: list = []
-    for entry in entries:
-        if not isinstance(entry, dict):
-            continue
-        media = entry.get("media")
+    for entry in (init_data.get("deviation", {}).get("extended") or {}).get(
+        "additionalMedia"
+    ) or []:
+        media = entry.get("media") if isinstance(entry, dict) else None
         if not isinstance(media, dict):
             continue
-        base = media.get("baseUri")
-        if not isinstance(base, str) or not base:
-            continue
-        if "blur_" in base:
-            continue
-        raw_token = media.get("token")
-        token = raw_token[0] if isinstance(raw_token, list) and raw_token else raw_token
-        if token:
-            urls.append(f"{base}{'&' if '?' in base else '?'}token={token}")
-        else:
-            urls.append(base)
+        url = _descriptor_media_url(media)
+        if url and "blur_" not in url:
+            urls.append(url)
     return urls
+
+
+_FILE_EXT_RE = re.compile(
+    r"\.(?:png|jpe?g|gif|webp|avif|mp4|m4v|webm|mov|mkv)$", re.IGNORECASE
+)
+_VIDEO_QUALITY_RANK = {"1080p": 4, "720p": 3, "480p": 2, "360p": 1}
+
+
+def _descriptor_media_url(media: dict) -> Optional[str]:
+    types = media.get("types")
+    types = types if isinstance(types, list) else []
+    videos = [
+        item
+        for item in types
+        if isinstance(item, dict) and item.get("t") == "video" and item.get("b")
+    ]
+    if videos:
+        best = max(videos, key=lambda item: _VIDEO_QUALITY_RANK.get(item.get("q"), 0))
+        return _append_token(str(best["b"]), media.get("token"))
+    base = media.get("baseUri")
+    if isinstance(base, str) and base and _FILE_EXT_RE.search(base.split("?", 1)[0]):
+        return _append_token(base, media.get("token"))
+    fullview = next(
+        (item for item in types if isinstance(item, dict) and item.get("t") == "fullview"),
+        None,
+    )
+    if fullview:
+        if fullview.get("b"):
+            return _append_token(str(fullview["b"]), media.get("token"))
+        if fullview.get("c") and isinstance(base, str) and base:
+            pretty = media.get("prettyName") or "image"
+            url = base + str(fullview["c"]).replace("<prettyName>", pretty)
+            return _append_token(url, media.get("token"))
+    return None
+
+
+def _append_token(url: str, raw_token: Any) -> str:
+    token = raw_token[0] if isinstance(raw_token, list) and raw_token else raw_token
+    if not token:
+        return url
+    return f"{url}{'&' if '?' in url else '?'}token={token}"
 
 
 __all__ = ["OfficialApiClient", "OriginalDownload", "resolve_uuid", "deviation_init", "deviation_uuid", "additional_media_urls"]
