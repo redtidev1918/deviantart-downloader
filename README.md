@@ -51,7 +51,7 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 
 > 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#/?id=github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
 
-## 核心特性
+## 功能
 
 - **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
 - **URL 优先**：直接粘贴作品 / 画廊 / 收藏夹 / 标签链接即可下载。

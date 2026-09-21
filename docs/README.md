@@ -16,7 +16,7 @@
 
 下载：`pip install -U devart-dl`，或见 [下载页](download.md)（自动指向最新 Release）。
 
-## 核心特性
+## 功能
 
 - **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
 - **URL 优先**：`devart-dl URL` 直接下载作品 / 画廊 / 收藏夹 / 标签 / fav.me 短链。
@@ -302,4 +302,3 @@ DeviantArt 会对「数据中心出口 IP」实施封锁（WAF 按 ASN/IP 段放
 - **建议**：在本机/住宅网络运行；云服务器上请经 clash/mihomo 等代理走放行出口，或使用官方 OAuth API（部分数据面相对放行，但同样受限时请加代理）。
 
 症状通常是：请求 `www.deviantart.com` 返回 403、官方 API 数据端点 500、或媒体下载 400/404 且换 UA/加 Referer 无效——先换出口排查，而不是改代码。
-
