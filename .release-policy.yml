@@ -30,6 +30,21 @@
     "failed_draft": 2,
     "pruneStable": true
   },
+  "release": {
+    "postRelease": [
+      {
+        "id": "refresh-download-page",
+        "type": "github-workflow",
+        "required": true,
+        "workflow": "update-download-page.yml",
+        "ref": "default",
+        "inputs": {
+          "tag": "{{tag}}",
+          "deploy-docs": "true"
+        }
+      }
+    ]
+  },
   "checksums": true,
   "sbom": false,
   "repository": {
