@@ -123,7 +123,7 @@ jobs:
       && (needs.publish-pypi.result == 'success' || needs.publish-pypi.result == 'skipped')
       && github.event_name != 'pull_request'
       && !(github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
-    uses: redtidev1918/releasegraph/.github/workflows/reusable-acknowledge.yml@4b2d2e5b200de710e232fd4c95769bf0bdc63385
+    uses: redtidev1918/releasegraph/.github/workflows/reusable-acknowledge.yml@ac8f202d5835861ffde472aa44a484c9099dc0fe
     with:
       version: ${{ needs.release.outputs.version }}
     secrets: inherit
