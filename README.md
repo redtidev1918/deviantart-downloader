@@ -2,7 +2,7 @@
 
 **语言 / Language:** 中文 · [English](README.en.md)
 
-**一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。**
+> **一个可靠、聚焦的 DeviantArt 下载 / 归档命令行工具。**
 
 📖 [完整文档](https://redtidev1918.github.io/deviantart-downloader/) · [更新日志](CHANGELOG.md)
 
