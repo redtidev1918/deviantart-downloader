@@ -76,7 +76,7 @@ def _version() -> str:
     try:
         return version("devart-dl")
     except PackageNotFoundError:
-        return "4.0.1"
+        return "4.3.0"
 
 
 def _looks_like_target(value: str) -> bool:
