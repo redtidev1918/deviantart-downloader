@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1](https://github.com/redtidev1918/deviantart-downloader/compare/v4.3.0...v4.3.1) (2026-09-21)
+
+
+### Bug Fixes
+
+* prefer official video source, skip blurred extras, widen web fallback ([ad5c79b](https://github.com/redtidev1918/deviantart-downloader/commit/ad5c79bea9a72a3428344136e29211defaf524d6))
+
+
+### Documentation
+
+* add language entries to both sidebars ([1c740b9](https://github.com/redtidev1918/deviantart-downloader/commit/1c740b96aadba6f512ed49fa8ffa56bbedfa0147))
+* improve README readability ([152b76b](https://github.com/redtidev1918/deviantart-downloader/commit/152b76beb3a8cb13eb148bdf68bbe4527803f69a))
+* labeled docs-site links, tidy header emphasis ([aa649f3](https://github.com/redtidev1918/deviantart-downloader/commit/aa649f3e71a93db5b20d8c67896dd496e55335cb))
+* move long-form usage out of the README and add doc index ([e9da38b](https://github.com/redtidev1918/deviantart-downloader/commit/e9da38bf663fb6d2cd09360ac2e4e4c6e8426afa))
+* put the documentation link on its own line ([9ea011f](https://github.com/redtidev1918/deviantart-downloader/commit/9ea011f407092d5c9da1eb821e9fe002d487a4ec))
+* refresh download page (latest) ([e371be9](https://github.com/redtidev1918/deviantart-downloader/commit/e371be9efa9276b62af7aaff34fa46110e99f0ac))
+* sync managed download-page generator to v3 ([8a59a1e](https://github.com/redtidev1918/deviantart-downloader/commit/8a59a1e551bb09c617b8082e3c510134f116c8cd))
+* tagline as blockquote ([8e8b8bd](https://github.com/redtidev1918/deviantart-downloader/commit/8e8b8bd058e7e097668734e1ea55810206787830))
+* tidy README header, match TelePost layout ([bb51ff4](https://github.com/redtidev1918/deviantart-downloader/commit/bb51ff43ee82a40076a0c738905c7520035743d3))
+
 ## [4.2.0](https://github.com/redtidev1918/deviantart-downloader/compare/v4.1.2...v4.2.0) (2026-09-17)
 
 
