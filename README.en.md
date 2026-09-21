@@ -4,7 +4,7 @@
 
 **A reliable, focused DeviantArt downloader and archival CLI.**
 
-📖 Full documentation: <https://redtidev1918.github.io/deviantart-downloader/> · [Changelog](CHANGELOG.md)
+📖 [Full documentation](https://redtidev1918.github.io/deviantart-downloader/) · [Changelog](CHANGELOG.md)
 
 [![CI](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/redtidev1918/deviantart-downloader/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/devart-dl.svg)](https://pypi.org/project/devart-dl/)
@@ -71,9 +71,7 @@ Register a **Public** OAuth app at [deviantart.com/developers](https://www.devia
 
 ## Documentation
 
-The full install, sign-in, download modes, configuration, command reference, Python API and FAQ live on the docs site:
-
-<https://redtidev1918.github.io/deviantart-downloader/>
+The full install, sign-in, download modes, configuration, command reference, Python API and FAQ live on the [docs site](https://redtidev1918.github.io/deviantart-downloader/).
 
 ## Acknowledgements
 
