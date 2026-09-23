@@ -4,4 +4,19 @@ rm -rf dist/pypi && mkdir -p dist/release dist/pypi
 pip install ".[dev]" build twine
 python -m build --outdir dist/pypi
 python -m twine check dist/pypi/*
+
+# Smoke test the built wheel in a clean venv before it can become a release.
+# This guards against broken console-script entry points (regression guard for
+# v3.3.0, whose entry points referenced the removed deviantart_downloader_cli
+# module): the wheel must install, every declared script must resolve, and the
+# CLI must actually run.
+smoke="$(mktemp -d)"
+trap 'rm -rf "$smoke"' EXIT
+python -m venv "$smoke/venv"
+"$smoke/venv/bin/python" -m pip install --quiet dist/pypi/*.whl
+for script in devart-dl deviantart-dl da-dl; do
+  "$smoke/venv/bin/$script" version
+  "$smoke/venv/bin/$script" --help > /dev/null
+done
+
 cp dist/pypi/* dist/release/
