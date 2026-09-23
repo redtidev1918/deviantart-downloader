@@ -29,6 +29,7 @@ class Deviation:
     is_downloadable: bool
     is_mature: bool
     deviation_type: str
+    premium: bool = False
 
     @classmethod
     def from_api_response(cls, data: Dict[str, Any]) -> "Deviation":
@@ -63,6 +64,7 @@ class Deviation:
             ),
             is_mature=bool(data.get("isMature", data.get("is_mature", False))),
             deviation_type=str(deviation_type),
+            premium=_is_locked(data),
         )
 
     def _extract_extension_from_media(self, media: Dict[str, Any]) -> str:
@@ -91,10 +93,23 @@ class Deviation:
         flags = []
         if self.is_mature:
             flags.append("MATURE")
+        if self.premium:
+            flags.append("PREMIUM")
         if self.is_downloadable:
             flags.append("DOWNLOADABLE")
         flag_str = f" [{', '.join(flags)}]" if flags else ""
         return f"{self.title} by {self.author}{flag_str}"
+
+
+def _is_locked(data: Dict[str, Any]) -> bool:
+    """True for premium/subscription-locked works (official/web DTO shapes)."""
+    premium = data.get("premium_folder_data") or data.get("premiumFolderData")
+    if isinstance(premium, dict):
+        access = premium.get("has_access", premium.get("hasAccess"))
+        if access is False:
+            return True
+    tier = data.get("tier_access") or data.get("tierAccess")
+    return tier in ("locked", "locked-subscribed")
 
 
 @dataclass(frozen=True)

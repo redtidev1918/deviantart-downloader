@@ -20,6 +20,8 @@ from .official_api import (
     additional_media_urls,
     deviation_init,
     deviation_uuid,
+    is_blurred,
+    is_locked,
 )
 from .targets import DownloadTarget, TargetKind
 
@@ -119,6 +121,11 @@ class WebProvider:
             media_url = self.api.get_download_url(deviation, "f")
         if media_url is None:
             logger.warning("no media URL for %r; skipping", deviation.title)
+            return None
+        # 付费/订阅锁定：非成熟作品的模糊主图 = 当前账号拿不到原图，跳过而不是把
+        # 打码图当成作品保存（成熟打码由 official provider / additional pages 处理）。
+        if deviation.premium or (not deviation.is_mature and is_blurred(media_url)):
+            logger.warning("premium/subscription-locked %r; skipping", deviation.title)
             return None
         return DownloadItem(
             artwork_id=deviation.deviation_id,
@@ -262,6 +269,8 @@ class OfficialProvider:
             original = self.client.original_download(uuid)
             ext = _ext_from_url(original.filename)
             return original.url, ext
+        url: Optional[str] = None
+        ext: Optional[str] = None
         content = deviation.get("content") or {}
         # `content.src` is a poster for video works; only videos[].src is playable.
         videos = deviation.get("videos") or []
@@ -269,16 +278,27 @@ class OfficialProvider:
             for video in videos:
                 src = video.get("src") if isinstance(video, dict) else None
                 if src:
-                    return str(src), _ext_from_url(str(src))
-        if content.get("src"):
-            return str(content["src"]), _ext_from_url(str(content["src"]))
-        preview = deviation.get("preview") or {}
-        if preview.get("src"):
-            return str(preview["src"]), _ext_from_url(str(preview["src"]))
-        thumbs = deviation.get("thumbs") or []
-        if thumbs and isinstance(thumbs[0], dict) and thumbs[0].get("src"):
-            return str(thumbs[0]["src"]), _ext_from_url(str(thumbs[0]["src"]))
-        raise MediaUnavailableError(f"no media available for deviation {uuid}")
+                    url, ext = str(src), _ext_from_url(str(src))
+                    break
+        if url is None and content.get("src"):
+            url, ext = str(content["src"]), _ext_from_url(str(content["src"]))
+        if url is None:
+            preview = deviation.get("preview") or {}
+            if preview.get("src"):
+                url, ext = str(preview["src"]), _ext_from_url(str(preview["src"]))
+        if url is None:
+            thumbs = deviation.get("thumbs") or []
+            if thumbs and isinstance(thumbs[0], dict) and thumbs[0].get("src"):
+                url, ext = str(thumbs[0]["src"]), _ext_from_url(str(thumbs[0]["src"]))
+        if url is None:
+            raise MediaUnavailableError(f"no media available for deviation {uuid}")
+        # 付费/订阅锁定：非成熟作品的模糊主图（或显式 premium 字段）＝拿不到原图，
+        # 明确报错而不是保存一张打码占位图。成熟作品由 mature_content=true 提供未打码源。
+        if is_locked(deviation) or (not deviation.get("is_mature") and is_blurred(url)):
+            raise MediaUnavailableError(
+                f"deviation {uuid} requires a subscription/purchase (premium)"
+            )
+        return url, ext
 
 
 def _ext_from_url(url: str) -> Optional[str]:
