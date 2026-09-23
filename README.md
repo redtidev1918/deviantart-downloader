@@ -60,6 +60,7 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 - **路径模板 + 元数据 sidecar**：`--directory`/`--filename` 模板与 `--write-info-json`。
 - **代理与降级**：支持 `--proxy`；未登录 OAuth 时自动回退 Cookie。
 - **Resolve 模式**：`devart-dl resolve URL` 输出 `ResolvedDeviation`/`MediaAsset` 的 JSON 契约，不写文件。
+- **付费/订阅锁定识别**：官方 API 返回 `premium_folder_data` / `tier_access`，或网页端非成熟作品的模糊主图（`blur_`），都会识别为「需要订阅/购买」：网页通道跳过，官方通道明确报错，不再把打码图当原图保存。
 
 ## 文档
 

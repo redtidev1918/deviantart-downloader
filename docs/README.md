@@ -25,6 +25,7 @@
 - **路径模板**：`--directory` / `--filename` 支持 `{id}` `{title}` `{author}` `{published}` `{ext}` 等字段，并做路径安全清洗。
 - **元数据**：`--write-info-json` 在每个作品旁写一份 `.json` 元数据。
 - **代理与降级**：支持 `--proxy` 与代理环境变量；未登录 OAuth 时自动回退 Cookie。
+- **付费/订阅锁定识别**：官方 API 的 `premium_folder_data` / `tier_access`，以及网页端非成熟作品的 `blur_` 模糊主图，都会识别为「需要订阅/购买」；网页通道跳过，官方通道明确报错，不把打码图当原图保存。
 
 ---
 
