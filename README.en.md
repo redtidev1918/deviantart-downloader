@@ -20,6 +20,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes.
 
 - **Official API first (OAuth)** — log in once to download originals; no cookie export, no anti-ban delays.
 - **URL-first** — `devart-dl URL` downloads artworks / galleries / favourites / tags / fav.me links directly.
+- **Literature support** — extracts inline literature/journal bodies and saves them as UTF-8 `.txt`, with media and text handled by the same pipeline.
 - **Reliable downloads** — HTTP Range resume, automatic retry, 429 backoff, HTML/empty-file validation, atomic finalize.
 - **Download archive** — `--archive` remembers what you've downloaded in SQLite, skipping it across sessions.
 - **Path templates** — `--directory` / `--filename` support `{id}` `{title}` `{author}` `{published}` `{ext}` and more, with safe sanitization.

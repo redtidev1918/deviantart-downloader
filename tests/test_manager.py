@@ -156,3 +156,18 @@ def test_dry_run_plans_without_writing(tmp_path: Path) -> None:
     assert not outcome.path.exists()
     assert downloader.calls == []  # never touched the network or disk
 
+
+
+def test_inline_literature_writes_text_without_http(tmp_path: Path) -> None:
+    downloader = FakeDownloader()
+    manager = make_manager(tmp_path, downloader=downloader)
+    item = make_item(media_url="", extension="txt", content="Chapter\n\nText")
+
+    outcome = manager.run(item)
+
+    assert outcome.status == "downloaded"
+    assert outcome.path is not None
+    assert outcome.path.read_bytes() == "Chapter\n\nText".encode("utf-8")
+    assert outcome.size == len("Chapter\n\nText".encode("utf-8"))
+    assert downloader.calls == []
+    assert not outcome.path.with_name(outcome.path.name + ".part").exists()

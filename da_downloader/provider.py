@@ -14,7 +14,7 @@ from typing import Any, Callable, Iterator, Optional, Protocol
 from .api import ActionType, DeviantArtAPI
 from .errors import MediaUnavailableError, ParseError
 from .errors import AuthenticationError, NetworkError
-from .models import Deviation, DownloadItem
+from .models import Deviation, DownloadItem, literature_text
 from .official_api import (
     OfficialApiClient,
     additional_media_urls,
@@ -116,6 +116,23 @@ class WebProvider:
                 break
 
     def _to_item(self, deviation: Deviation) -> Optional[DownloadItem]:
+        if deviation.deviation_type == "literature":
+            text = literature_text({"textContent": deviation.text_content})
+            if text:
+                return DownloadItem(
+                    artwork_id=deviation.deviation_id,
+                    url=deviation.url,
+                    title=deviation.title,
+                    author=deviation.author,
+                    media_url="",
+                    extension="txt",
+                    content=text,
+                    mature=deviation.is_mature,
+                    metadata={"kind": "literature"},
+                )
+            logger.warning("empty literature payload for %r; skipping", deviation.title)
+            return None
+
         media_url = self.api.get_download_url(deviation, self.quality)
         if media_url is None and self.quality == "o":
             media_url = self.api.get_download_url(deviation, "f")
@@ -214,6 +231,24 @@ class OfficialProvider:
         identifier = target.identifier or ""
         init_data = deviation_init(identifier, target.username)
         uuid = deviation_uuid(init_data)
+        init_deviation = init_data.get("deviation") if isinstance(init_data, dict) else {}
+        if isinstance(init_deviation, dict) and init_deviation.get("type") == "literature":
+            text = literature_text(init_deviation)
+            if text:
+                author = init_deviation.get("author") or {}
+                yield DownloadItem(
+                    artwork_id=uuid,
+                    url=str(init_deviation.get("url") or ""),
+                    title=str(init_deviation.get("title") or "Untitled"),
+                    author=str(author.get("username") or "unknown"),
+                    media_url="",
+                    extension="txt",
+                    content=text,
+                    published_at=_parse_published(init_deviation.get("published_time")),
+                    mature=bool(init_deviation.get("is_mature", False)),
+                    metadata={"kind": "literature", "quality": self.quality},
+                )
+                return
         main = self._item(self.client.deviation(uuid))
         yield main
         for index, url in enumerate(additional_media_urls(init_data), start=1):
@@ -251,6 +286,21 @@ class OfficialProvider:
         if not uuid:
             raise ParseError("a deviation is missing its id")
         author = deviation.get("author") or {}
+        if deviation.get("type") == "literature":
+            text = literature_text(deviation)
+            if text:
+                return DownloadItem(
+                    artwork_id=uuid,
+                    url=str(deviation.get("url") or ""),
+                    title=str(deviation.get("title") or "Untitled"),
+                    author=str(author.get("username") or "unknown"),
+                    media_url="",
+                    extension="txt",
+                    content=text,
+                    published_at=_parse_published(deviation.get("published_time")),
+                    mature=bool(deviation.get("is_mature", False)),
+                    metadata={"kind": "literature", "quality": self.quality},
+                )
         media_url, ext = self._media(deviation, uuid)
         return DownloadItem(
             artwork_id=uuid,

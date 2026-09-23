@@ -73,9 +73,17 @@ class DownloadManager:
             return DownloadOutcome(item.artwork_id, "planned", path=path)
 
         try:
-            result: TransferResult = self.downloader.download(
-                item.media_url, path, overwrite=self.overwrite
-            )
+            if item.content is not None:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                part = path.with_name(path.name + ".part")
+                with part.open("w", encoding="utf-8", newline="\n") as stream:
+                    stream.write(item.content)
+                part.replace(path)
+                result = TransferResult(path, len(item.content.encode("utf-8")))
+            else:
+                result = self.downloader.download(
+                    item.media_url, path, overwrite=self.overwrite
+                )
         except DeviantArtError as exc:
             return DownloadOutcome(item.artwork_id, "failed", path=path, reason=str(exc))
 

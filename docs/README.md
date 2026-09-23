@@ -20,6 +20,7 @@
 
 - **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
 - **URL 优先**：`devart-dl URL` 直接下载作品 / 画廊 / 收藏夹 / 标签 / fav.me 短链。
+- **文本作品**：文学 / 日志型 deviation 在响应内直接提取正文，保存为 UTF-8 `.txt`；媒体与文本自动分流。
 - **下载可靠**：HTTP Range 断点续传、自动重试、429 退避、HTML/空文件校验、原子落盘。
 - **下载档案**：`--archive` 用 SQLite 记住已下载内容，跨会话自动跳过。
 - **路径模板**：`--directory` / `--filename` 支持 `{id}` `{title}` `{author}` `{published}` `{ext}` 等字段，并做路径安全清洗。

@@ -333,3 +333,48 @@ def test_resolve_short_id_follows_redirect() -> None:
             return FakeResponse()
 
     assert _resolve_short_id("abc123", FakeHttp(), 30) == "123456"
+
+
+def test_artwork_literature_uses_init_text_and_skips_media_api(monkeypatch) -> None:
+    markup = "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Once upon a time.\"}]}]}"
+    init = {
+        "deviation": {
+            "extended": {"deviationUuid": "uuid-1", "additionalMedia": []},
+            "type": "literature",
+            "title": "Story",
+            "author": {"username": "alice"},
+            "url": "https://www.deviantart.com/alice/art/story-123456",
+            "textContent": {"html": {"markup": markup}},
+        }
+    }
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: init)
+    provider = OfficialProvider(FakeClient(), quality="o")
+
+    items = list(provider.resolve(TargetParser.parse("123456")))
+
+    assert items[0].content == "Once upon a time."
+    assert items[0].media_url == ""
+    assert items[0].extension == "txt"
+    assert items[0].metadata == {"kind": "literature", "quality": "o"}
+
+
+def test_gallery_literature_is_inline_text() -> None:
+    client = FakeClient()
+    client.pages[("gallery_all", "alice", 0)] = {
+        "results": [{
+            "deviationid": "uuid-1",
+            "title": "Story",
+            "author": {"username": "alice"},
+            "url": "https://www.deviantart.com/alice/art/story-1",
+            "type": "literature",
+            "textContent": {"html": {"markup": "{\"type\":\"doc\",\"content\":[{\"type\":\"text\",\"text\":\"Text\"}]}"}},
+        }],
+        "has_more": False,
+    }
+    provider = OfficialProvider(client, quality="o")
+
+    items = list(provider.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items[0].content == "Text"
+    assert items[0].media_url == ""
+    assert items[0].extension == "txt"

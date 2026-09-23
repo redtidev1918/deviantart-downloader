@@ -55,6 +55,7 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 
 - **官方 API（OAuth）优先**：登录一次即可下载原图，无需导出 Cookie，也无需防封延时。
 - **URL 优先**：直接粘贴作品 / 画廊 / 收藏夹 / 标签链接即可下载。
+- **文本作品**：文学 / 日志型 deviation 在响应内直接提取正文，保存为 UTF-8 `.txt`；媒体与文本自动分流。
 - **下载可靠**：HTTP Range 断点续传、自动重试、429 退避、原子落盘。
 - **下载档案**：`--archive` 用 SQLite 记住已下载，跨会话自动跳过。
 - **路径模板 + 元数据 sidecar**：`--directory`/`--filename` 模板与 `--write-info-json`。

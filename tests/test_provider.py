@@ -249,3 +249,21 @@ def test_composite_tag_without_official_requires_official() -> None:
     router = CompositeProvider(official=None, web=web)
     with pytest.raises(MediaUnavailableError):
         list(router.resolve(TargetParser.parse("https://www.deviantart.com/tag/landscape")))
+
+
+def test_literature_item_is_delivered_as_inline_text() -> None:
+    dev = make_deviation("123", title="Story")
+    dev.deviation_type = "literature"
+    dev.media = {}
+    dev.text_content = {
+        "html": {"markup": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Chapter one\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Chapter two\"}]}]}"}
+    }
+    provider = make_provider(pages=[([dev], False, 1, "")])
+
+    items = list(provider.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert len(items) == 1
+    assert items[0].content == "Chapter one\nChapter two"
+    assert items[0].media_url == ""
+    assert items[0].extension == "txt"
+    assert items[0].metadata == {"kind": "literature"}
