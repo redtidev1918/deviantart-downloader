@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.4](https://github.com/redtidev1918/deviantart-downloader/compare/v4.3.3...v4.3.4) (2026-09-23)
+
+
+### Bug Fixes
+
+* recognize paid/subscription-locked works instead of saving blurred mains ([ca1d405](https://github.com/redtidev1918/deviantart-downloader/commit/ca1d405e54c63e7ede9f948529f769979d9370b4))
+* recognize paid/subscription-locked works instead of saving blurred mains ([bb88b92](https://github.com/redtidev1918/deviantart-downloader/commit/bb88b92667aa4b3780d59b2b8417845cae33d709))
+
+
+### Documentation
+
+* document paid/subscription-locked work handling ([5db6330](https://github.com/redtidev1918/deviantart-downloader/commit/5db63307adc569386a20a471fb071896170355fc))
+* refresh download page (v4.3.3) ([4e1872a](https://github.com/redtidev1918/deviantart-downloader/commit/4e1872ac244df8aab4e1ca1f8be3ab4dfe3d05aa))
+
 ## [4.3.3](https://github.com/redtidev1918/deviantart-downloader/compare/v4.3.2...v4.3.3) (2026-09-21)
 
 
