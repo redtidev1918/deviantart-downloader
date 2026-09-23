@@ -20,6 +20,7 @@ permissions:
   issues: write
   packages: write
   actions: write # post-release workflow_dispatch from 20ac922+
+  id-token: write # ReleaseGraph c035ba8 publish job (PyPI/Sigstore)
 
 jobs:
   release:
