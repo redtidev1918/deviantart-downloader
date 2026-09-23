@@ -316,6 +316,26 @@ def deviation_uuid(init_data: dict) -> str:
     return uuid
 
 
+def is_locked(deviation: dict) -> bool:
+    """Premium/paid works the current account cannot access.
+
+    The official DTO marks these with ``premium_folder_data.has_access ==
+    False`` or ``tier_access`` locked states (matching DAKit); the web DTO may
+    use the camelCase pair ``premiumFolderData.hasAccess`` / ``tierAccess``.
+    """
+    premium = deviation.get("premium_folder_data") or deviation.get(
+        "premiumFolderData"
+    )
+    if isinstance(premium, dict) and premium.get("has_access", premium.get("hasAccess")) is False:
+        return True
+    tier = deviation.get("tier_access") or deviation.get("tierAccess")
+    return tier in ("locked", "locked-subscribed")
+
+
+def is_blurred(url: str) -> bool:
+    """True when the URL is a censored ``blur_`` Wix transform (mature/paid)."""
+    return "blur_" in url
+
 def additional_media_urls(init_data: dict) -> list:
     """Original-file URLs of a multimedia deviation's extra pages
     (``deviation.extended.additionalMedia``, each entry nests its Wix
@@ -336,7 +356,7 @@ def additional_media_urls(init_data: dict) -> list:
         if not isinstance(media, dict):
             continue
         url = _descriptor_media_url(media)
-        if url and "blur_" not in url:
+        if url and not is_blurred(url):
             urls.append(url)
     return urls
 

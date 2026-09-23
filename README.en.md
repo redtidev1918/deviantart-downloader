@@ -25,6 +25,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes.
 - **Path templates** — `--directory` / `--filename` support `{id}` `{title}` `{author}` `{published}` `{ext}` and more, with safe sanitization.
 - **Metadata sidecars** — `--write-info-json` writes a `.json` next to each file.
 - **Proxy & fallback** — `--proxy` or proxy environment variables; falls back to cookies when not logged in via OAuth.
+- **Paid / subscription-lock detection** — official API `premium_folder_data` / `tier_access`, or a blurred (`blur_`) non-mature main on the web path, is recognised as subscription/purchase-gated: the web path skips it and the official path fails with a clear message instead of saving a censored placeholder.
 
 ---
 

@@ -274,6 +274,33 @@ def test_no_media_raises(monkeypatch) -> None:
         list(provider.resolve(TargetParser.parse("123456")))
 
 
+def test_blurred_non_mature_main_raises_premium(monkeypatch) -> None:
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
+    client = FakeClient()
+    client.deviations["uuid-1"] = make_deviation(
+        uuid="uuid-1",
+        content_src="https://images.test/blur_40/full.jpg",
+        is_downloadable=False,
+        mature=False,
+    )
+    provider = OfficialProvider(client, quality="f")
+
+    with pytest.raises(MediaUnavailableError, match="subscription/purchase"):
+        list(provider.resolve(TargetParser.parse("123456")))
+
+
+def test_premium_folder_without_access_raises_premium(monkeypatch) -> None:
+    monkeypatch.setattr(provider_mod, "deviation_init", lambda identifier, username=None, **_: {"deviation": {"extended": {"deviationUuid": "uuid-1", "additionalMedia": []}}})
+    client = FakeClient()
+    deviation = make_deviation(uuid="uuid-1", is_downloadable=False)
+    deviation["premium_folder_data"] = {"has_access": False}
+    client.deviations["uuid-1"] = deviation
+    provider = OfficialProvider(client, quality="f")
+
+    with pytest.raises(MediaUnavailableError, match="subscription/purchase"):
+        list(provider.resolve(TargetParser.parse("123456")))
+
+
 def test_tag_target() -> None:
     client = FakeClient()
     client.pages[("browse_tags", "landscape", 0)] = {

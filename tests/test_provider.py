@@ -74,6 +74,31 @@ def test_gallery_yields_items_with_media_url_and_extension() -> None:
     assert items[0].extension == "png"
 
 
+def test_blurred_non_mature_item_is_skipped() -> None:
+    dev = make_deviation()
+    provider = make_provider(
+        pages=[([dev], False, 1, "")],
+        media_urls={"123": "https://images.test/blur_40/123.jpg"},
+    )
+
+    items = list(provider.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items == []
+
+
+def test_premium_locked_item_is_skipped() -> None:
+    dev = make_deviation()
+    dev.premium = True
+    provider = make_provider(
+        pages=[([dev], False, 1, "")],
+        media_urls={"123": "https://images.test/123.jpg"},
+    )
+
+    items = list(provider.resolve(TargetParser.parse("https://www.deviantart.com/alice/gallery")))
+
+    assert items == []
+
+
 def test_pagination_across_two_pages() -> None:
     first = make_deviation("1")
     second = make_deviation("2")
