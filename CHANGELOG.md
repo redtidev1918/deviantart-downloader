@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.0](https://github.com/redtidev1918/deviantart-downloader/compare/v4.3.4...v4.4.0) (2026-09-23)
+
+
+### Features
+
+* **literature:** extract inline text works as documents ([86c38d7](https://github.com/redtidev1918/deviantart-downloader/commit/86c38d7b35fdf5b432b69bccba49cf5b2ef42e63))
+
+
+### Bug Fixes
+
+* **release:** smoke test wheel entry points before release ([#40](https://github.com/redtidev1918/deviantart-downloader/issues/40)) ([14296eb](https://github.com/redtidev1918/deviantart-downloader/commit/14296ebd78a798376b89586ad444c32832e9ef19))
+
+
+### Documentation
+
+* refresh download page (v4.3.4) ([7126324](https://github.com/redtidev1918/deviantart-downloader/commit/7126324521fe080d33f3e59e13c543aaaeb40bd0))
+
 ## [4.3.4](https://github.com/redtidev1918/deviantart-downloader/compare/v4.3.3...v4.3.4) (2026-09-23)
 
 
