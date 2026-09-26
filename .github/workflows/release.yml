@@ -24,7 +24,11 @@ permissions:
 
 jobs:
   release:
-    if: github.event_name != 'workflow_dispatch' || !(github.event.inputs.repair == 'true' && github.event.inputs.stage == 'pypi')
+    # Skip release-please PRs (authored by github-actions[bot]): GitHub holds their
+    # workflow runs for approval so they never start, which shows a permanent failed
+    # check on every release PR. Self-healing: once RELEASE_PLEASE_TOKEN (a real user
+    # PAT) authors the release PR, this guard no longer matches and CI returns.
+    if: (github.event_name != 'pull_request' || github.event.pull_request.user.login != 'github-actions[bot]') && (github.event_name != 'workflow_dispatch' || !(github.event.inputs.repair == 'true' && github.event.inputs.stage == 'pypi'))
     uses: redtidev1918/releasegraph/.github/workflows/reusable-release.yml@c035ba8a92fd3a268143608d0043a680576ae812 # ReleaseGraph c035ba8 (Chinese release-body constraint)
     with:
       version: ${{ inputs.version || '' }}
