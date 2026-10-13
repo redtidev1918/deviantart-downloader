@@ -19,9 +19,9 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Optional, Sequence
 
-from .auth import AuthManager
+from .auth import AuthManager, diagnose_authentication_failure
 from .download import build_downloader
-from .errors import DeviantArtError
+from .errors import AuthenticationError, DeviantArtError
 from .oauth import (
     OAuthConfig,
     OAuthError,
@@ -138,6 +138,12 @@ def _execute(
             limit=limit,
         )
         outcomes = downloader.download(target)
+    except AuthenticationError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        hint = diagnose_authentication_failure(cookies, proxy=proxy, timeout=timeout)
+        if hint:
+            print(hint, file=sys.stderr)
+        return 1
     except (ValueError, DeviantArtError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -200,7 +206,6 @@ def _run_download(arguments: Sequence[str]) -> int:
     )
 
 
-
 def _run_resolve(arguments: Sequence[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="devart-dl resolve",
@@ -215,9 +220,10 @@ def _run_resolve(arguments: Sequence[str]) -> int:
     parser.add_argument("--limit", type=int, default=24)
     args = parser.parse_args(list(arguments))
     try:
+        cookies = _load_cookies(args.cookies)
         downloader = build_downloader(
             destination=Path("."),
-            cookies=_load_cookies(args.cookies),
+            cookies=cookies,
             quality=args.quality,
             proxy=args.proxy,
             timeout=args.timeout,
@@ -225,6 +231,12 @@ def _run_resolve(arguments: Sequence[str]) -> int:
             limit=args.limit,
         )
         works = downloader.resolve(args.target)
+    except AuthenticationError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        hint = diagnose_authentication_failure(cookies, proxy=args.proxy, timeout=args.timeout)
+        if hint:
+            print(hint, file=sys.stderr)
+        return 1
     except (ValueError, DeviantArtError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
