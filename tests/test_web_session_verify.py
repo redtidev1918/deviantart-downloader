@@ -1,17 +1,14 @@
 """Web session verification tests (tri-state verdict).
 
-Fixture origin (per AGENTS.md external protocol verification rule): the
-``__INITIAL_STATE__`` samples are ported from DAViewer
-``test/web_session_verifier_test.dart``, whose evidence was verified against
-the production DeviantArt home page during the DAViewer web-session recovery
-work (see DAViewer ``lib/core/auth/web_session_verifier.dart`` docstring,
-2026-10). They are real-world evidence, not reverse-engineered from this
-implementation.
+Fixture origin: fixtures/deviantart-home-evidence.md records the independent
+2026-10-13 anonymous home capture. Signed-in/malformed samples are synthetic
+mutations for policy checks; they do not prove real authenticated access.
 """
 
 from __future__ import annotations
 
 from unittest.mock import patch
+from pathlib import Path
 
 import pytest
 import requests
@@ -95,9 +92,8 @@ _SIGNED_IN_HTML = (
     r"<script>window.__INITIAL_STATE__ = JSON.parse("
     r'"{\"@@publicSession\":{\"isLoggedIn\":true,\"user\":{\"username\":\"alice\"}}}");</script>'
 )
-_ANONYMOUS_HTML = (
-    r"<script>window.__INITIAL_STATE__ = JSON.parse("
-    r'"{\"@@publicSession\":{\"isLoggedIn\":false}}");</script>'
+_ANONYMOUS_HTML = (Path(__file__).parent / "fixtures" / "deviantart-home-anonymous.html").read_text(
+    encoding="utf-8"
 )
 
 
@@ -129,6 +125,14 @@ def test_verify_non_200_is_unavailable(status: int) -> None:
 def test_verify_missing_marker_is_unavailable() -> None:
     _, verdict = _verify("<html>waf challenge</html>")
     assert verdict.state == WebSessionState.UNAVAILABLE
+
+
+def test_unavailable_page_does_not_erase_prior_identity() -> None:
+    manager = AuthManager()
+    manager.is_logged_in = True
+    with patch("da_downloader.auth.requests.get", return_value=_FakeResponse(200, "challenge")):
+        assert manager.verify_web_session().state == WebSessionState.UNAVAILABLE
+    assert manager.is_logged_in is True
 
 
 # --- diagnose_authentication_failure (401/403 hint text) ---

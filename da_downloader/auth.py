@@ -218,7 +218,8 @@ class AuthManager:
             verdict = WebSessionVerification(WebSessionState.SIGNED_IN, username)
         else:
             verdict = WebSessionVerification(WebSessionState.UNAVAILABLE)
-        self.is_logged_in = verdict.is_signed_in
+        if verdict.state != WebSessionState.UNAVAILABLE:
+            self.is_logged_in = verdict.is_signed_in
         logger.info("web session verify: %s", verdict.state.value)
         return verdict
 
