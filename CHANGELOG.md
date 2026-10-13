@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.2](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.1...v4.4.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **auth:** distinguish expired sessions from unavailable evidence ([#45](https://github.com/redtidev1918/deviantart-downloader/issues/45)) ([28a9ec9](https://github.com/redtidev1918/deviantart-downloader/commit/28a9ec903ac1545b763e209b51b1aa9d3a467337))
+
+
+### Documentation
+
+* refresh download page (v4.4.1) ([33fc046](https://github.com/redtidev1918/deviantart-downloader/commit/33fc046d1ad54d754fa4c6a4018bb849a403fbca))
+
 ## [4.4.1](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.0...v4.4.1) (2026-10-07)
 
 
