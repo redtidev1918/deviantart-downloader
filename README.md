@@ -47,6 +47,11 @@ devart-dl whoami
 devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，无需 F12 复制
 ```
 
+下载或 resolve 遇到 401/403 时，工具会用同一代理与浏览器 UA 核对网页会话，
+区分会话已过期、证据暂不可用和已登录但作品访问被拒。网络失败或页面结构变化
+不会当作登出，也不会清除 Cookie；只有明确的未登录证据才提示刷新登录。
+这一步只诊断错误，不自动重试下载，也不保证已登录账号有权访问所有作品。
+
 完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/#/LOGIN)**。
 
 > 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#/?id=github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
