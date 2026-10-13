@@ -334,9 +334,9 @@ def diagnose_authentication_failure(
     if verdict.state == WebSessionState.UNAVAILABLE:
         return (
             "hint: could not confirm the session state (network or page "
-            "change); if downloads keep failing, run `devart-dl login browser`"
+            "challenge/change); stored cookies were not cleared"
         )
     return (
         f"hint: the session is valid (signed in as {verdict.username}); "
-        "the server denied this item (mature/premium content or permission)"
+        "the request was denied, which may involve item permissions or a service challenge"
     )
