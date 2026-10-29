@@ -15,6 +15,7 @@ from .api import ActionType, DeviantArtAPI
 from .errors import MediaUnavailableError, ParseError
 from .errors import AuthenticationError, NetworkError
 from .models import Deviation, DownloadItem, literature_text
+from .wix_media import bounded_fullview_url
 from .official_api import (
     OfficialApiClient,
     additional_media_urls,
@@ -152,7 +153,10 @@ class WebProvider:
             media_url=media_url,
             extension=_extension(deviation, media_url),
             mature=deviation.is_mature,
-            metadata={"quality": self.quality},
+            metadata={"quality": self.quality, **(
+                {"representation": "fullview", "original_available": False}
+                if media_url == bounded_fullview_url(deviation.media or {}) else {}
+            )},
         )
 
 
@@ -251,6 +255,11 @@ class OfficialProvider:
                 return
         main = self._item(self.client.deviation(uuid))
         yield main
+        bounded_urls = {
+            bounded_fullview_url(entry.get("media") or {})
+            for entry in ((init_data.get("deviation", {}).get("extended") or {}).get("additionalMedia") or [])
+            if isinstance(entry, dict) and isinstance(entry.get("media"), dict)
+        }
         for index, url in enumerate(additional_media_urls(init_data), start=1):
             item = DownloadItem(
                 artwork_id=f"{main.artwork_id}-{index}",
@@ -261,7 +270,10 @@ class OfficialProvider:
                 extension=_ext_from_url(url),
                 published_at=main.published_at,
                 mature=main.mature,
-                metadata={**main.metadata, "index": index},
+                metadata={**main.metadata, "index": index, **(
+                    {"representation": "fullview", "original_available": False}
+                    if url in bounded_urls else {}
+                )},
             )
             yield item
 

@@ -85,6 +85,7 @@ class Downloader:
                     item.media_url,
                     extension=item.extension,
                     mature=item.mature,
+                    representation=item.metadata.get("representation"),
                 )
             )
         return [

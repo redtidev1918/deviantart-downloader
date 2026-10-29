@@ -1,0 +1,128 @@
+{
+  "capturedAt": "2026-10-29T06:25:51.905Z",
+  "source": "Authenticated /_puppy/dadeviation/init; signatures removed, fullview/preview types retained",
+  "samples": [
+    {
+      "deviationId": 1402511705,
+      "isMature": true,
+      "isMultiMedia": true,
+      "isDownloadable": true,
+      "media": {
+        "baseUri": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/609b097a-70c0-4aee-8381-bb6fa475d4bd/dn70oyh-26e6855b-41a5-4d3e-be75-2b3633d3ba69.png",
+        "prettyName": "pregnant_at_the_camp_site_commission_nsfw__by_gomizombie_dn70oyh",
+        "token": [
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTAzNiIsInBhdGgiOiIvZi82MDliMDk3YS03MGMwLTRhZWUtODM4MS1iYjZmYTQ3NWQ0YmQvZG43MG95aC0yNmU2ODU1Yi00MWE1LTRkM2UtYmU3NS0yYjM2MzNkM2JhNjkucG5nIiwid2lkdGgiOiI8PTE2MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.REDACTED"
+        ],
+        "types": [
+          {
+            "t": "preview",
+            "r": 0,
+            "c": "/v1/fill/w_1111,h_719,q_70,strp/<prettyName>-pre.jpg",
+            "h": 719,
+            "w": 1111,
+            "f": 1930347,
+            "ss": [
+              {
+                "x": 2,
+                "c": "/v1/fill/w_1111,h_719,q_70,strp/<prettyName>-pre-2x.jpg",
+                "w": 1111,
+                "h": 719
+              }
+            ]
+          },
+          {
+            "t": "fullview",
+            "r": 0,
+            "c": "/v1/fill/w_1600,h_1036,q_80,strp/<prettyName>-fullview.jpg",
+            "h": 1036,
+            "w": 1600,
+            "f": 1930347
+          }
+        ]
+      },
+      "extended": {
+        "deviationUuid": "2658AC4F-1923-8280-BD86-702D0F5AF702",
+        "additionalMedia": [
+          {
+            "media": {
+              "baseUri": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/609b097a-70c0-4aee-8381-bb6fa475d4bd/dn70oyh-5090a6a0-40b3-4550-a88b-d4b09b95fee6.png",
+              "prettyName": "Mattea Queensley & Tia at camp SK.png",
+              "token": [
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTAzNiIsInBhdGgiOiIvZi82MDliMDk3YS03MGMwLTRhZWUtODM4MS1iYjZmYTQ3NWQ0YmQvZG43MG95aC01MDkwYTZhMC00MGIzLTQ1NTAtYTg4Yi1kNGIwOWI5NWZlZTYucG5nIiwid2lkdGgiOiI8PTE2MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.REDACTED"
+              ],
+              "types": [
+                {
+                  "t": "preview",
+                  "r": 0,
+                  "c": "/v1/fill/w_1111,h_719,q_70,strp/<prettyName>-pre.jpg",
+                  "h": 719,
+                  "w": 1111,
+                  "f": 1298398,
+                  "ss": [
+                    {
+                      "x": 2,
+                      "c": "/v1/fill/w_1111,h_719,q_70,strp/<prettyName>-pre-2x.jpg",
+                      "w": 1111,
+                      "h": 719
+                    }
+                  ]
+                },
+                {
+                  "t": "fullview",
+                  "r": 0,
+                  "c": "/v1/fill/w_1600,h_1036,q_80,strp/<prettyName>-fullview.jpg",
+                  "h": 1036,
+                  "w": 1600,
+                  "f": 1298398
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "deviationId": 1403090181,
+      "isMature": false,
+      "isMultiMedia": false,
+      "isDownloadable": true,
+      "media": {
+        "baseUri": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/d82cd189-fc22-451d-b510-753c89ee4dde/dn7d3b9-69ee61ec-0651-43f5-9fb8-dd9096a45d76.jpg",
+        "prettyName": "untitled_by_lol1729_dn7d3b9",
+        "token": [
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI3OSIsInBhdGgiOiIvZi9kODJjZDE4OS1mYzIyLTQ1MWQtYjUxMC03NTNjODllZTRkZGUvZG43ZDNiOS02OWVlNjFlYy0wNjUxLTQzZjUtOWZiOC1kZDkwOTZhNDVkNzYuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.REDACTED"
+        ],
+        "types": [
+          {
+            "t": "preview",
+            "r": 0,
+            "c": "/v1/fill/w_894,h_894,q_70,strp/<prettyName>-pre.jpg",
+            "h": 894,
+            "w": 894,
+            "f": 667967,
+            "ss": [
+              {
+                "x": 2,
+                "c": "/v1/fill/w_894,h_894,q_70,strp/<prettyName>-pre-2x.jpg",
+                "w": 894,
+                "h": 894
+              }
+            ]
+          },
+          {
+            "t": "fullview",
+            "r": 0,
+            "c": "/v1/fill/w_1280,h_1279,q_75,strp/<prettyName>-fullview.jpg",
+            "h": 1279,
+            "w": 1280,
+            "f": 667967
+          }
+        ]
+      },
+      "extended": {
+        "deviationUuid": "C5E21ED8-5F0B-2F71-E97B-71B6E98EE84D",
+        "additionalMedia": []
+      }
+    }
+  ]
+}

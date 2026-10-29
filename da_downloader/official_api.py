@@ -24,6 +24,7 @@ from .errors import (
     ParseError,
 )
 from .oauth import OAuthSession
+from .wix_media import append_media_token, bounded_fullview_url
 
 logger = logging.getLogger(__name__)
 
@@ -337,12 +338,13 @@ def is_blurred(url: str) -> bool:
     return "blur_" in url
 
 def additional_media_urls(init_data: dict) -> list:
-    """Original-file URLs of a multimedia deviation's extra pages
+    """Media URLs of a multimedia deviation's extra pages
     (``deviation.extended.additionalMedia``, each entry nests its Wix
     descriptor under ``media``). Mirrors DeviantDrop's pick order: a playable
     video ``types[].b`` (best quality) wins over ``baseUri`` — a video page's
-    baseUri is its poster — then the ``baseUri`` file itself, then a
-    fullview template. A page whose only representation is a small preview is
+    baseUri is its poster — then a verified bounded fullview or the bare file.
+    A fullview is a display representation, not an uploaded original.
+    A page whose only representation is a small preview is
     skipped rather than saved as a fake original.
 
     Mature pages the server still returns with a ``blur_`` censored image are
@@ -378,6 +380,12 @@ def _descriptor_media_url(media: dict) -> Optional[str]:
     if videos:
         best = max(videos, key=lambda item: _VIDEO_QUALITY_RANK.get(item.get("q"), 0))
         return _append_token(str(best["b"]), media.get("token"))
+    bounded = bounded_fullview_url(media)
+    if bounded:
+        logger.warning(
+            "Using DA fullview display image for an additional page, not the uploaded original"
+        )
+        return bounded
     base = media.get("baseUri")
     if isinstance(base, str) and base and _FILE_EXT_RE.search(base.split("?", 1)[0]):
         return _append_token(base, media.get("token"))
@@ -399,7 +407,7 @@ def _append_token(url: str, raw_token: Any) -> str:
     token = raw_token[0] if isinstance(raw_token, list) and raw_token else raw_token
     if not token:
         return url
-    return f"{url}{'&' if '?' in url else '?'}token={token}"
+    return append_media_token(url, token)
 
 
 __all__ = ["OfficialApiClient", "OriginalDownload", "resolve_uuid", "deviation_init", "deviation_uuid", "additional_media_urls"]
