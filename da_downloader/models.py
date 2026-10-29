@@ -220,6 +220,7 @@ class MediaAsset:
     width: int | None = None
     height: int | None = None
     mature: bool = False
+    representation: str | None = None
 
     def to_dict(self) -> dict:
         data: dict = {
@@ -233,6 +234,7 @@ class MediaAsset:
             ("width", self.width),
             ("height", self.height),
             ("mature", self.mature),
+            ("representation", self.representation),
         ):
             if value is not None:
                 data[key] = value
@@ -270,6 +272,7 @@ def make_media_asset(
     *,
     extension: str | None = None,
     mature: bool = False,
+    representation: str | None = None,
 ) -> MediaAsset:
     ext = (extension or "").lstrip(".").lower() or None
     if ext == "txt":
@@ -285,4 +288,5 @@ def make_media_asset(
         extension=ext,
         mime_type=_MIME_BY_EXT.get(ext) or _DEFAULT_MIME[kind],
         mature=mature,
+        representation=representation,
     )

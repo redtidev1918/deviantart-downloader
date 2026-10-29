@@ -12,6 +12,7 @@ import requests
 from requests.exceptions import RequestException
 
 from .models import Deviation, ActionType
+from .wix_media import append_media_token, bounded_fullview_url
 
 logger = logging.getLogger(__name__)
 
@@ -324,9 +325,13 @@ class DeviantArtAPI:
             None,
         )
         
-        # 现代 DA 的 baseUri 本身就是原始文件（以图片/视频扩展名结尾）：
-        # 直接 baseUri + token 取原图即可。别拿它拼 fullview 的 /v1/fit|fill
-        # 变体模板——那些 URL 即使带 token 也可能返回 400/404（2026-09 实测）。
+        bounded = bounded_fullview_url(media)
+        if bounded:
+            logger.warning("Using DA fullview display image, not the uploaded original")
+            return bounded
+
+        # Preserve bare files for unrestricted/unknown signatures and GIFs.
+        # An extension alone does not establish that a bounded token permits it.
         def _is_file_url(u: str) -> bool:
             path = str(u).split('?', 1)[0].rstrip('/')
             return bool(re.search(r'\.(?:png|jpe?g|gif|webp|mp4|m4v)$', path, re.I))
@@ -344,10 +349,7 @@ class DeviantArtAPI:
             logger.warning("Full view not found, using base URI")
             url = base_uri
         
-        if token:
-            url += f"{'&' if '?' in url else '?'}token={token}"
-        
-        return url
+        return append_media_token(url, token)
     
     def _get_preview_url(self, media: Dict, base_uri: str, 
                         token: str, pretty_name: str) -> Optional[str]:
@@ -368,7 +370,4 @@ class DeviantArtAPI:
         
         url = base_uri + str(preview['c']).replace('<prettyName>', pretty_name)
         
-        if token:
-            url += f"{'&' if '?' in url else '?'}token={token}"
-        
-        return url
+        return append_media_token(url, token)

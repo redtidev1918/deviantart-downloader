@@ -13,6 +13,19 @@
 | [README (English)](https://github.com/redtidev1918/deviantart-downloader/blob/main/README.en.md) | Overview, install and usage |
 | [Login and authentication](LOGIN.md) | OAuth and cookie sign-in flows, mature-content handling, security notes |
 
+## Media download 403
+
+Media CDN 403 does not by itself mean the login expired. A dimension-bounded
+Wix signature may authorize the supplied fullview transform but reject the bare
+baseUri. The downloader selects that fullview with an explicit warning that it
+is a DA display version, not the uploaded original. It does not alter quality
+parameters, re-encode bytes, or silently substitute a small preview. Original
+download endpoints retain priority; GIF and video selection is unchanged.
+Sidecars record `representation: fullview` and `original_available: false`;
+resolve JSON includes `representation: fullview`. Both web main images and extra
+pages share `da_downloader/wix_media.py`, covered by the real-response fixtures
+documented in `tests/fixtures/deviantart-bounded-media-evidence.md`.
+
 ## Links
 
 - Repository: <https://github.com/redtidev1918/deviantart-downloader>

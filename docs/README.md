@@ -271,7 +271,9 @@ A: 请升级到 **v3.4.0+**。旧版本只下载 Featured（精选）文件夹�
 A: 请升级到 **v3.4.0+**（`pip install -U devart-dl`），安装入口已修复。
 
 **Q: 出现 403 Forbidden？**
-A: 通常是未登录或 Cookie 过期。优先 `devart-dl login oauth`（官方 API）；或 `devart-dl login interactive` 更新 Cookie。
+A: 先区分网页/API 拒绝与媒体 CDN 拒绝；403 本身不能证明登录过期。若媒体签名只授权尺寸受限的图片变体，裸 `baseUri` 会失败，即使刚取得签名且网页登录有效。此时工具选择响应提供的 fullview，并提示它是 DA 展示版本、非上传原文件；不修改服务端质量参数、不重编码、不自动换成小预览。真正的原文件下载端点仍优先于 fullview；只有确认会话失效时才重新登录。
+
+fullview 的下载 sidecar 带 `representation: fullview` 和 `original_available: false`；`resolve` 的媒体项带 `representation: fullview`，避免把展示版本误当作上传原文件。该选择由共享的 `da_downloader/wix_media.py` 完成，网页主图和附加页复用同一规则，GIF 与视频保留原处理方式。回归样本取自 2026-10-29 真实 init 响应，详见 `tests/fixtures/deviantart-bounded-media-evidence.md`，测试为 `tests/test_bounded_media.py`。
 
 **Q: 出现 429 Too Many Requests？**
 A: 使用官方 API（OAuth 登录）通常不会触发；Cookie 路径下会自动退避重试，若仍频繁 429，请暂停一段时间再试。
