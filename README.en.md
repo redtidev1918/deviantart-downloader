@@ -18,6 +18,8 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes.
 
 ## Core Features
 
+- **Media version labels** — 4.4.3 fixes CDN 403 for some images and additional pages; DA fullview display versions are explicitly labeled in warnings, download metadata and resolve output, while original-download endpoints retain priority.
+
 - **Official API first (OAuth)** — log in once to download originals; no cookie export, no anti-ban delays.
 - **URL-first** — `devart-dl URL` downloads artworks / galleries / favourites / tags / fav.me links directly.
 - **Literature support** — extracts inline literature/journal bodies and saves them as UTF-8 `.txt`, with media and text handled by the same pipeline.
