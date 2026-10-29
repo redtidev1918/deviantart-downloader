@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.3](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.2...v4.4.3) (2026-10-29)
+
+
+### Bug Fixes
+
+* download bounded media with explicit fullview labels ([#49](https://github.com/redtidev1918/deviantart-downloader/issues/49)) ([eb301c7](https://github.com/redtidev1918/deviantart-downloader/commit/eb301c72bc19ccdf9fb71dce19924a769720ece9))
+
+
+### Documentation
+
+* refresh download page (v4.4.2) ([14b7291](https://github.com/redtidev1918/deviantart-downloader/commit/14b7291b190a245975715c17bfbfea3f1d9645cf))
+
 ## [4.4.2](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.1...v4.4.2) (2026-10-13)
 
 
