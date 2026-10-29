@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.4](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.3...v4.4.4) (2026-10-29)
+
+
+### Documentation
+
+* explain media versions and original download priority ([8164784](https://github.com/redtidev1918/deviantart-downloader/commit/8164784a83e1d428a834e4eedd2fe05d6135643e))
+* refresh download page (v4.4.3) ([840e8fa](https://github.com/redtidev1918/deviantart-downloader/commit/840e8fab2abf5cb087e7194f1b52f373d492c9bd))
+
 ## [4.4.3](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.2...v4.4.3) (2026-10-29)
 
 
