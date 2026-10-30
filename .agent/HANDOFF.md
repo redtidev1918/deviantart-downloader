@@ -1,5 +1,11 @@
 # 会话交接
 
+### 2026-10-31 文档站迁移
+
+- 从最新远端新克隆接入 VitePress 1.6.4，Node 22 构建；static.yml 重命名备份停用，新增 docs.yml 与独立 PR 文档构建检查。
+- 原9份 Markdown、旧 index/vendor 均保留；语言切换使用主题菜单。下载页通过真实 v4.4.5 JSON 本地回放，保留 pip 安装说明，提交后由 docs.yml 重建。
+- 应用源码、Python 依赖和版本未改，不发布新包。备份位于工作区外 backups/deviantart-downloader-4af109136801；PR CI及合并后 Pages 上线另行验收。
+
 > 每次 Coding Agent 会话结束时追加一节，只记本会话发生的事实与下一步入口。跨会话状态在 [STATUS.md](STATUS.md)，任务在 [TASKS.md](TASKS.md)。
 
 ## 条目模板

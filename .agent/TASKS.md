@@ -7,6 +7,7 @@
 | T-001 | 建立 `.agent/` 六件套 | DONE | 2026-10-29 建立，参照 DAViewer / PixivFlow / DeviantDrop 同名体系；同日经用户确认以 `docs:` 提交入库。 |
 | T-002 | 登录态 CLI 真实下载验收（bounded 作品） | DEFERRED | 4.4.3 修复只做了测试与 fixture 冒烟；随真实使用顺带验证，不单独立项。 |
 | T-003 | 同步 `__init__.py` 源码回退版本号 | DEFERRED | 当前 `4.3.0` 落后 pyproject；按 `RELEASING.md` 约定随下次发版顺带同步。 |
+| T-004 | VitePress 文档站迁移 | IN_PROGRESS | Node 22 构建、原文档保留与下载页离线回放；PR CI和合并后的Pages验收待完成，不发布应用。 |
 
 ## 更新规则
 

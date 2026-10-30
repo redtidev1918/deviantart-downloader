@@ -1,0 +1,11 @@
+{
+  "repo": "redtidev1918/deviantart-downloader",
+  "name": "DA Downloader",
+  "emoji": "📥",
+  "description": "DeviantArt Downloader 文档：安装、登录认证、下载归档与维护。",
+  "branch": "main",
+  "engine": "vitepress",
+  "engineVersion": "1.6.4",
+  "version": 2,
+  "themeKey": "da-downloader-theme"
+}
