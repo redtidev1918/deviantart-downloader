@@ -143,3 +143,7 @@ dmypy.json
 !cookies.txt.example
 !config.example.yaml
 !.env.example
+
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

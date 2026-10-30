@@ -2,5 +2,3 @@
   - [Overview](/en/)
   - [Download](/en/download.md)
   - [Login and Authentication](/en/LOGIN.md)
-- 中文
-  - [中文文档](/)
