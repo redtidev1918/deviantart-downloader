@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.6](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.5...v4.4.6) (2026-10-31)
+
+
+### Documentation
+
+* **agent:** record download-page asset-table toggle delivery ([#58](https://github.com/redtidev1918/deviantart-downloader/issues/58)) ([0def9e9](https://github.com/redtidev1918/deviantart-downloader/commit/0def9e9f9aeb8a90eb3cd958f0d40e28ec34fb96))
+* fix docs-site links left over from the docsify era ([#56](https://github.com/redtidev1918/deviantart-downloader/issues/56)) ([6957712](https://github.com/redtidev1918/deviantart-downloader/commit/695771218006fc851006c0c85675577e4fcfed0f))
+* migrate documentation site to VitePress ([f7ddb8c](https://github.com/redtidev1918/deviantart-downloader/commit/f7ddb8ca046b2eb518f561fcb2e3b6a04dfda019))
+* migrate documentation site to VitePress ([13532d7](https://github.com/redtidev1918/deviantart-downloader/commit/13532d7cbd653e827010e3f9fbd53356d5496656))
+* migrate documentation site to VitePress [skip ci] ([f7ddb8c](https://github.com/redtidev1918/deviantart-downloader/commit/f7ddb8ca046b2eb518f561fcb2e3b6a04dfda019))
+* refresh download page (v4.4.5) ([4af1091](https://github.com/redtidev1918/deviantart-downloader/commit/4af109136801b589893d247ac91a15ad9055e63d))
+* retain inactive deployment workflow backup ([e79d304](https://github.com/redtidev1918/deviantart-downloader/commit/e79d3048653d24ac4143dd8e07f8f8ff72154a48))
+* 下载入口 PyPI 优先，补英文下载页安装指引 ([#54](https://github.com/redtidev1918/deviantart-downloader/issues/54)) ([cf1f968](https://github.com/redtidev1918/deviantart-downloader/commit/cf1f968ecf144a8fa8f622f234702ed699152e00))
+* 下载页精简为安装指引，生成器停用资产表 ([#57](https://github.com/redtidev1918/deviantart-downloader/issues/57)) ([f650a7c](https://github.com/redtidev1918/deviantart-downloader/commit/f650a7cd36741b654600390c89cc7be09c85f84d))
+
 ## [4.4.5](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.4...v4.4.5) (2026-10-29)
 
 
