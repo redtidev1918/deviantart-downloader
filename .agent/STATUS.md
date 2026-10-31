@@ -15,6 +15,8 @@
 
 ## 当前无阻塞
 
+下载页生成器治理见 T-006：docsite 上游 `showAssetTable` 配置（默认字节不变）落地本仓，双语下载页主体为「版本头 + PyPI 安装 + 首次使用 + 离线安装与历史版本 + 更新日志」，不再出现技术附件表；下次真实发版时观察重新生成后结构保持。
+
 下载入口 PyPI 优先治理见 T-005：英文下载页补齐推荐安装指引（en preview 注入），安装命令全线统一为 `python -m pip install -U devart-dl`；v4.4.5 Release 正文改为 PyPI 安装优先，`releasegraph-post-release` 标记逐字节保留。发布/构建流程未动。
 
 文档站迁移见 T-004：VitePress 1.6.4、Node 22 构建、新 docs.yml，旧 static.yml 保留为停用备份。下载页使用真实 v4.4.5 JSON 本地回放；应用代码和 Python 包版本未改。PR CI及合并后的上线验收待完成。
