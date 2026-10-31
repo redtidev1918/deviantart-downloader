@@ -39,7 +39,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes.
 Requires Python 3.10 or newer.
 
 ```bash
-pip install devart-dl
+python -m pip install -U devart-dl
 ```
 
 ### Basic Usage (URL-first)

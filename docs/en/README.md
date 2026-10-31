@@ -28,6 +28,7 @@ documented in `tests/fixtures/deviantart-bounded-media-evidence.md`.
 
 ## Links
 
+- PyPI: <https://pypi.org/project/devart-dl/>
 - Repository: <https://github.com/redtidev1918/deviantart-downloader>
 - Releases: <https://github.com/redtidev1918/deviantart-downloader/releases>
 - Changelog: <https://github.com/redtidev1918/deviantart-downloader/blob/main/CHANGELOG.md>
