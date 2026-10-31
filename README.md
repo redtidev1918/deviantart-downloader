@@ -52,9 +52,9 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 不会当作登出，也不会清除 Cookie；只有明确的未登录证据才提示刷新登录。
 这一步只诊断错误，不自动重试下载，也不保证已登录账号有权访问所有作品。
 
-完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/#/LOGIN)**。
+完整图文式步骤见 **[登录与认证教程](https://redtidev1918.github.io/deviantart-downloader/LOGIN)**。
 
-> 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#/?id=github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
+> 普通用户无需手动下载 GitHub Release 里的 `.whl`、`.tar.gz` 或 Source code，运行上面的 `pip install` 即可。文件区别和 SHA256 校验方法见[完整文档](https://redtidev1918.github.io/deviantart-downloader/#github-release-%e9%87%8c%e7%9a%84%e6%96%87%e4%bb%b6%e6%98%af%e4%bb%80%e4%b9%88)。
 
 ## 功能
 
@@ -74,7 +74,7 @@ devart-dl login browser   # 打开你的 Chrome 登录，自动保存 Cookie，�
 
 | 你想做什么 | 文档 |
 | --- | --- |
-| 下载安装包 | [下载页](https://redtidev1918.github.io/deviantart-downloader/download.md) |
+| 下载安装包 | [下载页](https://redtidev1918.github.io/deviantart-downloader/download) |
 | 登录与认证 | [登录与认证](docs/LOGIN.md) |
 | 命令、配置与 Python 调用 | [文档站](https://redtidev1918.github.io/deviantart-downloader/) |
 
