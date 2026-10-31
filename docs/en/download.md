@@ -12,6 +12,10 @@ GitHub Actions generates this page from release assets. If the page has not been
 
 [Release notes and checksums](https://github.com/redtidev1918/deviantart-downloader/releases/tag/v4.4.5)
 
+> 🐍 **Recommended install**: `python -m pip install -U devart-dl` (from PyPI; dependencies and upgrades are handled automatically).
+> The `.whl` / `.tar.gz` below are this release's distribution files; for manual cases you can run
+> `python -m pip install devart_dl-<version>-py3-none-any.whl`.
+
 | Platform | File | Size | Download |
 |---|---|---|---|
 | All platforms | `RELEASE-METADATA.json` | 2 KB | [Download](https://github.com/redtidev1918/deviantart-downloader/releases/download/v4.4.5/RELEASE-METADATA.json) |
