@@ -29,7 +29,7 @@ jobs:
     # check on every release PR. Self-healing: once RELEASE_PLEASE_TOKEN (a real user
     # PAT) authors the release PR, this guard no longer matches and CI returns.
     if: (github.event_name != 'pull_request' || github.event.pull_request.user.login != 'github-actions[bot]') && (github.event_name != 'workflow_dispatch' || !(github.event.inputs.repair == 'true' && github.event.inputs.stage == 'pypi'))
-    uses: redtidev1918/releasegraph/.github/workflows/reusable-release.yml@6d6f4a4a0a7631b55ccc20b4b1f0e89969484b61 # ReleaseGraph v1.5.14
+    uses: redtidev1918/releasegraph/.github/workflows/reusable-release.yml@5936e83b80044e4ce8d644b68b0388e201a99e39 # ReleaseGraph v1.5.19
     with:
       version: ${{ inputs.version || '' }}
       dry_run: ${{ github.event_name == 'pull_request' || inputs.dry_run || false }}
@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "Could not confirm PyPI status for $RELEASE_VERSION; refusing to publish."
           exit 1
-      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         if: steps.probe.outputs.status == 'missing'
         with:
           packages-dir: dist
@@ -128,7 +128,7 @@ jobs:
       && (needs.publish-pypi.result == 'success' || needs.publish-pypi.result == 'skipped')
       && github.event_name != 'pull_request'
       && !(github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
-    uses: redtidev1918/releasegraph/.github/workflows/reusable-acknowledge.yml@ac8f202d5835861ffde472aa44a484c9099dc0fe
+    uses: redtidev1918/releasegraph/.github/workflows/reusable-acknowledge.yml@9f1789fa7cda31e4a1138e627b5d1d29e1f164de
     with:
       version: ${{ needs.release.outputs.version }}
     secrets: inherit
@@ -204,7 +204,7 @@ jobs:
         run: |
           echo "Could not confirm PyPI status for $RELEASE_VERSION; refusing to publish."
           exit 1
-      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         if: steps.probe.outputs.status == 'missing'
         with:
           packages-dir: dist
