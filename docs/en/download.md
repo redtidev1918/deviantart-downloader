@@ -1,14 +1,14 @@
 <!-- docsite-release-repo: redtidev1918/deviantart-downloader -->
-<!-- docsite-release-tag: v4.4.5 -->
+<!-- docsite-release-tag: v4.4.6 -->
 # Download deviantart-downloader
 
 **Language / 语言:** [中文](/download.md) · English
 
-<!-- docsite: generated from redtidev1918/deviantart-downloader release v4.4.5; do not edit by hand -->
+<!-- docsite: generated from redtidev1918/deviantart-downloader release v4.4.6; do not edit by hand -->
 
-## Latest version: `v4.4.5` (2026-10-30)
+## Latest version: `v4.4.6` (2026-11-01)
 
-[Release notes and checksums](https://github.com/redtidev1918/deviantart-downloader/releases/tag/v4.4.5)
+[Release notes and checksums](https://github.com/redtidev1918/deviantart-downloader/releases/tag/v4.4.6)
 
 ## Requirements
 
