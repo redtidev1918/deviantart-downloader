@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.7](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.6...v4.4.7) (2026-11-01)
+
+
+### Documentation
+
+* refresh download page (v4.4.6) ([695fe94](https://github.com/redtidev1918/deviantart-downloader/commit/695fe94f0a73b6012940983c803966a62fb3eff8))
+* sync managed workflows with fixed docsite template ([#60](https://github.com/redtidev1918/deviantart-downloader/issues/60)) ([d590d6e](https://github.com/redtidev1918/deviantart-downloader/commit/d590d6e05883031cd7fc5a0b4ccd98524a5771d4))
+
 ## [4.4.6](https://github.com/redtidev1918/deviantart-downloader/compare/v4.4.5...v4.4.6) (2026-10-31)
 
 
