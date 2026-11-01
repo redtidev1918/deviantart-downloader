@@ -24,3 +24,7 @@
 releasegraph 生成的说明是原始 commit 标题，不符合 AGENTS.md 双语用户向规范（v4.4.3 曾手工重写；维护版也需确认措辞，如 4.4.4 的「本次为维护版本」）。
 **防复发**：每次发布后 `gh release edit` 核对/修整（[DECISIONS.md](DECISIONS.md) D-0006）。
 **来源**：v4.4.3 说明修整记录、`RELEASING.md` 发布后核对节。
+
+## 托管文档工作流与 Dependabot
+
+Dependabot 单改托管 docs.yml 的 setup-node 主版本会触发 DRIFT（2026-11-01 审计）。先修 docsite 模板并合并，再固定新 SHA 和运行生成器；不关闭一致性检查。
